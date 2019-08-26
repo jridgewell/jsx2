@@ -139,7 +139,7 @@ module.exports = function({ types: t, template }) {
     if (path.isLiteral()) return true;
 
     if (path.isArrayExpression()) {
-      return path.get("elements").every(isLiteral);
+      return path.get('elements').every(isLiteral);
     }
 
     if (path.isObjectExpression()) {
@@ -193,6 +193,6 @@ module.exports = function({ types: t, template }) {
   }
 
   function cleanJSXText(node) {
-    return t.react.buildChildren({children: [node]}).pop();
+    return t.react.buildChildren({ children: [node] }).pop();
   }
 };
