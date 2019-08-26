@@ -1,0 +1,14 @@
+{
+  "name": "jsx2",
+  "version": "0.0.0",
+  "description": "Reimagining JSX, faster performance with less memory",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Justin Ridgewell <justin@ridgewell.name>",
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^3.16.4"
+  }
+}
