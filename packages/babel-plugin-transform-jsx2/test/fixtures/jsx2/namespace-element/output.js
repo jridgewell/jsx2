@@ -2,8 +2,7 @@ var _ref = {
   type: "xml:foo",
   key: null,
   ref: null,
-  props: null,
-  constructor: void 0
+  props: null
 };
 
 function test() {

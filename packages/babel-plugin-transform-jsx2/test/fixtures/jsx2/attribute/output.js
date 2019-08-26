@@ -4,8 +4,7 @@ var _ref = {
   ref: null,
   props: {
     attr: "foo"
-  },
-  constructor: void 0
+  }
 };
 
 function test() {

@@ -4,22 +4,19 @@ var _ref = {
   ref: null,
   props: {
     attr: jsx2.expression
-  },
-  constructor: void 0
+  }
 };
 var _ref2 = {
   type: "t",
   key: null,
   ref: null,
-  props: null,
-  constructor: void 0
+  props: null
 };
 var _ref3 = {
   type: "f",
   key: null,
   ref: null,
-  props: null,
-  constructor: void 0
+  props: null
 };
 
 function test() {

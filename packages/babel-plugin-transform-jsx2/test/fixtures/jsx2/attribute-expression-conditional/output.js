@@ -4,8 +4,7 @@ var _ref = {
   ref: null,
   props: {
     attr: jsx2.expression
-  },
-  constructor: void 0
+  }
 };
 
 function test() {

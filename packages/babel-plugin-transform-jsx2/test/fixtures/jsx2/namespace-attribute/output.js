@@ -4,8 +4,7 @@ var _ref = {
   ref: null,
   props: {
     "xml:foo": true
-  },
-  constructor: void 0
+  }
 };
 
 function test() {

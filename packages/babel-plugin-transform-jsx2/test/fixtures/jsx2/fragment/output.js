@@ -2,8 +2,7 @@ var _ref = {
   type: jsx2.Fragment,
   key: null,
   ref: null,
-  props: null,
-  constructor: void 0
+  props: null
 };
 
 function test() {

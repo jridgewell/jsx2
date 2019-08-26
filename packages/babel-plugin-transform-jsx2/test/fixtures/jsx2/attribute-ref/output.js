@@ -2,8 +2,7 @@ var _ref = {
   type: "div",
   key: null,
   ref: jsx2.expression,
-  props: null,
-  constructor: void 0
+  props: null
 };
 
 function test() {

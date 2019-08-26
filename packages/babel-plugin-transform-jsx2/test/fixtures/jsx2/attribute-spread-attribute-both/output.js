@@ -6,8 +6,7 @@ var _ref = {
     before: true
   }, jsx2.expression, {
     after: true
-  }],
-  constructor: void 0
+  }]
 };
 
 function test() {

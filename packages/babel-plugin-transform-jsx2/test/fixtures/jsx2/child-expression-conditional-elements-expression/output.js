@@ -4,8 +4,7 @@ var _ref = {
   ref: null,
   props: {
     children: [jsx2.expression]
-  },
-  constructor: void 0
+  }
 };
 var _ref2 = {
   type: "inner",
@@ -13,8 +12,7 @@ var _ref2 = {
   ref: null,
   props: {
     children: [jsx2.expression]
-  },
-  constructor: void 0
+  }
 };
 
 function test() {

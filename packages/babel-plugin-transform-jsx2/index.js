@@ -33,7 +33,6 @@ module.exports = function({ types: t, template }) {
       key: ${key},
       ref: ${ref},
       props: ${props},
-      constructor: void 0,
     })`;
     if (!root) return obj;
 

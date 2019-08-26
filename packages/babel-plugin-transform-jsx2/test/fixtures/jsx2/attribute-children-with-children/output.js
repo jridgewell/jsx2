@@ -4,8 +4,7 @@ var _ref = {
   ref: null,
   props: {
     children: ["real children"]
-  },
-  constructor: void 0
+  }
 };
 
 function test() {
