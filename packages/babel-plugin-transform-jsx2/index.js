@@ -129,30 +129,10 @@ module.exports = function({ types: t, template }) {
     if (value.isJSXElement() || value.isJSXFragment()) {
       return buildElement(value, quasis);
     }
-    if (isLiteral(value)) return value.node;
+    if (value.isLiteral()) return value.node;
 
     quasis.push(value.node);
     return template.expression.ast`jsx2.expression`;
-  }
-
-  function isLiteral(path) {
-    if (path.isLiteral()) return true;
-
-    if (path.isArrayExpression()) {
-      return path.get('elements').every(isLiteral);
-    }
-
-    if (path.isObjectExpression()) {
-      return path.get('properties').every(prop => {
-        if (prop.node.computed) {
-          if (!isLiteral(prop.get('key'))) return false;
-        }
-
-        return isLiteral(prop.get('value'));
-      });
-    }
-
-    return false;
   }
 
   function elementType(node, quasis) {

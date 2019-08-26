@@ -3,7 +3,7 @@ var _ref = {
   key: null,
   ref: null,
   props: {
-    children: [[1]]
+    children: [jsx2.expression]
   },
   constructor: void 0
 };
@@ -11,7 +11,7 @@ var _ref = {
 function test() {
   return {
     template: _ref,
-    quasis: [],
+    quasis: [[1]],
     constructor: void 0
   };
 }
