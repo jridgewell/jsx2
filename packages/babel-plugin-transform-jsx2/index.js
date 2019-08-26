@@ -77,7 +77,6 @@ module.exports = function({ types: t, template }) {
 
       objProps.push(t.objectProperty(convertJSXName(name), extractAttributeValue(value, quasis)));
     }
-    pushProps(objProps, objs);
 
     for (let i = 0; i < childPaths.length; i++) {
       const child = childPaths[i];
@@ -99,6 +98,7 @@ module.exports = function({ types: t, template }) {
       const c = t.arrayExpression(children.length ? children : childrenProp);
       objProps.push(t.objectProperty(t.identifier('children'), c));
     }
+    pushProps(objProps, objs);
 
     const props = objs.length
       ? objs.length === 1 && t.isObjectExpression(objs[0])
