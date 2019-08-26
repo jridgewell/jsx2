@@ -1,0 +1,27 @@
+{
+  "name": "babel-plugin-transform-jsx2",
+  "version": "0.0.0",
+  "description": "Reimagining JSX, faster performance with less memory",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/babel-plugin-transform-jsx2",
+  "keywords": [
+    "jsx",
+    "jsx2",
+    "babel-plugin"
+  ],
+  "author": "Justin Ridgewell <justin@ridgewell.name>",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/plugin-syntax-jsx": "7.2.0"
+  },
+  "devDependencies": {
+    "@babel/helper-plugin-test-runner": "7.1.0",
+    "jest": "24.9.0"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.0.0-0"
+  }
+}

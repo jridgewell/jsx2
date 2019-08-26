@@ -1,12 +1,17 @@
+const jsx = require('@babel/plugin-syntax-jsx');
+
 module.exports = function({ types: t, template }) {
-  const visitor = {
-    'JSXElement|JSXFragment'(path) {
-      path.replaceWith(buildElement(path));
-      path.get('properties.0.value').hoist();
+  return {
+    name: 'transform-jsx2',
+    inherits: jsx.default,
+
+    visitor: {
+      'JSXElement|JSXFragment'(path) {
+        path.replaceWith(buildElement(path));
+        path.get('properties.0.value').hoist();
+      },
     },
   };
-
-  return { visitor };
 
   function buildElement(path, quasis) {
     const root = quasis === undefined;
@@ -62,13 +67,13 @@ module.exports = function({ types: t, template }) {
       const name = attribute.get('name');
       const value = attribute.get('value');
 
-      if (name.isIdentifier({ name: 'key' })) {
+      if (name.isJSXIdentifier({ name: 'key' })) {
         key = extractAttributeValue(value, quasis);
         continue;
-      } else if (name.isIdentifier({ name: 'ref' })) {
+      } else if (name.isJSXIdentifier({ name: 'ref' })) {
         ref = extractAttributeValue(value, quasis);
         continue;
-      } else if (name.isIdentifier({ name: 'children' })) {
+      } else if (name.isJSXIdentifier({ name: 'children' })) {
         childrenProp = extractAttributeValue(value, quasis);
         continue;
       }
@@ -93,7 +98,7 @@ module.exports = function({ types: t, template }) {
     }
 
     if (children.length || childrenProp) {
-      const c = t.arrayExpression(children.length ? children : childrenProp);
+      const c = t.arrayExpression(children.length ? children : [childrenProp]);
       objProps.push(t.objectProperty(t.identifier('children'), c));
     }
     pushProps(objProps, objs);
@@ -120,20 +125,35 @@ module.exports = function({ types: t, template }) {
   }
 
   function extractValue(value, quasis) {
+    if (value.isJSXExpressionContainer()) value = value.get('expression');
+
     if (value.isJSXElement() || value.isJSXFragment()) {
       return buildElement(value, quasis);
     }
-    if (!value.isJSXExpressionContainer()) return value.node;
+    if (isLiteral(value)) return value.node;
 
-    const expression = value.get('expression');
-
-    if (expression.isJSXElement() || expression.isJSXFragment()) {
-      return buildElement(expression, quasis);
-    }
-    if (expression.isPure()) return expression.node;
-
-    quasis.push(expression.node);
+    quasis.push(value.node);
     return template.expression.ast`jsx2.expression`;
+  }
+
+  function isLiteral(path) {
+    if (path.isLiteral()) return true;
+
+    if (path.isArrayExpression()) {
+      return path.get("elements").every(isLiteral);
+    }
+
+    if (path.isObjectExpression()) {
+      return path.get('properties').every(prop => {
+        if (prop.node.computed) {
+          if (!isLiteral(prop.get('key'))) return false;
+        }
+
+        return isLiteral(prop.get('value'));
+      });
+    }
+
+    return false;
   }
 
   function elementType(node, quasis) {
