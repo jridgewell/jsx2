@@ -22,13 +22,13 @@ var _ref3 = {
 function test() {
   return {
     template: _ref,
-    quasis: [cond ? {
+    expressions: [cond ? {
       template: _ref2,
-      quasis: [],
+      expressions: [],
       constructor: void 0
     } : {
       template: _ref3,
-      quasis: [],
+      expressions: [],
       constructor: void 0
     }],
     constructor: void 0

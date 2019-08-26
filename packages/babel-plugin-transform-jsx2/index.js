@@ -13,19 +13,19 @@ module.exports = function({ types: t, template }) {
     },
   };
 
-  function buildElement(path, quasis) {
-    const root = quasis === undefined;
-    if (!quasis) quasis = [];
+  function buildElement(path, expressions) {
+    const root = expressions === undefined;
+    if (!expressions) expressions = [];
 
     const frag = path.isJSXFragment();
     const opening = path.get('openingElement');
     const type = frag
       ? template.expression.ast`jsx2.Fragment`
-      : elementType(convertJSXName(opening.get('name')), quasis);
+      : elementType(convertJSXName(opening.get('name')), expressions);
     const { props, key, ref } = buildProps(
       frag ? [] : opening.get('attributes'),
       path.get('children'),
-      quasis
+      expressions
     );
 
     const obj = template.expression.ast`({
@@ -38,12 +38,12 @@ module.exports = function({ types: t, template }) {
 
     return template.expression.ast`({
       template: ${obj},
-      quasis: ${t.arrayExpression(quasis)},
+      expressions: ${t.arrayExpression(expressions)},
       constructor: void 0,
     })`;
   }
 
-  function buildProps(attributePaths, childPaths, quasis) {
+  function buildProps(attributePaths, childPaths, expressions) {
     const children = [];
     let key = t.nullLiteral();
     let ref = t.nullLiteral();
@@ -56,7 +56,7 @@ module.exports = function({ types: t, template }) {
 
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
-        quasis.push(attribute.node.argument);
+        expressions.push(attribute.node.argument);
         objs.push(template.expression.ast`jsx2.expression`);
         continue;
       }
@@ -65,17 +65,17 @@ module.exports = function({ types: t, template }) {
       const value = attribute.get('value');
 
       if (name.isJSXIdentifier({ name: 'key' })) {
-        key = extractAttributeValue(value, quasis);
+        key = extractAttributeValue(value, expressions);
         continue;
       } else if (name.isJSXIdentifier({ name: 'ref' })) {
-        ref = extractAttributeValue(value, quasis);
+        ref = extractAttributeValue(value, expressions);
         continue;
       } else if (name.isJSXIdentifier({ name: 'children' })) {
-        childrenProp = extractAttributeValue(value, quasis);
+        childrenProp = extractAttributeValue(value, expressions);
         continue;
       }
 
-      objProps.push(t.objectProperty(convertJSXName(name), extractAttributeValue(value, quasis)));
+      objProps.push(t.objectProperty(convertJSXName(name), extractAttributeValue(value, expressions)));
     }
 
     for (let i = 0; i < childPaths.length; i++) {
@@ -87,12 +87,12 @@ module.exports = function({ types: t, template }) {
       }
 
       if (child.isJSXSpreadChild()) {
-        quasis.push(t.arrayExpression([t.spreadElement(child.node.expression)]));
+        expressions.push(t.arrayExpression([t.spreadElement(child.node.expression)]));
         children.push(template.expression.ast`jsx2.expression`);
         continue;
       }
 
-      children.push(extractValue(child, quasis));
+      children.push(extractValue(child, expressions));
     }
 
     if (children.length || childrenProp) {
@@ -117,24 +117,24 @@ module.exports = function({ types: t, template }) {
     return [];
   }
 
-  function extractAttributeValue(value, quasis) {
+  function extractAttributeValue(value, expressions) {
     if (!value.node) return t.booleanLiteral(true);
-    return extractValue(value, quasis);
+    return extractValue(value, expressions);
   }
 
-  function extractValue(value, quasis) {
+  function extractValue(value, expressions) {
     if (value.isJSXExpressionContainer()) value = value.get('expression');
 
     if (value.isJSXElement() || value.isJSXFragment()) {
-      return buildElement(value, quasis);
+      return buildElement(value, expressions);
     }
     if (value.isLiteral()) return value.node;
 
-    quasis.push(value.node);
+    expressions.push(value.node);
     return template.expression.ast`jsx2.expression`;
   }
 
-  function elementType(node, quasis) {
+  function elementType(node, expressions) {
     if (t.isStringLiteral(node)) return node;
 
     if (t.isIdentifier(node)) {
@@ -142,7 +142,7 @@ module.exports = function({ types: t, template }) {
       if (t.react.isCompatTag(name)) return t.stringLiteral(name);
     }
 
-    quasis.push(node);
+    expressions.push(node);
     return template.expression.ast`jsx2.expression`;
   }
 

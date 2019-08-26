@@ -8,7 +8,7 @@ var _ref = {
 function test() {
   return {
     template: _ref,
-    quasis: [this.foo],
+    expressions: [this.foo],
     constructor: void 0
   };
 }

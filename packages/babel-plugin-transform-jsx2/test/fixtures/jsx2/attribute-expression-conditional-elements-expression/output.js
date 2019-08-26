@@ -18,9 +18,9 @@ var _ref2 = {
 function test() {
   return {
     template: _ref,
-    quasis: [cond && {
+    expressions: [cond && {
       template: _ref2,
-      quasis: [x],
+      expressions: [x],
       constructor: void 0
     }],
     constructor: void 0

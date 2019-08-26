@@ -9,7 +9,7 @@ function test() {
   const ref = {};
   return {
     template: _ref,
-    quasis: [ref],
+    expressions: [ref],
     constructor: void 0
   };
 }

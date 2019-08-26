@@ -10,7 +10,7 @@ var _ref = {
 function test() {
   return {
     template: _ref,
-    quasis: [cond ? true : false],
+    expressions: [cond ? true : false],
     constructor: void 0
   };
 }

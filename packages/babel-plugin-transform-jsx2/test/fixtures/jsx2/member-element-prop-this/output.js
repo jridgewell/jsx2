@@ -8,7 +8,7 @@ var _ref = {
 function test() {
   return {
     template: _ref,
-    quasis: [xml.this],
+    expressions: [xml.this],
     constructor: void 0
   };
 }
