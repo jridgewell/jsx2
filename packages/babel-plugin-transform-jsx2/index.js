@@ -84,7 +84,8 @@ module.exports = function({ types: t, template }) {
     for (let i = 0; i < childPaths.length; i++) {
       const child = childPaths[i];
       if (child.isJSXText()) {
-        children.push(t.stringLiteral(child.node.value));
+        const text = cleanJSXText(child.node);
+        if (text) children.push(text);
         continue;
       }
 
@@ -191,5 +192,9 @@ module.exports = function({ types: t, template }) {
     }
 
     return t.identifier(node.name);
+  }
+
+  function cleanJSXText(node) {
+    return t.react.buildChildren({children: [node]}).pop();
   }
 };
