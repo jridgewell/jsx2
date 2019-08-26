@@ -1,0 +1,18 @@
+{
+  "name": "babel-plugin-local-plugin",
+  "version": "0.0.0",
+  "description": "Hacky little plugin to load a local babel plugin",
+  "author": "Justin Ridgewell <justin@ridgewell.name>",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/babel-plugin-local-plugin",
+  "keywords": [
+    "babel-plugin"
+  ],
+  "scripts": {
+    "test": ""
+  },
+  "bugs": {
+    "url": "https://github.com/jridgewell/jsx2/issues"
+  }
+}
