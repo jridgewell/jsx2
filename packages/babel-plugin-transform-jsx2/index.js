@@ -28,22 +28,20 @@ module.exports = function({ types: t, template }) {
       quasis
     );
 
-    const objProps = [
-      t.objectProperty(t.identifier('type'), type),
-      t.objectProperty(t.identifier('key'), key),
-      t.objectProperty(t.identifier('ref'), ref),
-      t.objectProperty(t.identifier('props'), props),
-      t.objectProperty(t.identifier('constructor'), path.scope.buildUndefinedNode()),
-    ];
-
-    const obj = t.objectExpression(objProps);
+    const obj = template.expression.ast`({
+      type: ${type},
+      key: ${key},
+      ref: ${ref},
+      props: ${props},
+      constructor: void 0,
+    })`;
     if (!root) return obj;
 
-    return t.objectExpression([
-      t.objectProperty(t.identifier('template'), obj),
-      t.objectProperty(t.identifier('quasis'), t.arrayExpression(quasis)),
-      t.objectProperty(t.identifier('constructor'), path.scope.buildUndefinedNode()),
-    ]);
+    return template.expression.ast`({
+      template: ${obj},
+      quasis: ${t.arrayExpression(quasis)},
+      constructor: void 0,
+    })`;
   }
 
   function buildProps(attributePaths, childPaths, quasis) {
