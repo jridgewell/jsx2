@@ -1,11 +1,8 @@
 module.exports = function({ types: t, template }) {
   const visitor = {
     'JSXElement|JSXFragment'(path) {
-      const obj = buildElement(path);
-      if (obj) {
-        path.replaceWith(obj);
-        path.get('properties.0.value').hoist();
-      }
+      path.replaceWith(buildElement(path));
+      path.get('properties.0.value').hoist();
     },
   };
 
@@ -40,6 +37,7 @@ module.exports = function({ types: t, template }) {
     return t.objectExpression([
       t.objectProperty(t.identifier('template'), obj),
       t.objectProperty(t.identifier('quasis'), t.arrayExpression(quasis)),
+      t.objectProperty(t.identifier('constructor'), path.scope.buildUndefinedNode()),
     ]);
   }
 
