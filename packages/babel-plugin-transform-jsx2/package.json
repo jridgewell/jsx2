@@ -9,7 +9,6 @@
   "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/babel-plugin-transform-jsx2",
   "keywords": [
     "jsx",
-    "jsx2",
     "babel-plugin"
   ],
   "author": "Justin Ridgewell <justin@ridgewell.name>",

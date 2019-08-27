@@ -1,0 +1,19 @@
+{
+  "name": "jsx2",
+  "version": "0.0.0",
+  "description": "Reimagining JSX, faster performance with less memory",
+  "keywords": [
+    "jsx"
+  ],
+  "author": "Justin Ridgewell <justin@ridgewell.name>",
+  "homepage": "",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/jsx2",
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
