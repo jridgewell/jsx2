@@ -1,6 +1,9 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }) {
+  const fragMarker = template.expression`jsx2.Fragment`;
+  const expressionMarker = template.expression`jsx2.expression`;
+
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -20,7 +23,7 @@ module.exports = function({ types: t, template }) {
     const frag = path.isJSXFragment();
     const opening = path.get('openingElement');
     const type = frag
-      ? template.expression.ast`jsx2.Fragment`
+      ? fragMarker()
       : elementType(convertJSXName(opening.get('name')), expressions);
     const { props, key, ref } = buildProps(
       frag ? [] : opening.get('attributes'),
@@ -57,7 +60,7 @@ module.exports = function({ types: t, template }) {
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
         expressions.push(attribute.node.argument);
-        objs.push(template.expression.ast`jsx2.expression`);
+        objs.push(expressionMarker());
         continue;
       }
 
@@ -88,7 +91,7 @@ module.exports = function({ types: t, template }) {
 
       if (child.isJSXSpreadChild()) {
         expressions.push(t.arrayExpression([t.spreadElement(child.node.expression)]));
-        children.push(template.expression.ast`jsx2.expression`);
+        children.push(expressionMarker());
         continue;
       }
 
@@ -131,7 +134,7 @@ module.exports = function({ types: t, template }) {
     if (value.isLiteral()) return value.node;
 
     expressions.push(value.node);
-    return template.expression.ast`jsx2.expression`;
+    return expressionMarker();
   }
 
   function elementType(node, expressions) {
@@ -143,7 +146,7 @@ module.exports = function({ types: t, template }) {
     }
 
     expressions.push(node);
-    return template.expression.ast`jsx2.expression`;
+    return expressionMarker();
   }
 
   function convertJSXName(name, root = true) {
