@@ -1,0 +1,55 @@
+{
+  "name": "jsx2",
+  "version": "0.0.0",
+  "description": "Reimagining JSX, faster performance with less memory",
+  "keywords": [
+    "jsx"
+  ],
+  "author": "Justin Ridgewell <justin@ridgewell.name>",
+  "homepage": "",
+  "license": "MIT",
+  "main": "dist/jsx2.umd.js",
+  "module": "dist/jsx2.mjs",
+  "typings": "dist/types/jsx2.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/jsx2",
+  "scripts": {
+    "lint:ts": "npm run test:lint:ts -- --fix",
+    "lint:prettier": "npm run test:lint:prettier -- --write",
+    "lint": "run-s -n lint:*",
+    "prebuild": "rm -rf dist",
+    "build:ts": "tsc --module commonjs",
+    "build:rollup": "rollup -c rollup.config.ts",
+    "build": "run-s -n build:*",
+    "test": "jest --coverage",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:watch": "jest --coverage --watch",
+    "test:lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
+    "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
+    "test:lint": "run-s -n test:lint:*",
+    "test:prod": "run-s -n test:lint 'test --no-cache'",
+    "preversion": "run-s test:prod build",
+    "prepublishOnly": "npm run preversion"
+  },
+  "devDependencies": {
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.2",
+    "jest": "24.9.0",
+    "jest-config": "24.9.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "1.18.2",
+    "rollup": "1.20.2",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-sourcemaps": "0.4.2",
+    "rollup-plugin-typescript": "1.0.1",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.3.0",
+    "tslint": "5.19.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-config-standard": "8.0.1",
+    "typescript": "3.5.3"
+  }
+}
