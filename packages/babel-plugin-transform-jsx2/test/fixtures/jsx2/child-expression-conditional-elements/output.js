@@ -21,13 +21,13 @@ var _ref3 = {
 
 function test() {
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [cond ? {
-      template: _ref2,
+      tree: _ref2,
       expressions: [],
       constructor: void 0
     } : {
-      template: _ref3,
+      tree: _ref3,
       expressions: [],
       constructor: void 0
     }],

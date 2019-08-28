@@ -31,16 +31,16 @@ module.exports = function({ types: t, template }) {
       expressions
     );
 
-    const obj = template.expression.ast`({
+    const tree = template.expression.ast`({
       type: ${type},
       key: ${key},
       ref: ${ref},
       props: ${props},
     })`;
-    if (!root) return obj;
+    if (!root) return tree;
 
     return template.expression.ast`({
-      template: ${obj},
+      tree: ${tree},
       expressions: ${t.arrayExpression(expressions)},
       constructor: void 0,
     })`;

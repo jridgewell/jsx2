@@ -9,7 +9,7 @@ var _ref = {
 
 function test() {
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [x],
     constructor: void 0
   };

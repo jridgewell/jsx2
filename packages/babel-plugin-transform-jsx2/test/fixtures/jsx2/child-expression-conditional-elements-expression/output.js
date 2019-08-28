@@ -17,9 +17,9 @@ var _ref2 = {
 
 function test() {
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [cond && {
-      template: _ref2,
+      tree: _ref2,
       expressions: [x],
       constructor: void 0
     }],

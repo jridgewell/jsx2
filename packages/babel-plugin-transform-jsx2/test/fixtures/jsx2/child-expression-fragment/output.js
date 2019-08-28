@@ -14,7 +14,7 @@ var _ref = {
 
 function test() {
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [],
     constructor: void 0
   };

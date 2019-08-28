@@ -8,7 +8,7 @@ var _ref = {
 function test() {
   const ref = {};
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [ref],
     constructor: void 0
   };

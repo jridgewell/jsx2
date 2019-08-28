@@ -7,7 +7,7 @@ var _ref = {
 
 function test() {
   return {
-    template: _ref,
+    tree: _ref,
     expressions: [this.foo],
     constructor: void 0
   };
