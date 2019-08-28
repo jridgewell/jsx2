@@ -1,1 +1,7 @@
-export default { constructor: void 0 };
+export {
+  expressionMarker,
+  createElement,
+  createTemplate,
+  createRef,
+  createElement as h,
+} from './create-element';

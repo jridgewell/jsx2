@@ -9,7 +9,6 @@
   "rules": {
     "no-any": true,
     "ordered-imports": true,
-    "object-literal-sort-keys": true,
     "typedef": [
       true,
       "call-signature",
