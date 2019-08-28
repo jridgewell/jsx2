@@ -78,7 +78,9 @@ module.exports = function({ types: t, template }) {
         continue;
       }
 
-      objProps.push(t.objectProperty(convertJSXName(name), extractAttributeValue(value, expressions)));
+      objProps.push(
+        t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, expressions))
+      );
     }
 
     for (let i = 0; i < childPaths.length; i++) {
