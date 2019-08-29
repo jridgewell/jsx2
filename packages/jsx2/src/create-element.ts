@@ -1,36 +1,46 @@
-type Marker = { readonly constructor: undefined };
+type Primitive = string | number | boolean | null | undefined;
+type Expression = Primitive | Template;
 type TagName = string | Marker;
-type Key = string | Marker | null;
-type PropValue = string | number | null | boolean | Marker | Node;
-type Props = {
-  readonly [key: string]: PropValue | PropValue[];
-};
-type Ref = { current: Element | null } | ((current: Element) => void);
+type Key = string | number | null | Marker;
+type Ref = RefObject | ((current: Element) => void);
+type PropValue = Primitive | Marker | Node | Ref;
 
-type Node = {
-  readonly type: string | Marker;
+interface Marker {
+  readonly constructor: undefined
+}
+
+interface Props {
+  readonly [key: string]: PropValue | PropValue[];
+}
+
+interface RefObject {
+  current: Element | null;
+}
+
+export interface Node {
+  readonly type: TagName;
   readonly key: Key;
   readonly ref: Ref | Marker | null;
   readonly props: Props | null;
-};
+}
 
-type Template = {
+export interface Template {
   readonly tree: Node;
-  readonly expressions: unknown[];
+  readonly expressions: Expression[];
   readonly constructor: undefined;
-};
+}
 
-export const expressionMarker = { constructor: void 0 } as const;
+export const expressionMarker: Marker = { constructor: void 0 } as const;
 
 export function createElement(type: TagName, key: Key, properties: null | Props): Node {
   const { ref = null, ...props } = properties || {} as Props;
-  return { type, key, ref: ref as unknown as Ref, props };
+  return { type, key, ref: ref as Ref, props };
 }
 
-export function createTemplate(tree: Node, expressions: unknown[]): Template {
+export function createTemplate(tree: Node, expressions: Expression[]): Template {
   return { tree, expressions, constructor: void 0 };
 }
 
-export function createRef(): Ref {
+export function createRef(): RefObject {
   return { current: null };
 }
