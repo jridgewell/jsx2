@@ -1,14 +1,20 @@
-var _ref = {
-  type: jsx2.Fragment,
-  key: null,
-  ref: null,
-  props: null
-};
-
 function test() {
   return {
-    tree: _ref,
+    tree: _template(jsx2),
     expressions: [],
     constructor: void 0
   };
+}
+
+function _template(jsx2) {
+  const tree = {
+    type: jsx2.Fragment,
+    key: null,
+    ref: null,
+    props: null
+  };
+
+  _template = () => tree;
+
+  return tree;
 }

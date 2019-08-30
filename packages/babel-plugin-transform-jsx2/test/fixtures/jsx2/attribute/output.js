@@ -1,16 +1,22 @@
-var _ref = {
-  type: "div",
-  key: null,
-  ref: null,
-  props: {
-    attr: "foo"
-  }
-};
-
 function test() {
   return {
-    tree: _ref,
+    tree: _template(jsx2),
     expressions: [],
     constructor: void 0
   };
+}
+
+function _template(jsx2) {
+  const tree = {
+    type: "div",
+    key: null,
+    ref: null,
+    props: {
+      attr: "foo"
+    }
+  };
+
+  _template = () => tree;
+
+  return tree;
 }

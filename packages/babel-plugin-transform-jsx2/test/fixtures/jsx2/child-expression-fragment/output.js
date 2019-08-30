@@ -1,21 +1,27 @@
-var _ref = {
-  type: "div",
-  key: null,
-  ref: null,
-  props: {
-    children: [{
-      type: jsx2.Fragment,
-      key: null,
-      ref: null,
-      props: null
-    }]
-  }
-};
-
 function test() {
   return {
-    tree: _ref,
+    tree: _template(jsx2),
     expressions: [],
     constructor: void 0
   };
+}
+
+function _template(jsx2) {
+  const tree = {
+    type: "div",
+    key: null,
+    ref: null,
+    props: {
+      children: [{
+        type: jsx2.Fragment,
+        key: null,
+        ref: null,
+        props: null
+      }]
+    }
+  };
+
+  _template = () => tree;
+
+  return tree;
 }

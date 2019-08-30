@@ -11,7 +11,6 @@ module.exports = function({ types: t, template }) {
     visitor: {
       'JSXElement|JSXFragment'(path) {
         path.replaceWith(buildElement(path));
-        path.get('properties.0.value').hoist();
       },
     },
   };
@@ -39,8 +38,17 @@ module.exports = function({ types: t, template }) {
     })`;
     if (!root) return tree;
 
+    const id = path.scope.generateUidIdentifier('template');
+    const lazyTree = template.statement.ast`function ${id}(jsx2) {
+      const tree = ${tree};
+      ${id} = () => tree;
+      return tree;
+    }`;
+    const program = path.findParent(p => p.isProgram());
+    program.pushContainer('body', lazyTree);
+
     return template.expression.ast`({
-      tree: ${tree},
+      tree: ${id}(jsx2),
       expressions: ${t.arrayExpression(expressions)},
       constructor: void 0,
     })`;
@@ -108,8 +116,8 @@ module.exports = function({ types: t, template }) {
 
     const props = objs.length
       ? objs.length === 1 && t.isObjectExpression(objs[0])
-        ? objs[0]
-        : t.arrayExpression(objs)
+      ? objs[0]
+      : t.arrayExpression(objs)
       : t.nullLiteral();
 
     return { key, ref, props };
