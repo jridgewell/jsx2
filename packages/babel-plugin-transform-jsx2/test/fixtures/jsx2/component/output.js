@@ -9,12 +9,8 @@ function test() {
         id: foo,
         bar: bar,
         children: [{
-          type: "span",
-          key: null,
-          ref: null,
-          props: {
-            children: [text]
-          },
+          tree: _template2(jsx2),
+          expressions: [text],
           constructor: void 0
         }]
       },
@@ -26,7 +22,7 @@ function test() {
 
 function Component(props) {
   return {
-    tree: _template2(jsx2),
+    tree: _template3(jsx2),
     expressions: [props.id, props.bar, props.children],
     constructor: void 0
   };
@@ -66,6 +62,30 @@ function _template(jsx2) {
 
 function _template2(jsx2) {
   const tree = {
+    type: jsx2.Fragment,
+    key: null,
+    ref: null,
+    props: {
+      children: [{
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: [jsx2.expression]
+        },
+        constructor: void 0
+      }]
+    },
+    constructor: void 0
+  };
+
+  _template2 = () => tree;
+
+  return tree;
+}
+
+function _template3(jsx2) {
+  const tree = {
     type: "foo",
     key: null,
     ref: null,
@@ -93,7 +113,7 @@ function _template2(jsx2) {
     constructor: void 0
   };
 
-  _template2 = () => tree;
+  _template3 = () => tree;
 
   return tree;
 }

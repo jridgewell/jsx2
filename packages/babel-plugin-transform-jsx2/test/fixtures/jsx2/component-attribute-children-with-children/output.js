@@ -6,7 +6,11 @@ function test() {
       key: null,
       ref: null,
       props: {
-        children: ["real children"]
+        children: [{
+          tree: _template2(jsx2),
+          expressions: [],
+          constructor: void 0
+        }]
       },
       constructor: void 0
     }],
@@ -26,6 +30,22 @@ function _template(jsx2) {
   };
 
   _template = () => tree;
+
+  return tree;
+}
+
+function _template2(jsx2) {
+  const tree = {
+    type: jsx2.Fragment,
+    key: null,
+    ref: null,
+    props: {
+      children: ["real children"]
+    },
+    constructor: void 0
+  };
+
+  _template2 = () => tree;
 
   return tree;
 }
