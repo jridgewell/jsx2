@@ -1,20 +1,3 @@
 function test() {
-  return {
-    tree: _template(jsx2),
-    expressions: [this.foo],
-    constructor: void 0
-  };
-}
-
-function _template(jsx2) {
-  const tree = {
-    type: jsx2.expression,
-    key: null,
-    ref: null,
-    props: null
-  };
-
-  _template = () => tree;
-
-  return tree;
+  return <this.foo></this.foo>;
 }

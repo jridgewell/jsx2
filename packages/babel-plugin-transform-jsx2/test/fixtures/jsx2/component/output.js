@@ -1,0 +1,77 @@
+function test() {
+  return {
+    tree: _template(jsx2),
+    expressions: [before, <Component id={foo} bar={bar}>
+      <span>{text}</span>
+    </Component>, after],
+    constructor: void 0
+  };
+}
+
+function Component(props) {
+  return {
+    tree: _template2(jsx2),
+    expressions: [props.id, props.bar, props.children],
+    constructor: void 0
+  };
+}
+
+function _template(jsx2) {
+  const tree = {
+    type: "div",
+    key: null,
+    ref: null,
+    props: {
+      children: [{
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: [jsx2.expression]
+        }
+      }, jsx2.expression, {
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: [jsx2.expression]
+        }
+      }]
+    }
+  };
+
+  _template = () => tree;
+
+  return tree;
+}
+
+function _template2(jsx2) {
+  const tree = {
+    type: "foo",
+    key: null,
+    ref: null,
+    props: {
+      id: jsx2.expression,
+      bar: jsx2.expression,
+      children: [{
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: ["before"]
+        }
+      }, jsx2.expression, {
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: ["after"]
+        }
+      }]
+    }
+  };
+
+  _template2 = () => tree;
+
+  return tree;
+}

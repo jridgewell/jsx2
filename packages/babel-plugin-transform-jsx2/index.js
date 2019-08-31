@@ -9,7 +9,15 @@ module.exports = function({ types: t, template }) {
     inherits: jsx.default,
 
     visitor: {
-      'JSXElement|JSXFragment'(path) {
+      JSXFragment(path) {
+        path.replaceWith(buildElement(path));
+      },
+
+      JSXElement(path) {
+        if (isComponentRoot(path)) {
+          path.skip();
+          return;
+        }
         path.replaceWith(buildElement(path));
       },
     },
@@ -23,7 +31,13 @@ module.exports = function({ types: t, template }) {
     const opening = path.get('openingElement');
     const type = frag
       ? fragMarker()
-      : elementType(convertJSXName(opening.get('name')), expressions);
+      : elementType(convertJSXName(opening.get('name')), root, expressions);
+
+    if (!type) {
+      expressions.push(path.node);
+      return expressionMarker();
+    }
+
     const { props, key, ref } = buildProps(
       frag ? [] : opening.get('attributes'),
       path.get('children'),
@@ -147,7 +161,7 @@ module.exports = function({ types: t, template }) {
     return expressionMarker();
   }
 
-  function elementType(node, expressions) {
+  function elementType(node, root, expressions) {
     if (t.isStringLiteral(node)) return node;
 
     if (t.isIdentifier(node)) {
@@ -155,8 +169,13 @@ module.exports = function({ types: t, template }) {
       if (t.react.isCompatTag(name)) return t.stringLiteral(name);
     }
 
-    expressions.push(node);
-    return expressionMarker();
+    if (root) {
+      throw new Error('foo');
+      expressions.push(node);
+      return expressionMarker();
+    }
+
+    return null;
   }
 
   function convertJSXName(name, root = true) {
@@ -186,5 +205,12 @@ module.exports = function({ types: t, template }) {
 
   function cleanJSXText(node) {
     return t.react.buildChildren({ children: [node] }).pop();
+  }
+
+  function isComponentRoot(path) {
+    const name = convertJSXName(path.get('openingElement.name'));
+    if (t.isStringLiteral(name)) return false;
+    if (t.isMemberExpression(name)) return true;
+    return !t.react.isCompatTag(name.name);
   }
 };
