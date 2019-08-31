@@ -1,24 +1,11 @@
 function test() {
-  return {
-    tree: _template(jsx2),
-    expressions: [cond && {
-      tree: _template2(jsx2),
-      expressions: [x],
-      constructor: void 0
-    }],
-    constructor: void 0
-  };
+  return jsx2.template(_template(jsx2), [cond && jsx2.template(_template2(jsx2), [x])]);
 }
 
 function _template(jsx2) {
-  const tree = {
-    type: "div",
-    key: null,
-    ref: null,
-    props: {
-      children: [jsx2.expression]
-    }
-  };
+  const tree = jsx2.createElement("div", null, null, {
+    children: [jsx2.expression]
+  });
 
   _template = () => tree;
 
@@ -26,14 +13,9 @@ function _template(jsx2) {
 }
 
 function _template2(jsx2) {
-  const tree = {
-    type: "inner",
-    key: null,
-    ref: null,
-    props: {
-      children: [jsx2.expression]
-    }
-  };
+  const tree = jsx2.createElement("inner", null, null, {
+    children: [jsx2.expression]
+  });
 
   _template2 = () => tree;
 

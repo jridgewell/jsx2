@@ -1,20 +1,11 @@
 function test() {
-  return {
-    tree: _template(jsx2),
-    expressions: [x],
-    constructor: void 0
-  };
+  return jsx2.template(_template(jsx2), [x]);
 }
 
 function _template(jsx2) {
-  const tree = {
-    type: jsx2.Fragment,
-    key: null,
-    ref: null,
-    props: {
-      children: [jsx2.expression]
-    }
-  };
+  const tree = jsx2.createElement(jsx2.Fragment, null, null, {
+    children: [jsx2.expression]
+  });
 
   _template = () => tree;
 

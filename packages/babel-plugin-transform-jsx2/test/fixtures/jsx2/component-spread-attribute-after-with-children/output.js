@@ -1,33 +1,14 @@
 function test() {
-  return {
-    tree: _template(jsx2),
-    expressions: [{
-      type: Component,
-      key: null,
-      ref: null,
-      props: [s, {
-        after: true,
-        children: [{
-          tree: _template2(jsx2),
-          expressions: [],
-          constructor: void 0
-        }]
-      }],
-      constructor: void 0
-    }],
-    constructor: void 0
-  };
+  return jsx2.template(_template(jsx2), [jsx2.createElement(Component, null, null, [s, {
+    after: true,
+    children: [jsx2.template(_template2(jsx2), [])]
+  }])]);
 }
 
 function _template(jsx2) {
-  const tree = {
-    type: "div",
-    key: null,
-    ref: null,
-    props: {
-      children: [jsx2.expression]
-    }
-  };
+  const tree = jsx2.createElement("div", null, null, {
+    children: [jsx2.expression]
+  });
 
   _template = () => tree;
 
@@ -35,14 +16,9 @@ function _template(jsx2) {
 }
 
 function _template2(jsx2) {
-  const tree = {
-    type: jsx2.Fragment,
-    key: null,
-    ref: null,
-    props: {
-      children: ["text"]
-    }
-  };
+  const tree = jsx2.createElement(jsx2.Fragment, null, null, {
+    children: ["text"]
+  });
 
   _template2 = () => tree;
 

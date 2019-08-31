@@ -20,30 +20,26 @@ module.exports = function({ types: t, template }) {
       const frag = wrapChildrenInFragment(path);
       if (frag) frag.replaceWith(buildTemplate(frag));
 
-      const el = buildElement(path);
-      el.properties.push(
-        t.objectProperty(t.identifier('constructor'), path.scope.buildUndefinedNode())
-      );
-      return el;
+      return buildElement(path);
     }
 
     const expressions = [];
     const tree = buildElement(path, expressions);
 
     const id = path.scope.generateUidIdentifier('template');
-    const lazyTree = template.statement.ast`function ${id}(jsx2) {
-      const tree = ${tree};
-      ${id} = () => tree;
-      return tree;
-    }`;
+    const lazyTree = template.statement.ast`
+      function ${id}(jsx2) {
+        const tree = ${tree};
+        ${id} = () => tree;
+        return tree;
+      }
+    `;
     const program = path.findParent(p => p.isProgram());
     program.pushContainer('body', lazyTree);
 
-    return template.expression.ast`({
-      tree: ${id}(jsx2),
-      expressions: ${t.arrayExpression(expressions)},
-      constructor: void 0,
-    })`;
+    return template.expression.ast`
+      jsx2.template(${id}(jsx2), ${t.arrayExpression(expressions)})
+    `;
   }
 
   function buildElement(path, expressions) {
@@ -61,12 +57,9 @@ module.exports = function({ types: t, template }) {
       expressions
     );
 
-    return template.expression.ast`({
-      type: ${type},
-      key: ${key},
-      ref: ${ref},
-      props: ${props},
-    })`;
+    return template.expression.ast`
+      jsx2.createElement(${type}, ${key}, ${ref}, ${props})
+    `;
   }
 
   function buildProps(attributePaths, childPaths, expressions) {

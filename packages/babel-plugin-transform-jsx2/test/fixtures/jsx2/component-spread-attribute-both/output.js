@@ -1,30 +1,15 @@
 function test() {
-  return {
-    tree: _template(jsx2),
-    expressions: [{
-      type: Component,
-      key: null,
-      ref: null,
-      props: [{
-        before: true
-      }, s, {
-        after: true
-      }],
-      constructor: void 0
-    }],
-    constructor: void 0
-  };
+  return jsx2.template(_template(jsx2), [jsx2.createElement(Component, null, null, [{
+    before: true
+  }, s, {
+    after: true
+  }])]);
 }
 
 function _template(jsx2) {
-  const tree = {
-    type: "div",
-    key: null,
-    ref: null,
-    props: {
-      children: [jsx2.expression]
-    }
-  };
+  const tree = jsx2.createElement("div", null, null, {
+    children: [jsx2.expression]
+  });
 
   _template = () => tree;
 

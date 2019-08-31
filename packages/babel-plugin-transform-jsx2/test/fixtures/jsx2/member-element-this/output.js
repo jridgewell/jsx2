@@ -1,9 +1,3 @@
 function test() {
-  return {
-    type: this.foo,
-    key: null,
-    ref: null,
-    props: null,
-    constructor: void 0
-  };
+  return jsx2.createElement(this.foo, null, null, null);
 }
