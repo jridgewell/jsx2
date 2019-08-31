@@ -1,9 +1,23 @@
 function test() {
   return {
     tree: _template(jsx2),
-    expressions: [before, <Component id={foo} bar={bar}>
-      <span>{text}</span>
-    </Component>, after],
+    expressions: [before, {
+      type: Component,
+      key: null,
+      ref: null,
+      props: {
+        id: foo,
+        bar: bar,
+        children: [{
+          type: "span",
+          key: null,
+          ref: null,
+          props: {
+            children: [text]
+          }
+        }]
+      }
+    }, after],
     constructor: void 0
   };
 }

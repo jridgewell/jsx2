@@ -9,48 +9,19 @@ module.exports = function({ types: t, template }) {
     inherits: jsx.default,
 
     visitor: {
-      JSXFragment(path) {
-        path.replaceWith(buildElement(path));
-      },
-
-      JSXElement(path) {
-        if (isComponentRoot(path)) {
-          path.skip();
-          return;
-        }
-        path.replaceWith(buildElement(path));
+      'JSXElement|JSXFragment'(path) {
+        path.replaceWith(buildTemplate(path));
       },
     },
   };
 
-  function buildElement(path, expressions) {
-    const root = expressions === undefined;
-    if (!expressions) expressions = [];
-
-    const frag = path.isJSXFragment();
-    const opening = path.get('openingElement');
-    const type = frag
-      ? fragMarker()
-      : elementType(convertJSXName(opening.get('name')), root, expressions);
-
-    if (!type) {
-      expressions.push(path.node);
-      return expressionMarker();
+  function buildTemplate(path) {
+    if (isComponent(path)) {
+      return buildElement(path);
     }
 
-    const { props, key, ref } = buildProps(
-      frag ? [] : opening.get('attributes'),
-      path.get('children'),
-      expressions
-    );
-
-    const tree = template.expression.ast`({
-      type: ${type},
-      key: ${key},
-      ref: ${ref},
-      props: ${props},
-    })`;
-    if (!root) return tree;
+    const expressions = [];
+    const tree = buildElement(path, expressions);
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`function ${id}(jsx2) {
@@ -68,6 +39,29 @@ module.exports = function({ types: t, template }) {
     })`;
   }
 
+  function buildElement(path, expressions) {
+    if (isComponent(path) && expressions) {
+      expressions.push(path.node);
+      return expressionMarker();
+    }
+
+    const frag = path.isJSXFragment();
+    const type = elementType(path);
+
+    const { props, key, ref } = buildProps(
+      frag ? [] : path.get('openingElement.attributes'),
+      path.get('children'),
+      expressions
+    );
+
+    return template.expression.ast`({
+      type: ${type},
+      key: ${key},
+      ref: ${ref},
+      props: ${props},
+    })`;
+  }
+
   function buildProps(attributePaths, childPaths, expressions) {
     const children = [];
     let key = t.nullLiteral();
@@ -81,8 +75,13 @@ module.exports = function({ types: t, template }) {
 
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
-        expressions.push(attribute.node.argument);
-        objs.push(expressionMarker());
+        const {argument} = attribute.node;
+        if (expressions) {
+          expressions.push(argument);
+          objs.push(expressionMarker());
+        } else {
+          objs.push(argument);
+        }
         continue;
       }
 
@@ -114,8 +113,13 @@ module.exports = function({ types: t, template }) {
       }
 
       if (child.isJSXSpreadChild()) {
-        expressions.push(t.arrayExpression([t.spreadElement(child.node.expression)]));
-        children.push(expressionMarker());
+        const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
+        if (expressions) {
+          expressions.push(array);
+          children.push(expressionMarker());
+        } else {
+          children.push(array);
+        }
         continue;
       }
 
@@ -157,25 +161,27 @@ module.exports = function({ types: t, template }) {
     }
     if (value.isLiteral()) return value.node;
 
-    expressions.push(value.node);
+    const { node } = value;
+    if (!expressions) return node;
+    expressions.push(node);
     return expressionMarker();
   }
 
-  function elementType(node, root, expressions) {
+  function elementType(path) {
+    if (path.isJSXFragment()) return fragMarker();
+
+    const node = convertJSXName(path.get('openingElement.name'));
     if (t.isStringLiteral(node)) return node;
+    if (!t.isIdentifier(node)) return node;
 
-    if (t.isIdentifier(node)) {
-      const { name } = node;
-      if (t.react.isCompatTag(name)) return t.stringLiteral(name);
-    }
+    const { name } = node;
+    if (t.react.isCompatTag(name)) return t.stringLiteral(name);
+    return node;
+  }
 
-    if (root) {
-      throw new Error('foo');
-      expressions.push(node);
-      return expressionMarker();
-    }
-
-    return null;
+  function isComponent(path) {
+    if (!path.isJSXElement()) return false;
+    return !t.isLiteral(elementType(path));
   }
 
   function convertJSXName(name, root = true) {
@@ -205,12 +211,5 @@ module.exports = function({ types: t, template }) {
 
   function cleanJSXText(node) {
     return t.react.buildChildren({ children: [node] }).pop();
-  }
-
-  function isComponentRoot(path) {
-    const name = convertJSXName(path.get('openingElement.name'));
-    if (t.isStringLiteral(name)) return false;
-    if (t.isMemberExpression(name)) return true;
-    return !t.react.isCompatTag(name.name);
   }
 };

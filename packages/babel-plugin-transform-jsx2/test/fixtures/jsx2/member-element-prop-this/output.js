@@ -1,3 +1,8 @@
 function test() {
-  return <xml.this></xml.this>;
+  return {
+    type: xml.this,
+    key: null,
+    ref: null,
+    props: null
+  };
 }

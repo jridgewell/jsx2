@@ -1,3 +1,8 @@
 function test() {
-  return <this.foo></this.foo>;
+  return {
+    type: this.foo,
+    key: null,
+    ref: null,
+    props: null
+  };
 }

@@ -1,3 +1,8 @@
 function test() {
-  return <xml.foo></xml.foo>;
+  return {
+    type: xml.foo,
+    key: null,
+    ref: null,
+    props: null
+  };
 }

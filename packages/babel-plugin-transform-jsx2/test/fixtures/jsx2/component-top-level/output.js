@@ -1,7 +1,21 @@
 function test() {
-  return <Component id={foo} bar={bar}>
-    <span>{text}</span>
-  </Component>;
+  return {
+    type: Component,
+    key: null,
+    ref: null,
+    props: {
+      id: foo,
+      bar: bar,
+      children: [{
+        type: "span",
+        key: null,
+        ref: null,
+        props: {
+          children: [text]
+        }
+      }]
+    }
+  };
 }
 
 function Component(props) {
