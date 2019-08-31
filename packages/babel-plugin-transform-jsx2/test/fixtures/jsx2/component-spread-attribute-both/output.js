@@ -1,5 +1,5 @@
 function test() {
-  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [jsx2.createElement(Component, null, null, [{
+  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [jsx2.createElement(Component, "", null, [{
     before: true
   }, s, {
     after: true
@@ -7,7 +7,7 @@ function test() {
 }
 
 function _template(createElement, expression, Fragment) {
-  const tree = createElement("div", null, null, {
+  const tree = createElement("div", "", null, {
     children: [expression]
   });
 

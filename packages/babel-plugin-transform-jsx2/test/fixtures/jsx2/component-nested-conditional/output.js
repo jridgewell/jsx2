@@ -1,5 +1,5 @@
 function test() {
-  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [jsx2.createElement(Component, null, null, {
+  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [jsx2.createElement(Component, "", null, {
     id: foo,
     bar: bar,
     children: [jsx2.template(_template2(jsx2.createElement, jsx2.expression, jsx2.Fragment), [true && jsx2.template(_template3(jsx2.createElement, jsx2.expression, jsx2.Fragment), [])])]
@@ -7,7 +7,7 @@ function test() {
 }
 
 function _template(createElement, expression, Fragment) {
-  const tree = createElement("div", null, null, {
+  const tree = createElement("div", "", null, {
     children: [expression]
   });
 
@@ -17,7 +17,7 @@ function _template(createElement, expression, Fragment) {
 }
 
 function _template2(createElement, expression, Fragment) {
-  const tree = createElement(Fragment, null, null, {
+  const tree = createElement(Fragment, "", null, {
     children: [expression]
   });
 
@@ -27,7 +27,7 @@ function _template2(createElement, expression, Fragment) {
 }
 
 function _template3(createElement, expression, Fragment) {
-  const tree = createElement("div", null, null, null);
+  const tree = createElement("div", "", null, null);
 
   _template3 = () => tree;
 

@@ -87,7 +87,7 @@ module.exports = function({ types: t, template }) {
 
   function buildProps(attributePaths, childPaths, expressions) {
     const children = [];
-    let key = t.nullLiteral();
+    let key = t.stringLiteral('');
     let ref = t.nullLiteral();
     let childrenProp;
 

@@ -4,7 +4,7 @@ function test() {
 }
 
 function _template(createElement, expression, Fragment) {
-  const tree = createElement("div", null, expression, null);
+  const tree = createElement("div", "", expression, null);
 
   _template = () => tree;
 

@@ -3,8 +3,8 @@ function test() {
 }
 
 function _template(createElement, expression, Fragment) {
-  const tree = createElement("div", null, null, {
-    attr: createElement("inner", null, null, {
+  const tree = createElement("div", "", null, {
+    attr: createElement("inner", "", null, {
       children: [expression]
     })
   });
