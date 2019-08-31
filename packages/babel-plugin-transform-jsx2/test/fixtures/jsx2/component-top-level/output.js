@@ -2,18 +2,18 @@ function test() {
   return jsx2.createElement(Component, null, null, {
     id: foo,
     bar: bar,
-    children: [jsx2.template(_template(jsx2), [text])]
+    children: [jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [text])]
   });
 }
 
 function Component(props) {
-  return jsx2.template(_template2(jsx2), [props.id, props.bar, props.children]);
+  return jsx2.template(_template2(jsx2.createElement, jsx2.expression, jsx2.Fragment), [props.id, props.bar, props.children]);
 }
 
-function _template(jsx2) {
-  const tree = jsx2.createElement(jsx2.Fragment, null, null, {
-    children: [jsx2.createElement("span", null, null, {
-      children: [jsx2.expression]
+function _template(createElement, expression, Fragment) {
+  const tree = createElement(Fragment, null, null, {
+    children: [createElement("span", null, null, {
+      children: [expression]
     })]
   });
 
@@ -22,13 +22,13 @@ function _template(jsx2) {
   return tree;
 }
 
-function _template2(jsx2) {
-  const tree = jsx2.createElement("foo", null, null, {
-    id: jsx2.expression,
-    bar: jsx2.expression,
-    children: [jsx2.createElement("span", null, null, {
+function _template2(createElement, expression, Fragment) {
+  const tree = createElement("foo", null, null, {
+    id: expression,
+    bar: expression,
+    children: [createElement("span", null, null, {
       children: ["before"]
-    }), jsx2.expression, jsx2.createElement("span", null, null, {
+    }), expression, createElement("span", null, null, {
       children: ["after"]
     })]
   });

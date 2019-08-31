@@ -1,9 +1,9 @@
 function test() {
-  return jsx2.template(_template(jsx2), []);
+  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), []);
 }
 
-function _template(jsx2) {
-  const tree = jsx2.createElement("div", null, null, null);
+function _template(createElement, expression, Fragment) {
+  const tree = createElement("div", null, null, null);
 
   _template = () => tree;
 

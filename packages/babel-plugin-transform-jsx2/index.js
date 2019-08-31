@@ -1,9 +1,6 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }) {
-  const fragMarker = template.expression`jsx2.Fragment`;
-  const expressionMarker = template.expression`jsx2.expression`;
-
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -14,6 +11,21 @@ module.exports = function({ types: t, template }) {
       },
     },
   };
+
+  function createElementRef(insideTemplate) {
+    if (insideTemplate) return t.identifier('createElement');
+    return template.expression.ast`jsx2.createElement`;
+  }
+
+  function expressionMarkerRef(insideTemplate) {
+    if (insideTemplate) return t.identifier('expression');
+    return template.expression.ast`jsx2.expression`;
+  }
+
+  function fragMarkerRef(insideTemplate) {
+    if (insideTemplate) return t.identifier('Fragment');
+    return template.expression.ast`jsx2.Fragment`;
+  }
 
   function buildTemplate(path) {
     if (isComponent(path)) {
@@ -28,7 +40,11 @@ module.exports = function({ types: t, template }) {
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}(jsx2) {
+      function ${id}(
+        ${createElementRef(true)},
+        ${expressionMarkerRef(true)},
+        ${fragMarkerRef(true)}
+      ) {
         const tree = ${tree};
         ${id} = () => tree;
         return tree;
@@ -38,18 +54,25 @@ module.exports = function({ types: t, template }) {
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      jsx2.template(${id}(jsx2), ${t.arrayExpression(expressions)})
+      jsx2.template(
+        ${id}(
+          ${createElementRef(false)},
+          ${expressionMarkerRef(false)},
+          ${fragMarkerRef(false)}
+        ),
+        ${t.arrayExpression(expressions)}
+      )
     `;
   }
 
   function buildElement(path, expressions) {
     if (isComponent(path) && expressions) {
       expressions.push(path.node);
-      return expressionMarker();
+      return expressionMarkerRef(true);
     }
 
     const frag = path.isJSXFragment();
-    const type = elementType(path);
+    const type = frag ? fragMarkerRef(!!expressions) : elementType(path);
 
     const { props, key, ref } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
@@ -58,7 +81,7 @@ module.exports = function({ types: t, template }) {
     );
 
     return template.expression.ast`
-      jsx2.createElement(${type}, ${key}, ${ref}, ${props})
+      ${createElementRef(!!expressions)}(${type}, ${key}, ${ref}, ${props})
     `;
   }
 
@@ -78,7 +101,7 @@ module.exports = function({ types: t, template }) {
         const { argument } = attribute.node;
         if (expressions) {
           expressions.push(argument);
-          objs.push(expressionMarker());
+          objs.push(expressionMarkerRef(true));
         } else {
           objs.push(argument);
         }
@@ -116,7 +139,7 @@ module.exports = function({ types: t, template }) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
         if (expressions) {
           expressions.push(array);
-          children.push(expressionMarker());
+          children.push(expressionMarkerRef(true));
         } else {
           children.push(array);
         }
@@ -164,12 +187,10 @@ module.exports = function({ types: t, template }) {
     const { node } = value;
     if (!expressions) return node;
     expressions.push(node);
-    return expressionMarker();
+    return expressionMarkerRef(true);
   }
 
   function elementType(path) {
-    if (path.isJSXFragment()) return fragMarker();
-
     const node = convertJSXName(path.get('openingElement.name'));
     if (t.isStringLiteral(node)) return node;
     if (!t.isIdentifier(node)) return node;

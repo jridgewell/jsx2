@@ -1,13 +1,13 @@
 function test() {
-  return jsx2.template(_template(jsx2), [jsx2.createElement(Component, null, null, [s, {
+  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [jsx2.createElement(Component, null, null, [s, {
     after: true,
-    children: [jsx2.template(_template2(jsx2), [])]
+    children: [jsx2.template(_template2(jsx2.createElement, jsx2.expression, jsx2.Fragment), [])]
   }])]);
 }
 
-function _template(jsx2) {
-  const tree = jsx2.createElement("div", null, null, {
-    children: [jsx2.expression]
+function _template(createElement, expression, Fragment) {
+  const tree = createElement("div", null, null, {
+    children: [expression]
   });
 
   _template = () => tree;
@@ -15,8 +15,8 @@ function _template(jsx2) {
   return tree;
 }
 
-function _template2(jsx2) {
-  const tree = jsx2.createElement(jsx2.Fragment, null, null, {
+function _template2(createElement, expression, Fragment) {
+  const tree = createElement(Fragment, null, null, {
     children: ["text"]
   });
 
