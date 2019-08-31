@@ -36,11 +36,9 @@ function _template(jsx2) {
         ref: null,
         props: {
           children: [jsx2.expression]
-        },
-        constructor: void 0
+        }
       }]
-    },
-    constructor: void 0
+    }
   };
 
   _template = () => tree;
@@ -62,19 +60,16 @@ function _template2(jsx2) {
         ref: null,
         props: {
           children: ["before"]
-        },
-        constructor: void 0
+        }
       }, jsx2.expression, {
         type: "span",
         key: null,
         ref: null,
         props: {
           children: ["after"]
-        },
-        constructor: void 0
+        }
       }]
-    },
-    constructor: void 0
+    }
   };
 
   _template2 = () => tree;

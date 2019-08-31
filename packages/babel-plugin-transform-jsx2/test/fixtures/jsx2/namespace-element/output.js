@@ -11,8 +11,7 @@ function _template(jsx2) {
     type: "xml:foo",
     key: null,
     ref: null,
-    props: null,
-    constructor: void 0
+    props: null
   };
 
   _template = () => tree;

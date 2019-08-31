@@ -20,7 +20,11 @@ module.exports = function({ types: t, template }) {
       const frag = wrapChildrenInFragment(path);
       if (frag) frag.replaceWith(buildTemplate(frag));
 
-      return buildElement(path);
+      const el = buildElement(path);
+      el.properties.push(
+        t.objectProperty(t.identifier('constructor'), path.scope.buildUndefinedNode())
+      );
+      return el;
     }
 
     const expressions = [];
@@ -62,7 +66,6 @@ module.exports = function({ types: t, template }) {
       key: ${key},
       ref: ${ref},
       props: ${props},
-      constructor: void 0,
     })`;
   }
 

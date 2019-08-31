@@ -13,8 +13,7 @@ function _template(jsx2) {
     ref: null,
     props: {
       "xml:foo": true
-    },
-    constructor: void 0
+    }
   };
 
   _template = () => tree;

@@ -31,8 +31,7 @@ function _template(jsx2) {
     ref: null,
     props: {
       children: [jsx2.expression]
-    },
-    constructor: void 0
+    }
   };
 
   _template = () => tree;
@@ -47,8 +46,7 @@ function _template2(jsx2) {
     ref: null,
     props: {
       children: [jsx2.expression]
-    },
-    constructor: void 0
+    }
   };
 
   _template2 = () => tree;
@@ -61,8 +59,7 @@ function _template3(jsx2) {
     type: "div",
     key: null,
     ref: null,
-    props: null,
-    constructor: void 0
+    props: null
   };
 
   _template3 = () => tree;

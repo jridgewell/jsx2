@@ -16,8 +16,7 @@ function _template(jsx2) {
     }, jsx2.expression, {
       after: true,
       children: ["text"]
-    }],
-    constructor: void 0
+    }]
   };
 
   _template = () => tree;

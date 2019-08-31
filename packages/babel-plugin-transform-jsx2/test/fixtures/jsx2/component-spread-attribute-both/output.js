@@ -23,8 +23,7 @@ function _template(jsx2) {
     ref: null,
     props: {
       children: [jsx2.expression]
-    },
-    constructor: void 0
+    }
   };
 
   _template = () => tree;

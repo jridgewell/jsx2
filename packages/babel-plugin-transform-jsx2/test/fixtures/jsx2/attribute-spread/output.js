@@ -11,8 +11,7 @@ function _template(jsx2) {
     type: "div",
     key: null,
     ref: null,
-    props: [jsx2.expression],
-    constructor: void 0
+    props: [jsx2.expression]
   };
 
   _template = () => tree;
