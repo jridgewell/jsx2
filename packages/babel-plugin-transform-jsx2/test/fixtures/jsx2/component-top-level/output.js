@@ -12,9 +12,11 @@ function test() {
         ref: null,
         props: {
           children: [text]
-        }
+        },
+        constructor: void 0
       }]
-    }
+    },
+    constructor: void 0
   };
 }
 
@@ -40,16 +42,19 @@ function _template(jsx2) {
         ref: null,
         props: {
           children: ["before"]
-        }
+        },
+        constructor: void 0
       }, jsx2.expression, {
         type: "span",
         key: null,
         ref: null,
         props: {
           children: ["after"]
-        }
+        },
+        constructor: void 0
       }]
-    }
+    },
+    constructor: void 0
   };
 
   _template = () => tree;

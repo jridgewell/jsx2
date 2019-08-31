@@ -16,9 +16,11 @@ function _template(jsx2) {
         type: "inner",
         key: null,
         ref: null,
-        props: null
+        props: null,
+        constructor: void 0
       }
-    }
+    },
+    constructor: void 0
   };
 
   _template = () => tree;

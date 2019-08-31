@@ -13,7 +13,8 @@ function _template(jsx2) {
     ref: null,
     props: {
       attr: "foo"
-    }
+    },
+    constructor: void 0
   };
 
   _template = () => tree;

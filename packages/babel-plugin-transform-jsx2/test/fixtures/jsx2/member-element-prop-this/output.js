@@ -3,6 +3,7 @@ function test() {
     type: xml.this,
     key: null,
     ref: null,
-    props: null
+    props: null,
+    constructor: void 0
   };
 }

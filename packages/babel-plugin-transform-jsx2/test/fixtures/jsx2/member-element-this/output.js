@@ -3,6 +3,7 @@ function test() {
     type: this.foo,
     key: null,
     ref: null,
-    props: null
+    props: null,
+    constructor: void 0
   };
 }

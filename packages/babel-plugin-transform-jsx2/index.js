@@ -59,6 +59,7 @@ module.exports = function({ types: t, template }) {
       key: ${key},
       ref: ${ref},
       props: ${props},
+      constructor: void 0,
     })`;
   }
 
@@ -180,8 +181,8 @@ module.exports = function({ types: t, template }) {
   }
 
   function isComponent(path) {
-    if (!path.isJSXElement()) return false;
-    return !t.isLiteral(elementType(path));
+    if (path.isJSXFragment()) return false;
+    return !t.isStringLiteral(elementType(path));
   }
 
   function convertJSXName(name, root = true) {
