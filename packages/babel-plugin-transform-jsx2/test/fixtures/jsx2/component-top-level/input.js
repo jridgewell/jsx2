@@ -1,14 +1,10 @@
 function test() {
   return <Component id={foo} bar={bar}>
-    <span>{text}</span>
+    <first>{text}</first>
+    second
+    <third third="third"/>
+    {fourth}
+    <fifth fifth={fifth}/>
+    {...sixth}
   </Component>;
 }
-
-function Component(props) {
-  return <foo id={props.id} bar={props.bar}>
-    <span>before</span>
-    {props.children}
-    <span>after</span>
-  </foo>;
-}
-

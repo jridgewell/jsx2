@@ -29,9 +29,6 @@ module.exports = function({ types: t, template }) {
 
   function buildTemplate(path) {
     if (isComponent(path)) {
-      const frag = wrapChildrenInFragment(path);
-      if (frag) frag.replaceWith(buildTemplate(frag));
-
       return buildElement(path);
     }
 
@@ -87,9 +84,9 @@ module.exports = function({ types: t, template }) {
 
   function buildProps(attributePaths, childPaths, expressions) {
     const childrenStatic = [];
-
-    let objs = [];
+    const objs = [];
     let objProps = [];
+
     for (let i = 0; i < attributePaths.length; i++) {
       const attribute = attributePaths[i];
 
@@ -129,6 +126,11 @@ module.exports = function({ types: t, template }) {
         } else {
           childrenStatic.push(array);
         }
+        continue;
+      }
+
+      if (!expressions && (child.isJSXElement() || child.isJSXFragment())) {
+        childrenStatic.push(buildTemplate(child));
         continue;
       }
 
@@ -218,16 +220,6 @@ module.exports = function({ types: t, template }) {
 
   function cleanJSXText(node) {
     return t.react.buildChildren({ children: [node] }).pop();
-  }
-
-  function wrapChildrenInFragment(path) {
-    const children = path.node.children;
-    if (!children.length) return null;
-
-    const frag = t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), children.slice());
-    children.length = 0;
-    children.push(frag);
-    return path.get('children.0');
   }
 
   function flatMap(array, cb) {

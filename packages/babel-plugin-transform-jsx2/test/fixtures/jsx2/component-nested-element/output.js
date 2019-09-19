@@ -11,9 +11,9 @@ function _template(createElement, expressionMarker, Fragment) {
 }
 
 function _template2(createElement, expressionMarker, Fragment) {
-  const tree = createElement(Fragment, null, [createElement("inner", [{
+  const tree = createElement("inner", [{
     foo: expressionMarker
-  }, expressionMarker], [expressionMarker])]);
+  }, expressionMarker], [expressionMarker]);
 
   _template2 = () => tree;
 
