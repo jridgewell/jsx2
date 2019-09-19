@@ -1,8 +1,8 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [s]);
+  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [s]);
 }
 
-function _template(createElement, expressionMarker, Fragment) {
+function _template(createElement, expressionMarker) {
   const tree = createElement("div", [{
     before: true
   }, expressionMarker, {

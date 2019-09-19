@@ -2,10 +2,10 @@ function test() {
   return jsx2.createElement(Component, {
     id: foo,
     bar: bar
-  }, [jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [text]), "second", jsx2.templateResult(_template2(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), []), fourth, jsx2.templateResult(_template3(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [fifth]), [...sixth]]);
+  }, [jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [text]), "second", jsx2.templateResult(_template2(jsx2.createElement), []), fourth, jsx2.templateResult(_template3(jsx2.createElement, jsx2.expressionMarker), [fifth]), [...sixth]]);
 }
 
-function _template(createElement, expressionMarker, Fragment) {
+function _template(createElement, expressionMarker) {
   const tree = createElement("first", null, [expressionMarker]);
 
   _template = () => tree;
@@ -13,7 +13,7 @@ function _template(createElement, expressionMarker, Fragment) {
   return tree;
 }
 
-function _template2(createElement, expressionMarker, Fragment) {
+function _template2(createElement) {
   const tree = createElement("third", {
     third: "third"
   });
@@ -23,7 +23,7 @@ function _template2(createElement, expressionMarker, Fragment) {
   return tree;
 }
 
-function _template3(createElement, expressionMarker, Fragment) {
+function _template3(createElement, expressionMarker) {
   const tree = createElement("fifth", {
     fifth: expressionMarker
   });

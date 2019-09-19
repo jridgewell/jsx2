@@ -33,14 +33,26 @@ module.exports = function({ types: t, template }) {
     }
 
     const expressions = [];
-    const tree = buildElement(path, expressions);
+    let hasExpressionMarker = false;
+    let hasFragment = false;
+    const tree = buildElement(path, {
+      expressions,
+      expressionMarker() {
+        hasExpressionMarker = true;
+        return expressionMarkerRef(true);
+      },
+      fragMarker() {
+        hasFragment = true;
+        return fragMarkerRef(true);
+      },
+    });
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
       function ${id}(
         ${createElementRef(true)},
-        ${expressionMarkerRef(true)},
-        ${fragMarkerRef(true)}
+        ${hasExpressionMarker ? expressionMarkerRef(true) : null},
+        ${hasFragment ? fragMarkerRef(true) : null}
       ) {
         const tree = ${tree};
         ${id} = () => tree;
@@ -54,35 +66,39 @@ module.exports = function({ types: t, template }) {
       jsx2.templateResult(
         ${id}(
           ${createElementRef(false)},
-          ${expressionMarkerRef(false)},
-          ${fragMarkerRef(false)}
+          ${hasExpressionMarker ? expressionMarkerRef(false) : null},
+          ${hasFragment ? fragMarkerRef(false) : null}
         ),
         ${t.arrayExpression(expressions)}
       )
     `;
   }
 
-  function buildElement(path, expressions) {
-    if (isComponent(path) && expressions) {
-      expressions.push(path.node);
-      return expressionMarkerRef(true);
+  function buildElement(path, state) {
+    if (isComponent(path) && state) {
+      state.expressions.push(path.node);
+      return state.expressionMarker();
     }
 
     const frag = path.isJSXFragment();
-    const type = frag ? fragMarkerRef(!!expressions) : elementType(path);
+    const type = frag
+      ? state
+        ? state.fragMarker()
+        : fragMarkerRef(false)
+      : elementType(path);
 
     const { props, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
       path.get('children'),
-      expressions
+      state
     );
 
     return template.expression.ast`
-      ${createElementRef(!!expressions)}(${type}, ${props}, ${children})
+      ${createElementRef(state)}(${type}, ${props}, ${children})
     `;
   }
 
-  function buildProps(attributePaths, childPaths, expressions) {
+  function buildProps(attributePaths, childPaths, state) {
     const childrenStatic = [];
     const objs = [];
     let objProps = [];
@@ -93,9 +109,9 @@ module.exports = function({ types: t, template }) {
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
         const { argument } = attribute.node;
-        if (expressions) {
-          expressions.push(argument);
-          objs.push(expressionMarkerRef(true));
+        if (state) {
+          state.expressions.push(argument);
+          objs.push(state.expressionMarker());
         } else {
           objs.push(t.objectExpression([t.spreadElement(argument)]));
         }
@@ -106,7 +122,7 @@ module.exports = function({ types: t, template }) {
       const value = attribute.get('value');
 
       objProps.push(
-        t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, expressions))
+        t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, state))
       );
     }
 
@@ -120,16 +136,16 @@ module.exports = function({ types: t, template }) {
 
       if (child.isJSXSpreadChild()) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
-        if (expressions) {
-          expressions.push(array);
-          childrenStatic.push(expressionMarkerRef(true));
+        if (state) {
+          state.expressions.push(array);
+          childrenStatic.push(state.expressionMarker());
         } else {
           childrenStatic.push(array);
         }
         continue;
       }
 
-      childrenStatic.push(extractValue(child, expressions));
+      childrenStatic.push(extractValue(child, state));
     }
     pushProps(objProps, objs);
 
@@ -139,7 +155,7 @@ module.exports = function({ types: t, template }) {
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
-      } else if (expressions) {
+      } else if (state) {
         props = t.arrayExpression(objs);
       } else {
         props = t.objectExpression(flatMap(objs, o => o.properties));
@@ -158,24 +174,24 @@ module.exports = function({ types: t, template }) {
     return [];
   }
 
-  function extractAttributeValue(value, expressions) {
+  function extractAttributeValue(value, state) {
     if (!value.node) return t.booleanLiteral(true);
-    return extractValue(value, expressions);
+    return extractValue(value, state);
   }
 
-  function extractValue(value, expressions) {
+  function extractValue(value, state) {
     if (value.isJSXExpressionContainer()) value = value.get('expression');
 
     if (value.isJSXElement() || value.isJSXFragment()) {
-      if (expressions) return buildElement(value, expressions);
+      if (state) return buildElement(value, state);
       return buildTemplate(value);
     }
     if (value.isLiteral()) return value.node;
 
     const { node } = value;
-    if (!expressions) return node;
-    expressions.push(node);
-    return expressionMarkerRef(true);
+    if (!state) return node;
+    state.expressions.push(node);
+    return state.expressionMarker();
   }
 
   function elementType(path) {
@@ -226,6 +242,8 @@ module.exports = function({ types: t, template }) {
     if (array.flatMap) {
       return array.flatMap(cb);
     }
-    return array.reduce((collection, ...args) => collection.concat(cb(...args)), []);
+    return array.reduce((collection, ...args) => {
+      return collection.concat(cb(...args));
+    }, []);
   }
 };
