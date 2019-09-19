@@ -129,11 +129,6 @@ module.exports = function({ types: t, template }) {
         continue;
       }
 
-      if (!expressions && (child.isJSXElement() || child.isJSXFragment())) {
-        childrenStatic.push(buildTemplate(child));
-        continue;
-      }
-
       childrenStatic.push(extractValue(child, expressions));
     }
     pushProps(objProps, objs);
@@ -172,7 +167,8 @@ module.exports = function({ types: t, template }) {
     if (value.isJSXExpressionContainer()) value = value.get('expression');
 
     if (value.isJSXElement() || value.isJSXFragment()) {
-      return buildElement(value, expressions);
+      if (expressions) return buildElement(value, expressions);
+      return buildTemplate(value);
     }
     if (value.isLiteral()) return value.node;
 
