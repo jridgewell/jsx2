@@ -3,7 +3,7 @@ function test() {
 }
 
 function _template(createElement, expressionMarker, Fragment) {
-  const tree = createElement("xml:foo", "", null, null);
+  const tree = createElement("xml:foo");
 
   _template = () => tree;
 

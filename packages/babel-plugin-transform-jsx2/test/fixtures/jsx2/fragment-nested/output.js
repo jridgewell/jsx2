@@ -3,9 +3,7 @@ function test() {
 }
 
 function _template(createElement, expressionMarker, Fragment) {
-  const tree = createElement("div", "", null, {
-    children: [createElement(Fragment, "", null, null)]
-  });
+  const tree = createElement("div", null, [createElement(Fragment)]);
 
   _template = () => tree;
 

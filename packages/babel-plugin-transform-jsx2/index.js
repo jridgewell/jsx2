@@ -74,22 +74,19 @@ module.exports = function({ types: t, template }) {
     const frag = path.isJSXFragment();
     const type = frag ? fragMarkerRef(!!expressions) : elementType(path);
 
-    const { props, key, ref } = buildProps(
+    const { props, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
       path.get('children'),
       expressions
     );
 
     return template.expression.ast`
-      ${createElementRef(!!expressions)}(${type}, ${key}, ${ref}, ${props})
+      ${createElementRef(!!expressions)}(${type}, ${props}, ${children})
     `;
   }
 
   function buildProps(attributePaths, childPaths, expressions) {
-    const children = [];
-    let key = t.stringLiteral('');
-    let ref = t.nullLiteral();
-    let childrenProp;
+    const childrenStatic = [];
 
     let objs = [];
     let objProps = [];
@@ -111,17 +108,6 @@ module.exports = function({ types: t, template }) {
       const name = attribute.get('name');
       const value = attribute.get('value');
 
-      if (name.isJSXIdentifier({ name: 'key' })) {
-        key = extractAttributeValue(value, expressions);
-        continue;
-      } else if (name.isJSXIdentifier({ name: 'ref' })) {
-        ref = extractAttributeValue(value, expressions);
-        continue;
-      } else if (name.isJSXIdentifier({ name: 'children' })) {
-        childrenProp = extractAttributeValue(value, expressions);
-        continue;
-      }
-
       objProps.push(
         t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, expressions))
       );
@@ -131,7 +117,7 @@ module.exports = function({ types: t, template }) {
       const child = childPaths[i];
       if (child.isJSXText()) {
         const text = cleanJSXText(child.node);
-        if (text) children.push(text);
+        if (text) childrenStatic.push(text);
         continue;
       }
 
@@ -139,29 +125,27 @@ module.exports = function({ types: t, template }) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
         if (expressions) {
           expressions.push(array);
-          children.push(expressionMarkerRef(true));
+          childrenStatic.push(expressionMarkerRef(true));
         } else {
-          children.push(array);
+          childrenStatic.push(array);
         }
         continue;
       }
 
-      children.push(extractValue(child, expressions));
-    }
-
-    if (children.length || childrenProp) {
-      const c = t.arrayExpression(children.length ? children : [childrenProp]);
-      objProps.push(t.objectProperty(t.identifier('children'), c));
+      childrenStatic.push(extractValue(child, expressions));
     }
     pushProps(objProps, objs);
 
+    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
     const props = objs.length
       ? objs.length === 1 && t.isObjectExpression(objs[0])
         ? objs[0]
         : t.arrayExpression(objs)
-      : t.nullLiteral();
+      : children
+        ? t.nullLiteral()
+        : null;
 
-    return { key, ref, props };
+    return { props, children };
   }
 
   function pushProps(objProps, objs) {
