@@ -100,7 +100,7 @@ module.exports = function({ types: t, template }) {
           expressions.push(argument);
           objs.push(expressionMarkerRef(true));
         } else {
-          objs.push(argument);
+          objs.push(t.objectExpression([t.spreadElement(argument)]));
         }
         continue;
       }
@@ -140,7 +140,9 @@ module.exports = function({ types: t, template }) {
     const props = objs.length
       ? objs.length === 1 && t.isObjectExpression(objs[0])
         ? objs[0]
-        : t.arrayExpression(objs)
+        : expressions
+          ? t.arrayExpression(objs)
+          : t.objectExpression(flatMap(objs, o => o.properties))
       : children
         ? t.nullLiteral()
         : null;
@@ -226,5 +228,12 @@ module.exports = function({ types: t, template }) {
     children.length = 0;
     children.push(frag);
     return path.get('children.0');
+  }
+
+  function flatMap(array, cb) {
+    if (array.flatMap) {
+      return array.flatMap(cb);
+    }
+    return array.reduce((collection, ...args) => collection.concat(cb(...args)), []);
   }
 };
