@@ -139,15 +139,19 @@ module.exports = function({ types: t, template }) {
     pushProps(objProps, objs);
 
     const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
-    const props = objs.length
-      ? objs.length === 1 && t.isObjectExpression(objs[0])
-        ? objs[0]
-        : expressions
-          ? t.arrayExpression(objs)
-          : t.objectExpression(flatMap(objs, o => o.properties))
-      : children
-        ? t.nullLiteral()
-        : null;
+
+    let props = null;
+    if (objs.length) {
+      if (objs.length === 1 && t.isObjectExpression(objs[0])) {
+        props = objs[0];
+      } else if (expressions) {
+        props = t.arrayExpression(objs);
+      } else {
+        props = t.objectExpression(flatMap(objs, o => o.properties));
+      }
+    } else if (children) {
+      props = t.nullLiteral();
+    }
 
     return { props, children };
   }
