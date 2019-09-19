@@ -1,10 +1,10 @@
 function test() {
-  return jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [cond ? jsx2.template(_template2(jsx2.createElement, jsx2.expression, jsx2.Fragment), []) : jsx2.template(_template3(jsx2.createElement, jsx2.expression, jsx2.Fragment), [])]);
+  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [cond ? jsx2.templateResult(_template2(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), []) : jsx2.templateResult(_template3(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [])]);
 }
 
-function _template(createElement, expression, Fragment) {
+function _template(createElement, expressionMarker, Fragment) {
   const tree = createElement("div", "", null, {
-    children: [expression]
+    children: [expressionMarker]
   });
 
   _template = () => tree;
@@ -12,7 +12,7 @@ function _template(createElement, expression, Fragment) {
   return tree;
 }
 
-function _template2(createElement, expression, Fragment) {
+function _template2(createElement, expressionMarker, Fragment) {
   const tree = createElement("t", "", null, null);
 
   _template2 = () => tree;
@@ -20,7 +20,7 @@ function _template2(createElement, expression, Fragment) {
   return tree;
 }
 
-function _template3(createElement, expression, Fragment) {
+function _template3(createElement, expressionMarker, Fragment) {
   const tree = createElement("f", "", null, null);
 
   _template3 = () => tree;

@@ -18,8 +18,8 @@ module.exports = function({ types: t, template }) {
   }
 
   function expressionMarkerRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('expression');
-    return template.expression.ast`jsx2.expression`;
+    if (insideTemplate) return t.identifier('expressionMarker');
+    return template.expression.ast`jsx2.expressionMarker`;
   }
 
   function fragMarkerRef(insideTemplate) {
@@ -54,7 +54,7 @@ module.exports = function({ types: t, template }) {
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      jsx2.template(
+      jsx2.templateResult(
         ${id}(
           ${createElementRef(false)},
           ${expressionMarkerRef(false)},

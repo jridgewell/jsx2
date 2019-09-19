@@ -2,18 +2,18 @@ function test() {
   return jsx2.createElement(Component, "", null, {
     id: foo,
     bar: bar,
-    children: [jsx2.template(_template(jsx2.createElement, jsx2.expression, jsx2.Fragment), [text])]
+    children: [jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [text])]
   });
 }
 
 function Component(props) {
-  return jsx2.template(_template2(jsx2.createElement, jsx2.expression, jsx2.Fragment), [props.id, props.bar, props.children]);
+  return jsx2.templateResult(_template2(jsx2.createElement, jsx2.expressionMarker, jsx2.Fragment), [props.id, props.bar, props.children]);
 }
 
-function _template(createElement, expression, Fragment) {
+function _template(createElement, expressionMarker, Fragment) {
   const tree = createElement(Fragment, "", null, {
     children: [createElement("span", "", null, {
-      children: [expression]
+      children: [expressionMarker]
     })]
   });
 
@@ -22,13 +22,13 @@ function _template(createElement, expression, Fragment) {
   return tree;
 }
 
-function _template2(createElement, expression, Fragment) {
+function _template2(createElement, expressionMarker, Fragment) {
   const tree = createElement("foo", "", null, {
-    id: expression,
-    bar: expression,
+    id: expressionMarker,
+    bar: expressionMarker,
     children: [createElement("span", "", null, {
       children: ["before"]
-    }), expression, createElement("span", "", null, {
+    }), expressionMarker, createElement("span", "", null, {
       children: ["after"]
     })]
   });
