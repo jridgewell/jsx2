@@ -1,9 +1,9 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.Fragment), []);
+  return jsx2.templateResult(_template(), [], void 0, 0);
 }
 
-function _template(createElement, Fragment) {
-  const tree = createElement(Fragment, null, [createElement("inner")]);
+function _template() {
+  const tree = JSON.parse("{\"type\":0,\"children\":[{\"type\":\"inner\"}]}");
 
   _template = () => tree;
 

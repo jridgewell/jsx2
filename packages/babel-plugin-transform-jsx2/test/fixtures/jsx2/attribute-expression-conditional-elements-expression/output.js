@@ -1,19 +1,17 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, 0), [cond && jsx2.templateResult(_template2(jsx2.createElement, 0), [x], 0)], 0);
+  return jsx2.templateResult(_template(), [cond && jsx2.templateResult(_template2(), [x], 0)], 0);
 }
 
-function _template(createElement, expressionMarker) {
-  const tree = createElement("div", {
-    attr: expressionMarker
-  });
+function _template() {
+  const tree = JSON.parse("{\"type\":\"div\",\"props\":{\"attr\":0}}");
 
   _template = () => tree;
 
   return tree;
 }
 
-function _template2(createElement, expressionMarker) {
-  const tree = createElement("inner", null, [expressionMarker]);
+function _template2() {
+  const tree = JSON.parse("{\"type\":\"inner\",\"children\":[0]}");
 
   _template2 = () => tree;
 

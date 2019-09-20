@@ -1,11 +1,9 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, 0), [cond ? true : false], 0);
+  return jsx2.templateResult(_template(), [cond ? true : false], 0);
 }
 
-function _template(createElement, expressionMarker) {
-  const tree = createElement("div", {
-    attr: expressionMarker
-  });
+function _template() {
+  const tree = JSON.parse("{\"type\":\"div\",\"props\":{\"attr\":0}}");
 
   _template = () => tree;
 

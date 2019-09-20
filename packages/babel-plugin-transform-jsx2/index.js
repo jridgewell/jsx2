@@ -12,6 +12,10 @@ module.exports = function({ types: t, template }) {
     },
   };
 
+  function undefinedNode() {
+    return template.expression.ast`void 0`;
+  }
+
   function createElementRef(insideTemplate) {
     if (insideTemplate) return t.identifier('createElement');
     return template.expression.ast`jsx2.createElement`;
@@ -37,7 +41,7 @@ module.exports = function({ types: t, template }) {
     let hasExpressionMarker = false;
     let hasFragment = false;
 
-    const tree = buildElement(path, {
+    const treeNode = buildElement(path, {
       expressions,
       numbers,
       expressionMarker() {
@@ -51,39 +55,48 @@ module.exports = function({ types: t, template }) {
     });
 
     let expressionMarker = null;
+    let fragMarker = null;
+    let lowestNumber = 0;
+
     if (hasExpressionMarker) {
-      for (let i = 0; true; i++) {
-        if (!numbers.includes(i)) {
-          expressionMarker = t.numericLiteral(i);
-          break;
+      for (; !expressionMarker; lowestNumber++) {
+        if (!numbers.includes(lowestNumber)) {
+          expressionMarker = t.numericLiteral(lowestNumber);
+        }
+      }
+    }
+    if (hasFragment) {
+      for (; !fragMarker; lowestNumber++) {
+        if (!numbers.includes(lowestNumber)) {
+          fragMarker = t.numericLiteral(lowestNumber);
         }
       }
     }
 
+    const program = path.findParent(p => p.isProgram());
+    const stringified = (0, eval)(toString(
+      program,
+      template.expression.ast`(0, function(${expressionMarkerRef(true)}, ${fragMarkerRef(true)}) {
+        return JSON.stringify(${treeNode});
+      })(${expressionMarker || undefinedNode()}, ${fragMarker || undefinedNode()})`
+    ));
+
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}(
-        ${createElementRef(true)},
-        ${hasExpressionMarker ? expressionMarkerRef(true) : null},
-        ${hasFragment ? fragMarkerRef(true) : null}
-      ) {
-        const tree = ${tree};
+      function ${id}() {
+        const tree = JSON.parse(${t.stringLiteral(stringified)});
         ${id} = () => tree;
         return tree;
       }
     `;
-    const program = path.findParent(p => p.isProgram());
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
       jsx2.templateResult(
-        ${id}(
-          ${createElementRef(false)},
-          ${expressionMarker},
-          ${hasFragment ? fragMarkerRef(false) : null}
-        ),
+        ${id}(),
         ${t.arrayExpression(expressions)},
-        ${expressionMarker}
+        ${expressionMarker ? expressionMarker : fragMarker ? undefinedNode() : null},
+        ${fragMarker}
       )
     `;
   }
@@ -107,9 +120,17 @@ module.exports = function({ types: t, template }) {
       state
     );
 
-    return template.expression.ast`
-      ${createElementRef(state)}(${type}, ${props}, ${children})
-    `;
+    if (!state) {
+      return template.expression.ast`
+        ${createElementRef(state)}(${type}, ${props}, ${children})
+      `;
+    }
+
+    return template.expression.ast`{
+      type: ${type},
+      props: ${props},
+      children: ${children},
+    }`;
   }
 
   function buildProps(attributePaths, childPaths, state) {
@@ -163,9 +184,9 @@ module.exports = function({ types: t, template }) {
     }
     pushProps(objProps, objs);
 
-    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
+    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : undefinedNode();
 
-    let props = null;
+    let props = undefinedNode();
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
@@ -174,8 +195,6 @@ module.exports = function({ types: t, template }) {
       } else {
         props = t.objectExpression(flatMap(objs, o => o.properties));
       }
-    } else if (children) {
-      props = t.nullLiteral();
     }
 
     return { props, children };
@@ -264,5 +283,12 @@ module.exports = function({ types: t, template }) {
     return array.reduce((collection, ...args) => {
       return collection.concat(cb(...args));
     }, []);
+  }
+
+  function toString(program, node) {
+    const [path] = program.pushContainer('body', node);
+    const string = path.toString();
+    path.remove();
+    return string;
   }
 };

@@ -1,11 +1,9 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.Fragment), []);
+  return jsx2.templateResult(_template(), [], void 0, 0);
 }
 
-function _template(createElement, Fragment) {
-  const tree = createElement("div", {
-    attr: createElement(Fragment)
-  });
+function _template() {
+  const tree = JSON.parse("{\"type\":\"div\",\"props\":{\"attr\":{\"type\":0}}}");
 
   _template = () => tree;
 
