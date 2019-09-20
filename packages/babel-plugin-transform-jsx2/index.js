@@ -33,10 +33,13 @@ module.exports = function({ types: t, template }) {
     }
 
     const expressions = [];
+    const numbers = [];
     let hasExpressionMarker = false;
     let hasFragment = false;
+
     const tree = buildElement(path, {
       expressions,
+      numbers,
       expressionMarker() {
         hasExpressionMarker = true;
         return expressionMarkerRef(true);
@@ -46,6 +49,16 @@ module.exports = function({ types: t, template }) {
         return fragMarkerRef(true);
       },
     });
+
+    let expressionMarker = null;
+    if (hasExpressionMarker) {
+      for (let i = 0; true; i++) {
+        if (!numbers.includes(i)) {
+          expressionMarker = t.numericLiteral(i);
+          break;
+        }
+      }
+    }
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
@@ -66,10 +79,11 @@ module.exports = function({ types: t, template }) {
       jsx2.templateResult(
         ${id}(
           ${createElementRef(false)},
-          ${hasExpressionMarker ? expressionMarkerRef(false) : null},
+          ${expressionMarker},
           ${hasFragment ? fragMarkerRef(false) : null}
         ),
-        ${t.arrayExpression(expressions)}
+        ${t.arrayExpression(expressions)},
+        ${expressionMarker}
       )
     `;
   }
@@ -186,9 +200,14 @@ module.exports = function({ types: t, template }) {
       if (state) return buildElement(value, state);
       return buildTemplate(value);
     }
-    if (value.isLiteral()) return value.node;
 
     const { node } = value;
+    if (value.isNumericLiteral()) {
+      state.numbers.push(node.value);
+      return node;
+    }
+    if (value.isLiteral()) return node;
+
     if (!state) return node;
     state.expressions.push(node);
     return state.expressionMarker();

@@ -1,6 +1,6 @@
 function test() {
   const ref = {};
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [ref]);
+  return jsx2.templateResult(_template(jsx2.createElement, 0), [ref], 0);
 }
 
 function _template(createElement, expressionMarker) {

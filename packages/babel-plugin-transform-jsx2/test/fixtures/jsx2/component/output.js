@@ -1,8 +1,8 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [before, jsx2.createElement(Component, {
+  return jsx2.templateResult(_template(jsx2.createElement, 0), [before, jsx2.createElement(Component, {
     id: foo,
     bar: bar
-  }, [jsx2.templateResult(_template2(jsx2.createElement, jsx2.expressionMarker), [text]), "second", jsx2.templateResult(_template3(jsx2.createElement), []), fourth, jsx2.templateResult(_template4(jsx2.createElement, jsx2.expressionMarker), [fifth]), [...sixth]]), after]);
+  }, [jsx2.templateResult(_template2(jsx2.createElement, 0), [text], 0), "second", jsx2.templateResult(_template3(jsx2.createElement), []), fourth, jsx2.templateResult(_template4(jsx2.createElement, 0), [fifth], 0), [...sixth]]), after], 0);
 }
 
 function _template(createElement, expressionMarker) {
