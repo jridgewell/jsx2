@@ -1,7 +1,7 @@
 function test() {
   return jsx2.templateResult(_template(), [jsx2.createElement(Component, {
     children: "foo"
-  }, void 0)], 0);
+  })], 0);
 }
 
 function _template() {

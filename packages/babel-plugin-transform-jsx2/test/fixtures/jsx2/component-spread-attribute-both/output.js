@@ -3,7 +3,7 @@ function test() {
     before: true,
     ...s,
     after: true
-  }, void 0)], 0);
+  })], 0);
 }
 
 function _template() {

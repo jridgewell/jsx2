@@ -122,14 +122,18 @@ module.exports = function({ types: t, template }) {
 
     if (!state) {
       return template.expression.ast`
-        ${createElementRef(state)}(${type}, ${props}, ${children})
+        ${createElementRef(state)}(
+          ${type},
+          ${props ? props : children ? t.nullLiteral() : null},
+          ${children}
+        )
       `;
     }
 
     return template.expression.ast`{
       type: ${type},
-      props: ${props},
-      children: ${children},
+      props: ${props || undefinedNode()},
+      children: ${children || undefinedNode()},
     }`;
   }
 
@@ -184,9 +188,9 @@ module.exports = function({ types: t, template }) {
     }
     pushProps(objProps, objs);
 
-    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : undefinedNode();
+    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
 
-    let props = undefinedNode();
+    let props = null;
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
