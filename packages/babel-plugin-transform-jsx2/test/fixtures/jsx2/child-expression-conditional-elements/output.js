@@ -1,9 +1,9 @@
 function test() {
-  return jsx2.templateResult(_template(), [cond ? jsx2.templateResult(_template2(), []) : jsx2.templateResult(_template3(), [])], 1);
+  return jsx2.templateResult(_template(), [cond ? jsx2.templateResult(_template2(), []) : jsx2.templateResult(_template3(), [])]);
 }
 
 function _template() {
-  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[1]}}`);
+  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[0]}}`);
 
   _template = () => tree;
 

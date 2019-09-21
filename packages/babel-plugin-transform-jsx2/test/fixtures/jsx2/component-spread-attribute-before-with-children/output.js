@@ -2,11 +2,11 @@ function test() {
   return jsx2.templateResult(_template(), [jsx2.createElement(Component, {
     before: true,
     ...s
-  }, ["text"])], 1);
+  }, ["text"])]);
 }
 
 function _template() {
-  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[1]}}`);
+  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[0]}}`);
 
   _template = () => tree;
 

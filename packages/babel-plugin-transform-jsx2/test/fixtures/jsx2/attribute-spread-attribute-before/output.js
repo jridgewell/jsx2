@@ -1,9 +1,9 @@
 function test() {
-  return jsx2.templateResult(_template(), [s], 1);
+  return jsx2.templateResult(_template(), [s]);
 }
 
 function _template() {
-  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":[{"before":true},1]}`);
+  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":[{"before":true},0]}`);
 
   _template = () => tree;
 

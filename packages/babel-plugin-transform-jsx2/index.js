@@ -1,23 +1,6 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }) {
-  const numberLiteralVisitor = {
-    JSXExpressionContainer(path, state) {
-      const expression = path.get('expression');
-      if (expression.isNumericLiteral()) {
-        state.numbers.push(expression.node.value);
-        return;
-      }
-
-      if (expression.isJSXElement() || expression.isJSXFragment()) return;
-      path.skip();
-    },
-
-    JSXElement(path) {
-      if (isComponent(path)) path.skip();
-    },
-  };
-
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -34,35 +17,25 @@ module.exports = function({ types: t, template }) {
       return buildElement(path);
     }
 
-    const numberState = {
-      numbers: [],
-      lowestNumber: 0,
-    };
-    path.traverse(numberLiteralVisitor, numberState);
+    const program = path.findParent(p => p.isProgram());
 
     const expressions = [];
-    let expressionMarker = null;
-    let fragMarker = null;
-
+    let fragIndex;
     const treeNode = buildElement(path, {
-      expressions,
-
-      expressionMarker() {
-        if (!expressionMarker) {
-          expressionMarker = nextLowestNumber(numberState);
-        }
-        return t.cloneNode(expressionMarker);
+      expressionMarker(node) {
+        const {length} = expressions;
+        expressions.push(node);
+        return t.numericLiteral(length);
       },
 
       fragMarker() {
-        if (!fragMarker) {
-          fragMarker = nextLowestNumber(numberState);
+        if (fragIndex === undefined) {
+          fragIndex = this.expressionMarker(template.expression.ast`jsx2.Fragment`);
         }
-        return t.cloneNode(fragMarker);
-      },
+        return t.cloneNode(fragIndex);
+      }
     });
 
-    const program = path.findParent(p => p.isProgram());
     const cooked = JSON.stringify(evaluateNode(program, treeNode));
     const stringified = t.templateLiteral(
       [
@@ -87,17 +60,14 @@ module.exports = function({ types: t, template }) {
     return template.expression.ast`
       jsx2.templateResult(
         ${id}(),
-        ${t.arrayExpression(expressions)},
-        ${expressionMarker || (fragMarker ? template.expression.ast`void 0` : null)},
-        ${fragMarker}
+        ${t.arrayExpression(expressions)}
       )
     `;
   }
 
   function buildElement(path, state) {
     if (state && isComponent(path)) {
-      state.expressions.push(path.node);
-      return state.expressionMarker();
+      return state.expressionMarker(path.node);
     }
 
     const frag = path.isJSXFragment();
@@ -145,8 +115,7 @@ module.exports = function({ types: t, template }) {
         objProps = pushProps(objProps, objs);
         const { argument } = attribute.node;
         if (state) {
-          state.expressions.push(argument);
-          objs.push(state.expressionMarker());
+          objs.push(state.expressionMarker(argument));
         } else {
           objs.push(t.objectExpression([t.spreadElement(argument)]));
         }
@@ -182,8 +151,7 @@ module.exports = function({ types: t, template }) {
       if (child.isJSXSpreadChild()) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
         if (state) {
-          state.expressions.push(array);
-          childrenStatic.push(state.expressionMarker());
+          childrenStatic.push(state.expressionMarker(array));
         } else {
           childrenStatic.push(array);
         }
@@ -234,11 +202,10 @@ module.exports = function({ types: t, template }) {
     }
 
     const { node } = value;
-    if (value.isLiteral()) return node;
+    if (value.isLiteral() && !value.isNumericLiteral()) return node;
 
-    if (!state) return node;
-    state.expressions.push(node);
-    return state.expressionMarker();
+    if (state) return state.expressionMarker(node);
+    return node;
   }
 
   function elementType(path) {
@@ -292,17 +259,6 @@ module.exports = function({ types: t, template }) {
     return array.reduce((collection, ...args) => {
       return collection.concat(cb(...args));
     }, []);
-  }
-
-  function nextLowestNumber(state) {
-    let { numbers, lowestNumber } = state;
-    while (true) {
-      lowestNumber++;
-      if (!numbers.includes(lowestNumber)) {
-        state.lowestNumber = lowestNumber;
-        return t.numericLiteral(lowestNumber);
-      }
-    }
   }
 
   function evaluateNode(program, node) {
