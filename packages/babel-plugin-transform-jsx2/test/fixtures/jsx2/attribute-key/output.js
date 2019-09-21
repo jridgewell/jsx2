@@ -3,7 +3,7 @@ function test() {
 }
 
 function _template() {
-  const tree = JSON.parse("{\"type\":\"div\",\"props\":{\"key\":\"key\"}}");
+  const tree = JSON.parse(`{"type":"div","key":"key","ref":null,"props":null}`);
 
   _template = () => tree;
 

@@ -74,17 +74,21 @@ module.exports = function({ types: t, template }) {
     }
 
     const program = path.findParent(p => p.isProgram());
-    const stringified = (0, eval)(toString(
+    const cooked = (0, eval)(toString(
       program,
       template.expression.ast`(0, function(${expressionMarkerRef(true)}, ${fragMarkerRef(true)}) {
         return JSON.stringify(${treeNode});
       })(${expressionMarker || undefinedNode()}, ${fragMarker || undefinedNode()})`
     ));
+    const stringified = t.templateLiteral([t.templateElement({
+      raw: cooked.replace(/\${|\\/g, '\\$&'),
+      cooked,
+    })], []);
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
       function ${id}() {
-        const tree = JSON.parse(${t.stringLiteral(stringified)});
+        const tree = JSON.parse(${stringified});
         ${id} = () => tree;
         return tree;
       }
@@ -114,7 +118,7 @@ module.exports = function({ types: t, template }) {
         : fragMarkerRef(false)
       : elementType(path);
 
-    const { props, children } = buildProps(
+    const { props, key, ref, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
       path.get('children'),
       state
@@ -132,8 +136,9 @@ module.exports = function({ types: t, template }) {
 
     return template.expression.ast`{
       type: ${type},
-      props: ${props || undefinedNode()},
-      children: ${children || undefinedNode()},
+      key: ${key},
+      ref: ${ref},
+      props: ${props},
     }`;
   }
 
@@ -141,6 +146,8 @@ module.exports = function({ types: t, template }) {
     const childrenStatic = [];
     const objs = [];
     let objProps = [];
+    let ref = t.nullLiteral();
+    let key = t.stringLiteral('');
 
     for (let i = 0; i < attributePaths.length; i++) {
       const attribute = attributePaths[i];
@@ -159,6 +166,16 @@ module.exports = function({ types: t, template }) {
 
       const name = attribute.get('name');
       const value = attribute.get('value');
+
+      if (state) {
+        if (name.isJSXIdentifier({ name: 'key' })) {
+          key = extractAttributeValue(value, state);
+          continue;
+        } else if (name.isJSXIdentifier({ name: 'ref' })) {
+          ref = extractAttributeValue(value, state);
+          continue;
+        }
+      }
 
       objProps.push(
         t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, state))
@@ -186,11 +203,14 @@ module.exports = function({ types: t, template }) {
 
       childrenStatic.push(extractValue(child, state));
     }
-    pushProps(objProps, objs);
 
     const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
+    if (state && children) {
+      objProps.push(t.objectProperty(t.identifier('children'), children));
+    }
+    pushProps(objProps, objs);
 
-    let props = null;
+    let props = t.nullLiteral();
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
@@ -201,7 +221,7 @@ module.exports = function({ types: t, template }) {
       }
     }
 
-    return { props, children };
+    return { props, key, ref, children };
   }
 
   function pushProps(objProps, objs) {
