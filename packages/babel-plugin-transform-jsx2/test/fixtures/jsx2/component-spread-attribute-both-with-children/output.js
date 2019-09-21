@@ -3,11 +3,11 @@ function test() {
     before: true,
     ...s,
     after: true
-  }, ["text"])], 0);
+  }, ["text"])], 1);
 }
 
 function _template() {
-  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[0]}}`);
+  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"children":[1]}}`);
 
   _template = () => tree;
 

@@ -1,6 +1,23 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }) {
+  const numberLiteralVisitor = {
+    JSXExpressionContainer(path, state) {
+      const expression = path.get('expression');
+      if (expression.isNumericLiteral()) {
+        state.numbers.push(expression.node.value);
+        return;
+      }
+
+      if (expression.isJSXElement() || expression.isJSXFragment()) return;
+      path.skip();
+    },
+
+    JSXElement(path) {
+      if (isComponent(path)) path.skip();
+    },
+  };
+
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -12,78 +29,50 @@ module.exports = function({ types: t, template }) {
     },
   };
 
-  function undefinedNode() {
-    return template.expression.ast`void 0`;
-  }
-
-  function createElementRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('createElement');
-    return template.expression.ast`jsx2.createElement`;
-  }
-
-  function expressionMarkerRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('expressionMarker');
-    return template.expression.ast`jsx2.expressionMarker`;
-  }
-
-  function fragMarkerRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('Fragment');
-    return template.expression.ast`jsx2.Fragment`;
-  }
-
   function buildTemplate(path) {
     if (isComponent(path)) {
       return buildElement(path);
     }
 
+    const numberState = {
+      numbers: [],
+      lowestNumber: 0,
+    };
+    path.traverse(numberLiteralVisitor, numberState);
+
     const expressions = [];
-    const numbers = [];
-    let hasExpressionMarker = false;
-    let hasFragment = false;
+    let expressionMarker = null;
+    let fragMarker = null;
 
     const treeNode = buildElement(path, {
       expressions,
-      numbers,
+
       expressionMarker() {
-        hasExpressionMarker = true;
-        return expressionMarkerRef(true);
+        if (!expressionMarker) {
+          expressionMarker = nextLowestNumber(numberState);
+        }
+        return t.cloneNode(expressionMarker);
       },
+
       fragMarker() {
-        hasFragment = true;
-        return fragMarkerRef(true);
+        if (!fragMarker) {
+          fragMarker = nextLowestNumber(numberState);
+        }
+        return t.cloneNode(fragMarker);
       },
     });
 
-    let expressionMarker = null;
-    let fragMarker = null;
-    let lowestNumber = 0;
-
-    if (hasExpressionMarker) {
-      for (; !expressionMarker; lowestNumber++) {
-        if (!numbers.includes(lowestNumber)) {
-          expressionMarker = t.numericLiteral(lowestNumber);
-        }
-      }
-    }
-    if (hasFragment) {
-      for (; !fragMarker; lowestNumber++) {
-        if (!numbers.includes(lowestNumber)) {
-          fragMarker = t.numericLiteral(lowestNumber);
-        }
-      }
-    }
-
     const program = path.findParent(p => p.isProgram());
-    const cooked = (0, eval)(toString(
-      program,
-      template.expression.ast`(0, function(${expressionMarkerRef(true)}, ${fragMarkerRef(true)}) {
-        return JSON.stringify(${treeNode});
-      })(${expressionMarker || undefinedNode()}, ${fragMarker || undefinedNode()})`
-    ));
-    const stringified = t.templateLiteral([t.templateElement({
-      raw: cooked.replace(/\${|\\/g, '\\$&'),
-      cooked,
-    })], []);
+    const cooked = JSON.stringify(evaluateNode(program, treeNode));
+    const stringified = t.templateLiteral(
+      [
+        t.templateElement({
+          cooked,
+          raw: cooked.replace(/\${|\\/g, '\\$&'),
+        }),
+      ],
+      []
+    );
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
@@ -99,14 +88,14 @@ module.exports = function({ types: t, template }) {
       jsx2.templateResult(
         ${id}(),
         ${t.arrayExpression(expressions)},
-        ${expressionMarker ? expressionMarker : fragMarker ? undefinedNode() : null},
+        ${expressionMarker || (fragMarker ? template.expression.ast`void 0` : null)},
         ${fragMarker}
       )
     `;
   }
 
   function buildElement(path, state) {
-    if (isComponent(path) && state) {
+    if (state && isComponent(path)) {
       state.expressions.push(path.node);
       return state.expressionMarker();
     }
@@ -115,7 +104,7 @@ module.exports = function({ types: t, template }) {
     const type = frag
       ? state
         ? state.fragMarker()
-        : fragMarkerRef(false)
+        : template.expression.ast`jsx2.Fragment`
       : elementType(path);
 
     const { props, key, ref, children } = buildProps(
@@ -124,22 +113,22 @@ module.exports = function({ types: t, template }) {
       state
     );
 
-    if (!state) {
-      return template.expression.ast`
-        ${createElementRef(state)}(
-          ${type},
-          ${props ? props : children ? t.nullLiteral() : null},
-          ${children}
-        )
-      `;
+    if (state) {
+      return template.expression.ast`{
+        type: ${type},
+        key: ${key},
+        ref: ${ref},
+        props: ${props},
+      }`;
     }
 
-    return template.expression.ast`{
-      type: ${type},
-      key: ${key},
-      ref: ${ref},
-      props: ${props},
-    }`;
+    return template.expression.ast`
+      jsx2.createElement(
+        ${type},
+        ${props || (children ? t.nullLiteral() : null)},
+        ${children}
+      )
+    `;
   }
 
   function buildProps(attributePaths, childPaths, state) {
@@ -245,10 +234,6 @@ module.exports = function({ types: t, template }) {
     }
 
     const { node } = value;
-    if (value.isNumericLiteral()) {
-      state.numbers.push(node.value);
-      return node;
-    }
     if (value.isLiteral()) return node;
 
     if (!state) return node;
@@ -309,10 +294,26 @@ module.exports = function({ types: t, template }) {
     }, []);
   }
 
-  function toString(program, node) {
+  function nextLowestNumber(state) {
+    let { numbers, lowestNumber } = state;
+    while (true) {
+      lowestNumber++;
+      if (!numbers.includes(lowestNumber)) {
+        state.lowestNumber = lowestNumber;
+        return t.numericLiteral(lowestNumber);
+      }
+    }
+  }
+
+  function evaluateNode(program, node) {
     const [path] = program.pushContainer('body', node);
-    const string = path.toString();
+    const result = path.evaluate();
+
+    if (!result.confident) {
+      throw path.buildCodeFrameError("Well this is strange, we can't evaluate the static template");
+    }
+
     path.remove();
-    return string;
+    return result.value;
   }
 };
