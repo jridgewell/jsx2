@@ -1,7 +1,14 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }, options = {}) {
-  const { json = false, taggedTemplate = false } = options;
+  const { json = false, minimalJson = false, taggedTemplate = false } = options;
+
+  if (minimalJson && !json) {
+    throw new Error('"minimalJson" option requires "json" to be true');
+  }
+  if (taggedTemplate && !json) {
+    throw new Error('"taggedTemplate" option requires "json" to be true');
+  }
 
   return {
     name: 'transform-jsx2',
@@ -106,8 +113,9 @@ module.exports = function({ types: t, template }, options = {}) {
     const childrenStatic = [];
     const objs = [];
     let objProps = [];
-    let ref = t.nullLiteral();
-    let key = t.stringLiteral('');
+    let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
+    let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
+    let props = minimalJson ? t.identifier('undefined') : t.nullLiteral();
 
     for (let i = 0; i < attributePaths.length; i++) {
       const attribute = attributePaths[i];
@@ -168,7 +176,6 @@ module.exports = function({ types: t, template }, options = {}) {
     }
     pushProps(objProps, objs);
 
-    let props = t.nullLiteral();
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
@@ -282,10 +289,15 @@ module.exports = function({ types: t, template }, options = {}) {
         return `[${node.elements.map(stringify)}]`;
 
       case 'ObjectExpression':
-        return `{${node.properties.map(stringify)}}`;
+        return `{${node.properties.map(stringify).filter(Boolean)}}`;
 
-      case 'ObjectProperty':
-        return `${stringify(node.key)}:${stringify(node.value)}`;
+      case 'ObjectProperty': {
+        const { key, value } = node;
+        if (minimalJson && t.isIdentifier(value, { name: 'undefined' })) {
+          return '';
+        }
+        return `${stringify(key)}:${stringify(value)}`;
+      }
     }
 
     throw new Error(`Can't handle type "${type}"`);
