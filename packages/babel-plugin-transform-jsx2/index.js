@@ -296,7 +296,7 @@ module.exports = function({ types: t, template }, options = {}) {
   }
 
   function buildTaggedTemplate(json, expressions) {
-    const regex = /((?:[^"\d]+(?:"(?:\\\\|\\"|[^"])*")?)+)(\d+|$)/g;
+    const regex = /((?:[^"\d]+(?:"(?:[^"\\]*|\\[^])+")?)+)(\d+|$)/g;
     const elements = [];
     let orderedExpressions = [];
 
