@@ -50,7 +50,7 @@ module.exports = function({ types: t, template }, options = {}) {
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}(${json ? null : template.expression.ast`createElement`}) {
+      function ${id}(${json ? null : 'createElement'}) {
         const tree = ${tree};
         ${id} = () => tree;
         return tree;
@@ -60,7 +60,7 @@ module.exports = function({ types: t, template }, options = {}) {
 
     return template.expression.ast`
       jsx2.templateResult(
-        ${id}(${json ? null : template.expression.ast`jsx2.createElement`}),
+        ${id}(${json ? null : 'jsx2.createElement'}),
         ${t.arrayExpression(expressions)}
       )
     `;
@@ -94,9 +94,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return template.expression.ast`
-      ${
-        state ? template.expression.ast`createElement` : template.expression.ast`jsx2.createElement`
-      }(
+      ${state ? 'createElement' : 'jsx2.createElement'}(
         ${type},
         ${props},
         ${children}
@@ -296,7 +294,7 @@ module.exports = function({ types: t, template }, options = {}) {
   function buildTaggedTemplate(json, expressions) {
     const regex = /((?:[^"\d]+(?:"(?:[^"\\]*|\\[^])+")?)+)(\d+|$)/g;
     const elements = [];
-    let orderedExpressions = [];
+    const orderedExpressions = [];
 
     let match;
     while ((match = regex.exec(json))) {
