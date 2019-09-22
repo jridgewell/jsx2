@@ -1,6 +1,8 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
-module.exports = function({ types: t, template }) {
+module.exports = function({ types: t, template }, options = {}) {
+  const { json = false } = options;
+
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -21,9 +23,9 @@ module.exports = function({ types: t, template }) {
 
     const expressions = [];
     let fragIndex;
-    const treeNode = buildElement(path, {
+    let tree = buildElement(path, {
       expressionMarker(node) {
-        const {length} = expressions;
+        const { length } = expressions;
         expressions.push(node);
         return t.numericLiteral(length);
       },
@@ -33,24 +35,27 @@ module.exports = function({ types: t, template }) {
           fragIndex = this.expressionMarker(template.expression.ast`jsx2.Fragment`);
         }
         return t.cloneNode(fragIndex);
-      }
+      },
     });
 
-    const cooked = JSON.stringify(evaluateNode(program, treeNode));
-    const stringified = t.templateLiteral(
-      [
-        t.templateElement({
-          cooked,
-          raw: cooked.replace(/\${|\\/g, '\\$&'),
-        }),
-      ],
-      []
-    );
+    if (json) {
+      const cooked = JSON.stringify(evaluateNode(program, tree));
+      const stringified = t.templateLiteral(
+        [
+          t.templateElement({
+            cooked,
+            raw: cooked.replace(/\${|\\/g, '\\$&'),
+          }),
+        ],
+        []
+      );
+      tree = template.expression.ast`JSON.parse(${stringified})`;
+    }
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}() {
-        const tree = JSON.parse(${stringified});
+      function ${id}(${json ? null : template.expression.ast`createElement`}) {
+        const tree = ${tree};
         ${id} = () => tree;
         return tree;
       }
@@ -59,7 +64,7 @@ module.exports = function({ types: t, template }) {
 
     return template.expression.ast`
       jsx2.templateResult(
-        ${id}(),
+        ${id}(${json ? null : template.expression.ast`jsx2.createElement`}),
         ${t.arrayExpression(expressions)}
       )
     `;
@@ -83,7 +88,7 @@ module.exports = function({ types: t, template }) {
       state
     );
 
-    if (state) {
+    if (state && json) {
       return template.expression.ast`{
         type: ${type},
         key: ${key},
@@ -93,9 +98,11 @@ module.exports = function({ types: t, template }) {
     }
 
     return template.expression.ast`
-      jsx2.createElement(
+      ${
+        state ? template.expression.ast`createElement` : template.expression.ast`jsx2.createElement`
+      }(
         ${type},
-        ${props || (children ? t.nullLiteral() : null)},
+        ${props},
         ${children}
       )
     `;
@@ -125,7 +132,7 @@ module.exports = function({ types: t, template }) {
       const name = attribute.get('name');
       const value = attribute.get('value');
 
-      if (state) {
+      if (state && json) {
         if (name.isJSXIdentifier({ name: 'key' })) {
           key = extractAttributeValue(value, state);
           continue;
@@ -162,7 +169,7 @@ module.exports = function({ types: t, template }) {
     }
 
     const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
-    if (state && children) {
+    if (state && json && children) {
       objProps.push(t.objectProperty(t.identifier('children'), children));
     }
     pushProps(objProps, objs);

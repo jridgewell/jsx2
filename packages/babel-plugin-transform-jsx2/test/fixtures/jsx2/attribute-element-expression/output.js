@@ -1,9 +1,11 @@
 function test() {
-  return jsx2.templateResult(_template(), [x]);
+  return jsx2.templateResult(_template(jsx2.createElement), [x]);
 }
 
-function _template() {
-  const tree = JSON.parse(`{"type":"div","key":"","ref":null,"props":{"attr":{"type":"inner","key":"","ref":null,"props":{"children":[0]}}}}`);
+function _template(createElement) {
+  const tree = createElement("div", {
+    attr: createElement("inner", null, [0])
+  });
 
   _template = () => tree;
 
