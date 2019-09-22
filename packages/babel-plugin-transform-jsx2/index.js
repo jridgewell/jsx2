@@ -281,15 +281,13 @@ module.exports = function({ types: t, template }, options = {}) {
         return JSON.stringify(node.name);
 
       case 'ArrayExpression':
-        const elements = node.elements.map(stringify);
-        return `[${elements}]`;
+        return `[${node.elements.map(stringify)}]`;
 
       case 'ObjectExpression':
-        const properties = node.properties.map(prop => {
-          const { key, value } = prop;
-          return `${stringify(key)}:${stringify(value)}`;
-        });
-        return `{${properties}}`;
+        return `{${node.properties.map(stringify)}}`;
+
+      case 'ObjectProperty':
+        return `${stringify(node.key)}:${stringify(node.value)}`;
     }
 
     throw new Error(`Can't handle type "${type}"`);
