@@ -1,7 +1,7 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }, options = {}) {
-  const { json = false } = options;
+  const { json = false, taggedTemplate = false } = options;
 
   return {
     name: 'transform-jsx2',
@@ -27,7 +27,7 @@ module.exports = function({ types: t, template }, options = {}) {
       expressionMarker(node) {
         const { length } = expressions;
         expressions.push(node);
-        return t.numericLiteral(length);
+        return t.numericLiteral(json && taggedTemplate ? length + 1 : length);
       },
 
       fragMarker() {
@@ -39,16 +39,12 @@ module.exports = function({ types: t, template }, options = {}) {
     });
 
     if (json) {
-      const cooked = JSON.stringify(evaluateNode(program, tree));
-      const stringified = t.templateLiteral(
-        [
-          t.templateElement({
-            cooked,
-            raw: cooked.replace(/\${|\\/g, '\\$&'),
-          }),
-        ],
-        []
-      );
+      const cooked = stringify(tree);
+      if (taggedTemplate) {
+        return buildTaggedTemplate(cooked, expressions);
+      }
+
+      const stringified = t.templateLiteral([buildTemplateElement(cooked)], []);
       tree = template.expression.ast`JSON.parse(${stringified})`;
     }
 
@@ -268,15 +264,62 @@ module.exports = function({ types: t, template }, options = {}) {
     }, []);
   }
 
-  function evaluateNode(program, node) {
-    const [path] = program.pushContainer('body', node);
-    const result = path.evaluate();
+  function stringify(node) {
+    const { type } = node;
+    switch (type) {
+      case 'BooleanLiteral':
+      case 'NumericLiteral':
+        return String(node.value);
 
-    if (!result.confident) {
-      throw path.buildCodeFrameError("Well this is strange, we can't evaluate the static template");
+      case 'NullLiteral':
+        return 'null';
+
+      case 'StringLiteral':
+        return JSON.stringify(node.value);
+
+      case 'Identifier':
+        return JSON.stringify(node.name);
+
+      case 'ArrayExpression':
+        const elements = node.elements.map(stringify);
+        return `[${elements}]`;
+
+      case 'ObjectExpression':
+        const properties = node.properties.map(prop => {
+          const { key, value } = prop;
+          return `${stringify(key)}:${stringify(value)}`;
+        });
+        return `{${properties}}`;
     }
 
-    path.remove();
-    return result.value;
+    throw new Error(`Can't handle type "${type}"`);
+  }
+
+  function buildTaggedTemplate(json, expressions) {
+    const regex = /((?:[^"\d]+(?:"(?:\\\\|\\"|[^"])*")?)+)(\d+|$)/g;
+    const elements = [];
+    let orderedExpressions = [];
+
+    let match;
+    while ((match = regex.exec(json))) {
+      elements.push(buildTemplateElement(match[1]));
+
+      const digit = +match[2];
+      if (digit > 0) {
+        orderedExpressions.push(t.cloneNode(expressions[digit - 1]));
+      }
+    }
+
+    return t.taggedTemplateExpression(
+      template.expression.ast`jsx2.templateResult`,
+      t.templateLiteral(elements, orderedExpressions)
+    );
+  }
+
+  function buildTemplateElement(cooked) {
+    return t.templateElement({
+      cooked,
+      raw: cooked.replace(/\${|\\/g, '\\$&'),
+    });
   }
 };
