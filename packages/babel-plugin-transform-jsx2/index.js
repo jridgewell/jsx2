@@ -1,7 +1,15 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }, options = {}) {
-  const { json = false, minimalJson = false, taggedTemplate = false } = options;
+  const {
+    json = false,
+    minimalJson = false,
+    taggedTemplate = false,
+
+    pragma = 'jsx2.createElement',
+    pragmaFrag = 'jsx2.Fragment',
+    pragmaTemplate = 'jsx2.templateResult',
+  } = options;
 
   if (minimalJson && !json) {
     throw new Error('"minimalJson" option requires "json" to be true');
@@ -39,7 +47,7 @@ module.exports = function({ types: t, template }, options = {}) {
 
       fragMarker() {
         if (fragIndex === undefined) {
-          fragIndex = this.expressionMarker(template.expression.ast`jsx2.Fragment`);
+          fragIndex = this.expressionMarker(template.expression.ast(pragmaFrag));
         }
         return t.cloneNode(fragIndex);
       },
@@ -66,8 +74,8 @@ module.exports = function({ types: t, template }, options = {}) {
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      jsx2.templateResult(
-        ${id}(${json ? null : 'jsx2.createElement'}),
+      ${pragmaTemplate}(
+        ${id}(${json ? null : pragma}),
         ${t.arrayExpression(expressions)}
       )
     `;
@@ -82,7 +90,7 @@ module.exports = function({ types: t, template }, options = {}) {
     const type = frag
       ? state
         ? state.fragMarker()
-        : template.expression.ast`jsx2.Fragment`
+        : template.expression.ast(pragmaFrag)
       : elementType(path);
 
     const { props, key, ref, children } = buildProps(
@@ -101,7 +109,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return template.expression.ast`
-      ${state ? 'createElement' : 'jsx2.createElement'}(
+      ${state ? 'createElement' : pragma}(
         ${type},
         ${props},
         ${children}
@@ -117,9 +125,7 @@ module.exports = function({ types: t, template }, options = {}) {
     let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
     let props = minimalJson ? t.identifier('undefined') : t.nullLiteral();
 
-    for (let i = 0; i < attributePaths.length; i++) {
-      const attribute = attributePaths[i];
-
+    for (const attribute of attributePaths) {
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
         const { argument } = attribute.node;
@@ -149,8 +155,7 @@ module.exports = function({ types: t, template }, options = {}) {
       );
     }
 
-    for (let i = 0; i < childPaths.length; i++) {
-      const child = childPaths[i];
+    for (const child of childPaths) {
       if (child.isJSXText()) {
         const text = cleanJSXText(child.node);
         if (text) childrenStatic.push(text);
@@ -319,7 +324,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return t.taggedTemplateExpression(
-      template.expression.ast`jsx2.templateResult`,
+      template.expression.ast(pragmaTemplate),
       t.templateLiteral(elements, orderedExpressions)
     );
   }
