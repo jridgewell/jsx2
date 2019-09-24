@@ -360,7 +360,7 @@ module.exports = function({ types: t, template }, options = {}) {
   function buildTemplateElement(cooked) {
     return t.templateElement({
       cooked,
-      raw: cooked.replace(/\${|\\/g, '\\$&'),
+      raw: cooked.replace(/\${|\\|`/g, '\\$&'),
     });
   }
 
