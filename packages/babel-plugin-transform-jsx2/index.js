@@ -365,6 +365,8 @@ module.exports = function({ types: t, template }, options = {}) {
     if (path.isTemplateLiteral()) {
       return path.get('expressions').every(isLiteral);
     }
+    if (path.isRegExpLiteral()) return false;
+    if (json && path.isBigIntLiteral()) return false;
     return true;
   }
 };
