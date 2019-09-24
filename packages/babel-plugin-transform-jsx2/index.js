@@ -278,15 +278,11 @@ module.exports = function({ types: t, template }, options = {}) {
     const { type } = node;
     switch (type) {
       case 'BooleanLiteral':
+      case 'NullLiteral':
       case 'NumericLiteral':
       case 'StringLiteral':
-        return JSON.stringify(node.value);
-
-      case 'NullLiteral':
-        return JSON.stringify(null);
-
       case 'TemplateLiteral':
-        return JSON.stringify(simpleString(node));
+        return JSON.stringify(literalValue(node));
 
       case 'Identifier':
         return JSON.stringify(node.name);
@@ -309,28 +305,28 @@ module.exports = function({ types: t, template }, options = {}) {
     throw new Error(`Can't handle type "${type}"`);
   }
 
-  function simpleString(node) {
+  function literalValue(node) {
     const { type } = node;
     switch (type) {
-      case 'TemplateLiteral': {
-        const {quasis, expressions} = node;
-        let s = simpleString(quasis[0]);
-        for (let i = 1; i < quasis.length; i++) {
-          s += simpleString(expressions[i - 1]) + simpleString(quasis[i]);
-        }
-        return s;
-      }
+      case 'BooleanLiteral':
+      case 'NumericLiteral':
+      case 'StringLiteral':
+        return node.value;
+
+      case 'NullLiteral':
+        return null;
 
       case 'TemplateElement':
         return node.value.cooked;
 
-      case 'BooleanLiteral':
-      case 'NumericLiteral':
-      case 'StringLiteral':
-        return String(node.value);
-
-      case 'NullLiteral':
-        return String(null);
+      case 'TemplateLiteral': {
+        const {quasis, expressions} = node;
+        let s = literalValue(quasis[0]);
+        for (let i = 1; i < quasis.length; i++) {
+          s += literalValue(expressions[i - 1]) + literalValue(quasis[i]);
+        }
+        return s;
+      }
     }
 
     throw new Error(`Can't handle type "${type}"`);
