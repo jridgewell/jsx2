@@ -42,7 +42,7 @@ module.exports = function({ types: t, template }, options = {}) {
       expressionMarker(node) {
         const { length } = expressions;
         expressions.push(node);
-        return t.numericLiteral(json && taggedTemplate ? length + 1 : length);
+        return t.numericLiteral(taggedTemplate ? length + 1 : length);
       },
 
       fragMarker() {
@@ -324,7 +324,7 @@ module.exports = function({ types: t, template }, options = {}) {
         return node.value.cooked;
 
       case 'TemplateLiteral': {
-        const {quasis, expressions} = node;
+        const { quasis, expressions } = node;
         let s = literalValue(quasis[0]);
         for (let i = 1; i < quasis.length; i++) {
           s += literalValue(expressions[i - 1]) + literalValue(quasis[i]);
