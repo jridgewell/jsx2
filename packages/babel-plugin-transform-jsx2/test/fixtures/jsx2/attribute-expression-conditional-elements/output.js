@@ -1,10 +1,10 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [cond ? jsx2.templateResult(_template2(jsx2.createElement), []) : jsx2.templateResult(_template3(jsx2.createElement), [])]);
+  return jsx2.templateResult(_template(jsx2.createElement), [cond ? jsx2.templateResult(_template2(jsx2.createElement), []) : jsx2.templateResult(_template3(jsx2.createElement), [])]);
 }
 
-function _template(createElement, expressionMarker) {
+function _template(createElement) {
   const tree = createElement("div", {
-    attr: expressionMarker
+    attr: 0
   });
 
   _template = () => tree;
@@ -13,7 +13,7 @@ function _template(createElement, expressionMarker) {
 }
 
 function _template2(createElement) {
-  const tree = createElement("t");
+  const tree = createElement("t", null);
 
   _template2 = () => tree;
 
@@ -21,7 +21,7 @@ function _template2(createElement) {
 }
 
 function _template3(createElement) {
-  const tree = createElement("f");
+  const tree = createElement("f", null);
 
   _template3 = () => tree;
 

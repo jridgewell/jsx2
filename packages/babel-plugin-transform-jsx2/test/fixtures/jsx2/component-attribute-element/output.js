@@ -5,7 +5,7 @@ function test() {
 }
 
 function _template(createElement) {
-  const tree = createElement("inner");
+  const tree = createElement("inner", null);
 
   _template = () => tree;
 

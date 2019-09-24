@@ -1,6 +1,23 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 
-module.exports = function({ types: t, template }) {
+module.exports = function({ types: t, template }, options = {}) {
+  const {
+    json = false,
+    minimalJson = false,
+    taggedTemplate = false,
+
+    pragma = 'jsx2.createElement',
+    pragmaFrag = 'jsx2.Fragment',
+    pragmaTemplate = 'jsx2.templateResult',
+  } = options;
+
+  if (minimalJson && !json) {
+    throw new Error('"minimalJson" option requires "json" to be true');
+  }
+  if (taggedTemplate && !json) {
+    throw new Error('"taggedTemplate" option requires "json" to be true');
+  }
+
   return {
     name: 'transform-jsx2',
     inherits: jsx.default,
@@ -12,89 +29,91 @@ module.exports = function({ types: t, template }) {
     },
   };
 
-  function createElementRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('createElement');
-    return template.expression.ast`jsx2.createElement`;
-  }
-
-  function expressionMarkerRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('expressionMarker');
-    return template.expression.ast`jsx2.expressionMarker`;
-  }
-
-  function fragMarkerRef(insideTemplate) {
-    if (insideTemplate) return t.identifier('Fragment');
-    return template.expression.ast`jsx2.Fragment`;
-  }
-
   function buildTemplate(path) {
     if (isComponent(path)) {
       return buildElement(path);
     }
 
+    const program = path.findParent(p => p.isProgram());
+
     const expressions = [];
-    let hasExpressionMarker = false;
-    let hasFragment = false;
-    const tree = buildElement(path, {
-      expressions,
-      expressionMarker() {
-        hasExpressionMarker = true;
-        return expressionMarkerRef(true);
+    let fragIndex;
+    let tree = buildElement(path, {
+      expressionMarker(node) {
+        const { length } = expressions;
+        expressions.push(node);
+        return t.numericLiteral(json && taggedTemplate ? length + 1 : length);
       },
+
       fragMarker() {
-        hasFragment = true;
-        return fragMarkerRef(true);
+        if (fragIndex === undefined) {
+          fragIndex = this.expressionMarker(template.expression.ast(pragmaFrag));
+        }
+        return t.cloneNode(fragIndex);
       },
     });
 
+    if (json) {
+      const cooked = stringify(tree);
+      if (taggedTemplate) {
+        return buildTaggedTemplate(cooked, expressions);
+      }
+
+      const stringified = t.templateLiteral([buildTemplateElement(cooked)], []);
+      tree = template.expression.ast`JSON.parse(${stringified})`;
+    }
+
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}(
-        ${createElementRef(true)},
-        ${hasExpressionMarker ? expressionMarkerRef(true) : null},
-        ${hasFragment ? fragMarkerRef(true) : null}
-      ) {
+      function ${id}(${json ? null : 'createElement'}) {
         const tree = ${tree};
         ${id} = () => tree;
         return tree;
       }
     `;
-    const program = path.findParent(p => p.isProgram());
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      jsx2.templateResult(
-        ${id}(
-          ${createElementRef(false)},
-          ${hasExpressionMarker ? expressionMarkerRef(false) : null},
-          ${hasFragment ? fragMarkerRef(false) : null}
-        ),
+      ${pragmaTemplate}(
+        ${id}(${json ? null : pragma}),
         ${t.arrayExpression(expressions)}
       )
     `;
   }
 
   function buildElement(path, state) {
-    if (isComponent(path) && state) {
-      state.expressions.push(path.node);
-      return state.expressionMarker();
+    if (state && isComponent(path)) {
+      return state.expressionMarker(path.node);
     }
 
     const frag = path.isJSXFragment();
     const type = frag
       ? state
         ? state.fragMarker()
-        : fragMarkerRef(false)
+        : template.expression.ast(pragmaFrag)
       : elementType(path);
 
-    const { props, children } = buildProps(
+    const { props, key, ref, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
       path.get('children'),
       state
     );
 
+    if (state && json) {
+      return template.expression.ast`{
+        type: ${type},
+        key: ${key},
+        ref: ${ref},
+        props: ${props},
+      }`;
+    }
+
     return template.expression.ast`
-      ${createElementRef(state)}(${type}, ${props}, ${children})
+      ${state ? 'createElement' : pragma}(
+        ${type},
+        ${props},
+        ${children}
+      )
     `;
   }
 
@@ -102,16 +121,16 @@ module.exports = function({ types: t, template }) {
     const childrenStatic = [];
     const objs = [];
     let objProps = [];
+    let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
+    let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
+    let props = minimalJson ? t.identifier('undefined') : t.nullLiteral();
 
-    for (let i = 0; i < attributePaths.length; i++) {
-      const attribute = attributePaths[i];
-
+    for (const attribute of attributePaths) {
       if (attribute.isJSXSpreadAttribute()) {
         objProps = pushProps(objProps, objs);
         const { argument } = attribute.node;
         if (state) {
-          state.expressions.push(argument);
-          objs.push(state.expressionMarker());
+          objs.push(state.expressionMarker(argument));
         } else {
           objs.push(t.objectExpression([t.spreadElement(argument)]));
         }
@@ -121,13 +140,22 @@ module.exports = function({ types: t, template }) {
       const name = attribute.get('name');
       const value = attribute.get('value');
 
+      if (state && json) {
+        if (name.isJSXIdentifier({ name: 'key' })) {
+          key = extractAttributeValue(value, state);
+          continue;
+        } else if (name.isJSXIdentifier({ name: 'ref' })) {
+          ref = extractAttributeValue(value, state);
+          continue;
+        }
+      }
+
       objProps.push(
         t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, state))
       );
     }
 
-    for (let i = 0; i < childPaths.length; i++) {
-      const child = childPaths[i];
+    for (const child of childPaths) {
       if (child.isJSXText()) {
         const text = cleanJSXText(child.node);
         if (text) childrenStatic.push(text);
@@ -137,8 +165,7 @@ module.exports = function({ types: t, template }) {
       if (child.isJSXSpreadChild()) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
         if (state) {
-          state.expressions.push(array);
-          childrenStatic.push(state.expressionMarker());
+          childrenStatic.push(state.expressionMarker(array));
         } else {
           childrenStatic.push(array);
         }
@@ -147,11 +174,13 @@ module.exports = function({ types: t, template }) {
 
       childrenStatic.push(extractValue(child, state));
     }
-    pushProps(objProps, objs);
 
     const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
+    if (state && json && children) {
+      objProps.push(t.objectProperty(t.identifier('children'), children));
+    }
+    pushProps(objProps, objs);
 
-    let props = null;
     if (objs.length) {
       if (objs.length === 1 && t.isObjectExpression(objs[0])) {
         props = objs[0];
@@ -160,11 +189,9 @@ module.exports = function({ types: t, template }) {
       } else {
         props = t.objectExpression(flatMap(objs, o => o.properties));
       }
-    } else if (children) {
-      props = t.nullLiteral();
     }
 
-    return { props, children };
+    return { props, key, ref, children };
   }
 
   function pushProps(objProps, objs) {
@@ -186,12 +213,12 @@ module.exports = function({ types: t, template }) {
       if (state) return buildElement(value, state);
       return buildTemplate(value);
     }
-    if (value.isLiteral()) return value.node;
 
     const { node } = value;
-    if (!state) return node;
-    state.expressions.push(node);
-    return state.expressionMarker();
+    if (value.isLiteral() && !value.isNumericLiteral()) return node;
+
+    if (state) return state.expressionMarker(node);
+    return node;
   }
 
   function elementType(path) {
@@ -245,5 +272,67 @@ module.exports = function({ types: t, template }) {
     return array.reduce((collection, ...args) => {
       return collection.concat(cb(...args));
     }, []);
+  }
+
+  function stringify(node) {
+    const { type } = node;
+    switch (type) {
+      case 'BooleanLiteral':
+      case 'NumericLiteral':
+        return String(node.value);
+
+      case 'NullLiteral':
+        return 'null';
+
+      case 'StringLiteral':
+        return JSON.stringify(node.value);
+
+      case 'Identifier':
+        return JSON.stringify(node.name);
+
+      case 'ArrayExpression':
+        return `[${node.elements.map(stringify)}]`;
+
+      case 'ObjectExpression':
+        return `{${node.properties.map(stringify).filter(Boolean)}}`;
+
+      case 'ObjectProperty': {
+        const { key, value } = node;
+        if (minimalJson && t.isIdentifier(value, { name: 'undefined' })) {
+          return '';
+        }
+        return `${stringify(key)}:${stringify(value)}`;
+      }
+    }
+
+    throw new Error(`Can't handle type "${type}"`);
+  }
+
+  function buildTaggedTemplate(json, expressions) {
+    const regex = /((?:[^"\d]+(?:"(?:[^"\\]*|\\[^])+")?)+)(\d+|$)/g;
+    const elements = [];
+    const orderedExpressions = [];
+
+    let match;
+    while ((match = regex.exec(json))) {
+      elements.push(buildTemplateElement(match[1]));
+
+      const digit = +match[2];
+      if (digit > 0) {
+        orderedExpressions.push(t.cloneNode(expressions[digit - 1]));
+      }
+    }
+
+    return t.taggedTemplateExpression(
+      template.expression.ast(pragmaTemplate),
+      t.templateLiteral(elements, orderedExpressions)
+    );
+  }
+
+  function buildTemplateElement(cooked) {
+    return t.templateElement({
+      cooked,
+      raw: cooked.replace(/\${|\\/g, '\\$&'),
+    });
   }
 };

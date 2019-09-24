@@ -1,20 +1,20 @@
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement, jsx2.expressionMarker), [before, jsx2.createElement(Component, {
+  return jsx2.templateResult(_template(jsx2.createElement), [before, jsx2.createElement(Component, {
     id: foo,
     bar: bar
-  }, [jsx2.templateResult(_template2(jsx2.createElement, jsx2.expressionMarker), [text]), "second", jsx2.templateResult(_template3(jsx2.createElement), []), fourth, jsx2.templateResult(_template4(jsx2.createElement, jsx2.expressionMarker), [fifth]), [...sixth]]), after]);
+  }, [jsx2.templateResult(_template2(jsx2.createElement), [text]), "second", jsx2.templateResult(_template3(jsx2.createElement), []), fourth, jsx2.templateResult(_template4(jsx2.createElement), [fifth]), [...sixth]]), after]);
 }
 
-function _template(createElement, expressionMarker) {
-  const tree = createElement("div", null, [createElement("before", null, [expressionMarker]), expressionMarker, createElement("after", null, [expressionMarker])]);
+function _template(createElement) {
+  const tree = createElement("div", null, [createElement("before", null, [0]), 1, createElement("after", null, [2])]);
 
   _template = () => tree;
 
   return tree;
 }
 
-function _template2(createElement, expressionMarker) {
-  const tree = createElement("first", null, [expressionMarker]);
+function _template2(createElement) {
+  const tree = createElement("first", null, [0]);
 
   _template2 = () => tree;
 
@@ -31,9 +31,9 @@ function _template3(createElement) {
   return tree;
 }
 
-function _template4(createElement, expressionMarker) {
+function _template4(createElement) {
   const tree = createElement("fifth", {
-    fifth: expressionMarker
+    fifth: 0
   });
 
   _template4 = () => tree;

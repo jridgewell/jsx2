@@ -3,7 +3,7 @@ function test() {
 }
 
 function _template(createElement) {
-  const tree = createElement("xml:foo");
+  const tree = createElement("xml:foo", null);
 
   _template = () => tree;
 
