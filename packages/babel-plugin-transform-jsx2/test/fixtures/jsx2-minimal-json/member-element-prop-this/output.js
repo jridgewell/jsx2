@@ -1,3 +1,3 @@
 function test() {
-  return jsx2.createElement(xml.this, undefined);
+  return jsx2.createElement(xml.this, null);
 }

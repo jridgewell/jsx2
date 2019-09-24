@@ -123,7 +123,7 @@ module.exports = function({ types: t, template }, options = {}) {
     let objProps = [];
     let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
     let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
-    let props = minimalJson ? t.identifier('undefined') : t.nullLiteral();
+    let props = state && minimalJson ? t.identifier('undefined') : t.nullLiteral();
 
     for (const attribute of attributePaths) {
       if (attribute.isJSXSpreadAttribute()) {

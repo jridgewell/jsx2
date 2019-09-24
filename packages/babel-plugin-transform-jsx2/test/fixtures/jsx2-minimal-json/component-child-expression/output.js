@@ -1,5 +1,5 @@
 function test() {
-  return jsx2.templateResult(_template(), [jsx2.createElement(Component, undefined, [x])]);
+  return jsx2.templateResult(_template(), [jsx2.createElement(Component, null, [x])]);
 }
 
 function _template() {
