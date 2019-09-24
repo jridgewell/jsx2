@@ -215,7 +215,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     const { node } = value;
-    if (value.isLiteral() && !value.isNumericLiteral()) return node;
+    if (isLiteral(value) && !value.isNumericLiteral()) return node;
 
     if (state) return state.expressionMarker(node);
     return node;
@@ -279,13 +279,14 @@ module.exports = function({ types: t, template }, options = {}) {
     switch (type) {
       case 'BooleanLiteral':
       case 'NumericLiteral':
-        return String(node.value);
-
-      case 'NullLiteral':
-        return 'null';
-
       case 'StringLiteral':
         return JSON.stringify(node.value);
+
+      case 'NullLiteral':
+        return JSON.stringify(null);
+
+      case 'TemplateLiteral':
+        return JSON.stringify(simpleString(node));
 
       case 'Identifier':
         return JSON.stringify(node.name);
@@ -298,11 +299,38 @@ module.exports = function({ types: t, template }, options = {}) {
 
       case 'ObjectProperty': {
         const { key, value } = node;
-        if (minimalJson && t.isIdentifier(value, { name: 'undefined' })) {
+        if (t.isIdentifier(value, { name: 'undefined' })) {
           return '';
         }
         return `${stringify(key)}:${stringify(value)}`;
       }
+    }
+
+    throw new Error(`Can't handle type "${type}"`);
+  }
+
+  function simpleString(node) {
+    const { type } = node;
+    switch (type) {
+      case 'TemplateLiteral': {
+        const {quasis, expressions} = node;
+        let s = simpleString(quasis[0]);
+        for (let i = 1; i < quasis.length; i++) {
+          s += simpleString(expressions[i - 1]) + simpleString(quasis[i]);
+        }
+        return s;
+      }
+
+      case 'TemplateElement':
+        return node.value.cooked;
+
+      case 'BooleanLiteral':
+      case 'NumericLiteral':
+      case 'StringLiteral':
+        return String(node.value);
+
+      case 'NullLiteral':
+        return String(null);
     }
 
     throw new Error(`Can't handle type "${type}"`);
@@ -334,5 +362,13 @@ module.exports = function({ types: t, template }, options = {}) {
       cooked,
       raw: cooked.replace(/\${|\\/g, '\\$&'),
     });
+  }
+
+  function isLiteral(path) {
+    if (!path.isLiteral()) return false;
+    if (path.isTemplateLiteral()) {
+      return path.get('expressions').every(isLiteral);
+    }
+    return true;
   }
 };
