@@ -172,6 +172,10 @@ module.exports = function({ types: t, template }, options = {}) {
         continue;
       }
 
+      if (child.isJSXExpressionContainer() && child.get('expression').isJSXEmptyExpression()) {
+        continue;
+      }
+
       childrenStatic.push(extractValue(child, state));
     }
 

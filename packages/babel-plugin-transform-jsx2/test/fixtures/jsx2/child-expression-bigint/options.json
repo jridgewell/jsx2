@@ -1,0 +1,6 @@
+{
+  "plugins": [
+    ["@babel/plugin-syntax-bigint"],
+    ["local-plugin", {"plugin": "../babel-plugin-transform-jsx2"}]
+  ]
+}
