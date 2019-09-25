@@ -4,8 +4,9 @@
   "description": "Reimagining JSX, faster performance with less memory",
   "private": true,
   "scripts": {
-    "pretest": "lerna link",
-    "test": "lerna run test"
+    "pretest": "lerna bootstrap",
+    "test-only": "lerna run test",
+    "test": "npm run test-only"
   },
   "author": "Justin Ridgewell <justin@ridgewell.name>",
   "license": "MIT",

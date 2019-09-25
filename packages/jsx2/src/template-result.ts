@@ -48,14 +48,3 @@ export function templateResult(strings: TemplateStringsArray, ...expressions: un
     constructor: void 0,
   };
 }
-
-export function isMarker(value: unknown): value is Marker {
-  return typeof value === 'number';
-};
-
-export function isTemplateResult(value: unknown): value is TemplateResult {
-  if (!value) return false;
-  if (typeof value !== 'object') return false;
-  let v = value as { constructor: unknown, tree: unknown };
-  return v.constructor === void 0 && !!v.tree;
-}
