@@ -87,11 +87,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     const frag = path.isJSXFragment();
-    const type = frag
-      ? state
-        ? state.fragMarker()
-        : template.expression.ast(pragmaFrag)
-      : elementType(path);
+    const type = frag ? state.fragMarker() : elementType(path);
 
     const { props, key, ref, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
@@ -269,6 +265,7 @@ module.exports = function({ types: t, template }, options = {}) {
     return t.react.buildChildren({ children: [node] }).pop();
   }
 
+  // istanbul ignore next
   function flatMap(array, cb) {
     if (array.flatMap) {
       return array.flatMap(cb);
@@ -306,6 +303,7 @@ module.exports = function({ types: t, template }, options = {}) {
       }
     }
 
+    // istanbul ignore next
     throw new Error(`Can't handle type "${type}"`);
   }
 
@@ -333,6 +331,7 @@ module.exports = function({ types: t, template }, options = {}) {
       }
     }
 
+    // istanbul ignore next
     throw new Error(`Can't handle type "${type}"`);
   }
 
