@@ -185,12 +185,11 @@ module.exports = function({ types: t, template }, options = {}) {
         children = staticChildren;
       }
     }
-
     if (state && json && children) {
       objProps.push(t.objectProperty(t.identifier('children'), children));
     }
-    pushProps(objProps, objs);
 
+    pushProps(objProps, objs);
     if (objs.length) {
       if (objs.length === 1) {
         props = objs[0];
