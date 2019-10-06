@@ -2,20 +2,17 @@ type Primitive = string | boolean | null;
 type Marker = number;
 
 type PropValue = Primitive | Marker | StaticNode;
-type Props =
-  | {
-      readonly children?: PropValue | readonly PropValue[];
-    }
-  | {
-      readonly [key: string]: PropValue;
-    };
-type PropsWithSpread = readonly (Props | Marker)[];
+type Props = {
+  readonly children?: PropValue | readonly PropValue[];
+} & {
+  readonly [key: string]: PropValue;
+};
 
 export interface StaticNode {
-  readonly type: string;
-  readonly key: string | null | Marker;
-  readonly ref: null | Marker;
-  readonly props: null | Props | PropsWithSpread;
+  readonly type: string | Marker;
+  readonly key?: string | null | Marker;
+  readonly ref?: null | Marker;
+  readonly props?: null | Props | Marker | readonly (Props | Marker)[];
 }
 
 export interface TemplateResult {
