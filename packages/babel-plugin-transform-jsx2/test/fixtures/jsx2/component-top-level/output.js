@@ -2,11 +2,11 @@ function test() {
   return jsx2.createElement(Component, {
     id: foo,
     bar: bar
-  }, [jsx2.templateResult(_template(jsx2.createElement), [text]), "second", jsx2.templateResult(_template2(jsx2.createElement), []), fourth, jsx2.templateResult(_template3(jsx2.createElement), [fifth]), [...sixth]]);
+  }, jsx2.templateResult(_template(jsx2.createElement), [text]), "second", jsx2.templateResult(_template2(jsx2.createElement), []), fourth, jsx2.templateResult(_template3(jsx2.createElement), [fifth]), [...sixth]);
 }
 
 function _template(createElement) {
-  const tree = createElement("first", null, [0]);
+  const tree = createElement("first", null, 0);
 
   _template = () => tree;
 

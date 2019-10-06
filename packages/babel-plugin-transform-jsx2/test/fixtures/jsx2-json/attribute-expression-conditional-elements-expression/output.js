@@ -11,7 +11,7 @@ function _template() {
 }
 
 function _template2() {
-  const tree = JSON.parse(`{"type":"inner","key":"","ref":null,"props":{"children":[0]}}`);
+  const tree = JSON.parse(`{"type":"inner","key":"","ref":null,"props":{"children":0}}`);
 
   _template2 = () => tree;
 

@@ -1,3 +1,3 @@
 function test() {
-  return jsx2.templateResult`{"type":"div","key":"","ref":null,"props":[${s},{"after":true,"children":["text"]}]}`;
+  return jsx2.templateResult`{"type":"div","key":"","ref":null,"props":[${s},{"after":true,"children":"text"}]}`;
 }

@@ -5,7 +5,7 @@ function test() {
 function _template(createElement) {
   const tree = createElement("div", [0, {
     after: true
-  }], ["text"]);
+  }], "text");
 
   _template = () => tree;
 

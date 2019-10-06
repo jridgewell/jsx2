@@ -114,7 +114,7 @@ module.exports = function({ types: t, template }, options = {}) {
   }
 
   function buildProps(attributePaths, childPaths, state) {
-    const childrenStatic = [];
+    const staticChildren = [];
     const objs = [];
     let objProps = [];
     let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
@@ -154,16 +154,16 @@ module.exports = function({ types: t, template }, options = {}) {
     for (const child of childPaths) {
       if (child.isJSXText()) {
         const text = cleanJSXText(child.node);
-        if (text) childrenStatic.push(text);
+        if (text) staticChildren.push(text);
         continue;
       }
 
       if (child.isJSXSpreadChild()) {
         const array = t.arrayExpression([t.spreadElement(child.node.expression)]);
         if (state) {
-          childrenStatic.push(state.expressionMarker(array));
+          staticChildren.push(state.expressionMarker(array));
         } else {
-          childrenStatic.push(array);
+          staticChildren.push(array);
         }
         continue;
       }
@@ -172,10 +172,10 @@ module.exports = function({ types: t, template }, options = {}) {
         continue;
       }
 
-      childrenStatic.push(extractValue(child, state));
+      staticChildren.push(extractValue(child, state));
     }
 
-    const children = childrenStatic.length ? t.arrayExpression(childrenStatic) : null;
+    const children = buildChildren(staticChildren);
     if (state && json && children) {
       objProps.push(t.objectProperty(t.identifier('children'), children));
     }
@@ -192,6 +192,18 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return { props, key, ref, children };
+  }
+
+  function buildChildren(staticChildren) {
+    switch (staticChildren.length) {
+      case 0:
+        return null;
+      case 1:
+        return staticChildren[0];
+    }
+
+    if (json) return t.arrayExpression(staticChildren);
+    return staticChildren;
   }
 
   function pushProps(objProps, objs) {
@@ -365,10 +377,10 @@ module.exports = function({ types: t, template }, options = {}) {
 
   function isLiteral(path) {
     if (!path.isLiteral()) return false;
+    if (path.isRegExpLiteral()) return false;
     if (path.isTemplateLiteral()) {
       return path.get('expressions').every(isLiteral);
     }
-    if (path.isRegExpLiteral()) return false;
     if (json && path.isBigIntLiteral()) return false;
     return true;
   }

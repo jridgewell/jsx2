@@ -7,7 +7,7 @@ function _template(createElement) {
     children: 0,
     key: 1,
     ref: 2
-  }, [3]);
+  }, 3);
 
   _template = () => tree;
 

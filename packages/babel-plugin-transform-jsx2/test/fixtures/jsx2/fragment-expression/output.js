@@ -3,7 +3,7 @@ function test() {
 }
 
 function _template(createElement) {
-  const tree = createElement(0, null, [1]);
+  const tree = createElement(0, null, 1);
 
   _template = () => tree;
 

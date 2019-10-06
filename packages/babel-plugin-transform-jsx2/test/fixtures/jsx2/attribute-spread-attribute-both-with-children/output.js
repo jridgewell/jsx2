@@ -7,7 +7,7 @@ function _template(createElement) {
     before: true
   }, 0, {
     after: true
-  }], ["text"]);
+  }], "text");
 
   _template = () => tree;
 
