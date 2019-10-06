@@ -1,3 +1,1 @@
-export {
-  templateResult
-} from './template-result';
+export { templateResult } from './template-result';

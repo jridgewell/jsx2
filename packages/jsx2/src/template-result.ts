@@ -1,8 +1,8 @@
-type Primitive = string | boolean | null;
-type Marker = number;
+export type Primitive = string | boolean | null;
+export type Marker = number;
 
-type PropValue = Primitive | Marker | StaticNode;
-type Props = {
+export type PropValue = Primitive | Marker | StaticNode;
+export type Props = {
   readonly children?: PropValue | readonly PropValue[];
 } & {
   readonly [key: string]: PropValue;
