@@ -120,6 +120,7 @@ module.exports = function({ types: t, template }, options = {}) {
     let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
     let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
     let props = state && minimalJson ? t.identifier('undefined') : t.nullLiteral();
+    let children = null;
 
     for (const attribute of attributePaths) {
       if (attribute.isJSXSpreadAttribute()) {
@@ -175,14 +176,23 @@ module.exports = function({ types: t, template }, options = {}) {
       staticChildren.push(extractValue(child, state));
     }
 
-    const children = buildChildren(staticChildren);
+    if (staticChildren.length) {
+      if (staticChildren.length === 1) {
+        children = staticChildren[0];
+      } else if (json) {
+        children = t.arrayExpression(staticChildren);
+      } else {
+        children = staticChildren;
+      }
+    }
+
     if (state && json && children) {
       objProps.push(t.objectProperty(t.identifier('children'), children));
     }
     pushProps(objProps, objs);
 
     if (objs.length) {
-      if (objs.length === 1 && t.isObjectExpression(objs[0])) {
+      if (objs.length === 1) {
         props = objs[0];
       } else if (state) {
         props = t.arrayExpression(objs);
@@ -192,18 +202,6 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return { props, key, ref, children };
-  }
-
-  function buildChildren(staticChildren) {
-    switch (staticChildren.length) {
-      case 0:
-        return null;
-      case 1:
-        return staticChildren[0];
-    }
-
-    if (json) return t.arrayExpression(staticChildren);
-    return staticChildren;
   }
 
   function pushProps(objProps, objs) {
