@@ -179,7 +179,7 @@ module.exports = function({ types: t, template }, options = {}) {
     if (staticChildren.length) {
       if (staticChildren.length === 1) {
         children = staticChildren[0];
-      } else if (json) {
+      } else if (state && json) {
         children = t.arrayExpression(staticChildren);
       } else {
         children = staticChildren;

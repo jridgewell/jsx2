@@ -2,7 +2,7 @@ function test() {
   return jsx2.createElement(Component, {
     id: foo,
     bar: bar
-  }, [jsx2.templateResult(_template(), [text]), "second", jsx2.templateResult(_template2(), []), fourth, jsx2.templateResult(_template3(), [fifth]), [...sixth]]);
+  }, jsx2.templateResult(_template(), [text]), "second", jsx2.templateResult(_template2(), []), fourth, jsx2.templateResult(_template3(), [fifth]), [...sixth]);
 }
 
 function _template() {
