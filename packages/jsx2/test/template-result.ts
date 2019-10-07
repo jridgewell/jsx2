@@ -1,4 +1,4 @@
-import {templateResult} from '../src/jsx2';
+import { templateResult } from '../src/jsx2';
 type TemplateResult = import('../src/template-result').TemplateResult;
 
 describe('templateResult', () => {
@@ -62,7 +62,7 @@ describe('templateResult', () => {
     expect(result.expressions).toEqual(['a', 'b']);
   });
 
-  it("sanity-check: naive JSON.parse cannot set constructor to undefined", () => {
+  it('sanity-check: naive JSON.parse cannot set constructor to undefined', () => {
     expect(() => {
       JSON.parse(`{"constructor": undefined}`);
     }).toThrow();
