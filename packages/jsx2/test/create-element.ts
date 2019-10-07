@@ -10,6 +10,22 @@ describe('createElement', () => {
     expect(el).toHaveProperty('props');
   });
 
+  it('accepts FunctionComponent as type', () => {
+    function Component() {}
+    const el = createElement(Component);
+
+    expect(el).toHaveProperty('type', Component);
+  });
+
+  it('accepts ClassComponent as type', () => {
+    class Component {
+      render() {}
+    }
+    const el = createElement(Component);
+
+    expect(el).toHaveProperty('type', Component);
+  });
+
   it('sets constructor to undefined', () => {
     const el = createElement('div');
 
