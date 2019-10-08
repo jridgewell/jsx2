@@ -1,4 +1,4 @@
-import { createElement } from '../src/jsx2';
+import { createElement, Component } from '../src/jsx2';
 
 describe('createElement', () => {
   it('returns object with type set to type arg', () => {
@@ -18,12 +18,10 @@ describe('createElement', () => {
   });
 
   it('accepts ClassComponent as type', () => {
-    class Component {
-      render() {}
-    }
-    const el = createElement(Component);
+    class C extends Component {}
+    const el = createElement(C);
 
-    expect(el).toHaveProperty('type', Component);
+    expect(el).toHaveProperty('type', C);
   });
 
   it('sets constructor to undefined', () => {
