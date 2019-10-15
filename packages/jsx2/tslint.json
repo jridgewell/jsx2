@@ -8,6 +8,7 @@
   },
   "rules": {
     "no-any": true,
+    "no-empty": false,
     "ordered-imports": true,
     "typedef": [
       true,
