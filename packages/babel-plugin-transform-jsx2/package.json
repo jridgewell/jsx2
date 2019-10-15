@@ -20,7 +20,6 @@
   "devDependencies": {
     "@babel/helper-plugin-test-runner": "7.1.0",
     "@babel/plugin-syntax-bigint": "7.4.4",
-    "babel-plugin-local-plugin": "0.0.0",
     "jest": "24.9.0"
   },
   "peerDependencies": {

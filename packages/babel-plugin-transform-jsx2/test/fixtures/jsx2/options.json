@@ -1,5 +1,5 @@
 {
   "plugins": [
-    ["local-plugin", {"plugin": "../babel-plugin-transform-jsx2"}]
+    ["../../../.."]
   ]
 }
