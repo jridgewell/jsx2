@@ -17,7 +17,13 @@ describe('createElement', () => {
     expect(el).toHaveProperty('type', Component);
   });
 
-  it('accepts ClassComponent as type', () => {
+  it('accepts Component as type', () => {
+    const el = createElement(Component);
+
+    expect(el).toHaveProperty('type', Component);
+  });
+
+  it('accepts Component subclass as type', () => {
     class C extends Component {}
     const el = createElement(C);
 
@@ -31,25 +37,25 @@ describe('createElement', () => {
   });
 
   describe('key', () => {
-    it('defaults key to null if props is omitted', () => {
+    it('defaults to null if props is omitted', () => {
       const el = createElement('div');
 
       expect(el).toHaveProperty('key', null);
     });
 
-    it('defaults key to null if props is null', () => {
+    it('defaults to null if props is null', () => {
       const el = createElement('div', null);
 
       expect(el).toHaveProperty('key', null);
     });
 
-    it('defaults key to null if props does not contain key', () => {
+    it('defaults to null if props does not contain key', () => {
       const el = createElement('div', {});
 
       expect(el).toHaveProperty('key', null);
     });
 
-    it('extracts key from props', () => {
+    it('extracts from props', () => {
       const key = 'key';
       const el = createElement('div', { key });
 
@@ -59,25 +65,25 @@ describe('createElement', () => {
   });
 
   describe('ref', () => {
-    it('defaults ref to null if props is omitted', () => {
+    it('defaults to null if props is omitted', () => {
       const el = createElement('div');
 
       expect(el).toHaveProperty('ref', null);
     });
 
-    it('defaults ref to null if props is null', () => {
+    it('defaults to null if props is null', () => {
       const el = createElement('div', null);
 
       expect(el).toHaveProperty('ref', null);
     });
 
-    it('defaults ref to null if props does not contain ref', () => {
+    it('defaults to null if props does not contain ref', () => {
       const el = createElement('div', {});
 
       expect(el).toHaveProperty('ref', null);
     });
 
-    it('extracts ref from props', () => {
+    it('extracts from props', () => {
       const ref = () => {};
       const el = createElement('div', { ref });
 
@@ -87,34 +93,44 @@ describe('createElement', () => {
   });
 
   describe('props', () => {
-    it('defaults props to empty object if props is omitted', () => {
+    it('defaults to empty object if props is omitted', () => {
       const el = createElement('div');
 
       expect(el).toHaveProperty('props', {});
     });
 
-    it('defaults props to empty object if props is omitted', () => {
+    it('defaults to empty object if props is null', () => {
       const el = createElement('div', null);
 
       expect(el).toHaveProperty('props', {});
     });
 
     it('copies properties from props', () => {
-      const a = {};
-      const b = 1;
-      const props = { a, b };
+      const props = { a: 1, b: {} };
       const el = createElement('div', props);
 
       expect(el).toHaveProperty('props', props);
     });
 
     it('makes a copy of props', () => {
-      const a = {};
-      const b = 1;
-      const props = { a, b };
+      const props = { a: 1, b: {} };
       const el = createElement('div', props);
 
       expect(el.props).not.toBe(props);
+    });
+
+    it('excludes key', () => {
+      const props = { a: 1, key: 'key', b: {} };
+      const el = createElement('div', props);
+
+      expect(el.props).not.toHaveProperty('key');
+    });
+
+    it('excludes ref', () => {
+      const props = { a: 1, ref() {}, b: {} };
+      const el = createElement('div', props);
+
+      expect(el.props).not.toHaveProperty('ref');
     });
   });
 

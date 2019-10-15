@@ -12,7 +12,7 @@ export interface StaticNode {
   readonly type: string | Marker;
   readonly key?: string | null | Marker;
   readonly ref?: null | Marker;
-  readonly props?: null | Props | Marker | readonly (Props | Marker)[];
+  readonly props?: null | Marker | Props | readonly (Marker | Props)[];
 }
 
 export interface TemplateResult {
