@@ -8,7 +8,7 @@ describe('Component', () => {
   });
 
   it('has default render method', () => {
-    expect(typeof Component.prototype.render).toEqual('function');
+    expect(typeof Component.prototype.render).toBe('function');
   });
 
   it('renders nothing by default', () => {
