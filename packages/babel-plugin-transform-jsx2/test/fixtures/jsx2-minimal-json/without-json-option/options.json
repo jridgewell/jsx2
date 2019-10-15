@@ -1,7 +1,9 @@
 {
   "plugins": [
     ["../../../..", {
-      "minimalJson": true
+      "json": false,
+      "minimalJson": true,
+      "taggedTemplate": false
     }]
   ],
   "throws": "\"minimalJson\" option requires \"json\" to be true"

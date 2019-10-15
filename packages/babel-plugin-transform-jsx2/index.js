@@ -2,9 +2,9 @@ const jsx = require('@babel/plugin-syntax-jsx');
 
 module.exports = function({ types: t, template }, options = {}) {
   const {
-    json = false,
+    json = true,
     minimalJson = false,
-    taggedTemplate = false,
+    taggedTemplate = true,
 
     pragma = 'jsx2.createElement',
     pragmaFrag = 'jsx2.Fragment',

@@ -1,8 +1,5 @@
 {
   "plugins": [
-    ["../../../..", {
-      "json": true,
-      "taggedTemplate": true
-    }]
+    ["../../../.."]
   ]
 }
