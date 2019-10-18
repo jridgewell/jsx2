@@ -8,6 +8,7 @@
   },
   "rules": {
     "no-any": true,
+    "no-conditional-assignment": false,
     "no-empty": false,
     "ordered-imports": true,
     "typedef": [

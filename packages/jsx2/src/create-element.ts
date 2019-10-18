@@ -45,3 +45,12 @@ export function createElement<R>(
     constructor: void 0,
   };
 }
+
+export function isValidElement<R>(value: unknown): value is Node<R> {
+  return (
+    typeof value === 'object' &&
+    !!value &&
+    value.constructor === void 0 &&
+    !!(value as { type?: unknown }).type
+  );
+}
