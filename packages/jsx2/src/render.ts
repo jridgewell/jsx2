@@ -1,4 +1,4 @@
-type Node<R> = import('./create-element').Node<R>;
+type VNode<R> = import('./create-element').VNode<R>;
 
 import { isFunctionComponent } from './component';
 import { createElement, isValidElement } from './create-element';
@@ -12,7 +12,7 @@ export type Renderable<R> =
   | boolean
   | null
   | undefined
-  | Node<R> /* | TemplateResult*/
+  | VNode<R> /* | TemplateResult*/
   | RenderableArray<R>;
 interface RenderableArray<R> extends Array<Renderable<R>> {}
 
@@ -30,12 +30,12 @@ function mountElement<R>(element: Renderable<R>, container: Container): void {
   while ((lastChild = container.lastChild)) {
     container.removeChild(lastChild);
   }
-  appendElement(element, container);
+  insertElement(element, container, null);
 }
 
-function appendElement<R>(element: Renderable<R>, container: Container): void {
+function insertElement<R>(element: Renderable<R>, container: Container, before: Node | null): void {
   const dom = renderableToNode(element);
-  if (dom) container.appendChild(dom);
+  if (dom) container.insertBefore(dom, before);
 }
 
 function renderableToNode<R>(
@@ -50,13 +50,14 @@ function renderableToNode<R>(
   if (Array.isArray(renderable)) {
     const frag = document.createDocumentFragment();
     for (let i = 0; i < renderable.length; i++) {
-      appendElement(renderable[i], frag);
+      insertElement(renderable[i], frag, null);
     }
     return frag;
   }
 
   const { type, props } = renderable;
   if (typeof type === 'string') {
+    // TODO: props
     return document.createElement(type);
   }
 

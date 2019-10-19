@@ -2,7 +2,7 @@ type Ref<R> = import('./create-ref').Ref<R>;
 type FunctionComponent<R> = import('./component').FunctionComponent<R>;
 type Component<R> = import('./component').Component<R>;
 
-export interface Node<R> {
+export interface VNode<R> {
   readonly type: string | FunctionComponent<R> | (new (props: object) => Component<R>);
   readonly key: string | number | null | undefined;
   readonly ref: null | undefined | Ref<R>;
@@ -15,8 +15,8 @@ export interface RegularProps {
 }
 
 export interface SpecialProps<R> {
-  readonly key?: Node<R>['key'];
-  readonly ref?: Node<R>['ref'];
+  readonly key?: VNode<R>['key'];
+  readonly ref?: VNode<R>['ref'];
   readonly children?: unknown;
 }
 
@@ -28,10 +28,10 @@ const nilProps: { key: null; ref: null; children?: null } = {
 } as const;
 
 export function createElement<R>(
-  type: Node<R>['type'],
+  type: VNode<R>['type'],
   _props?: null | undefined | Props<R>,
   ...children: unknown[]
-): Node<R> {
+): VNode<R> {
   const { key = null, ref = null, ...props } = _props || nilProps;
   if (children.length > 0) {
     props.children = children.length === 1 ? children[0] : children;
@@ -46,7 +46,7 @@ export function createElement<R>(
   };
 }
 
-export function isValidElement<R>(value: unknown): value is Node<R> {
+export function isValidElement<R>(value: unknown): value is VNode<R> {
   return (
     typeof value === 'object' &&
     !!value &&

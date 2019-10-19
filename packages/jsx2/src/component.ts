@@ -5,7 +5,7 @@ export interface FunctionComponent<R> {
 }
 
 export class Component<R = {}> {
-  render(props: object): ReturnType<FunctionComponent<R>> {}
+  render(props: object): void | Renderable<R> {}
 }
 
 export function isFunctionComponent<R>(value: Function): value is FunctionComponent<R> {

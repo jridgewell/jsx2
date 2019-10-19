@@ -1,5 +1,3 @@
-type Renderable<R> = import('../src/render').Renderable<R>;
-
 import { render, createElement } from '../src/jsx2';
 
 describe('render', () => {
