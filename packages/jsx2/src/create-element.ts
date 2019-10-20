@@ -1,12 +1,13 @@
 type Ref<R> = import('./create-ref').Ref<R>;
 type FunctionComponent<R> = import('./component').FunctionComponent<R>;
 type Component<R> = import('./component').Component<R>;
+type Renderable<R> = import('./render').Renderable<R>;
 
 export interface VNode<R> {
   readonly type: string | FunctionComponent<R> | (new (props: object) => Component<R>);
   readonly key: string | number | null | undefined;
   readonly ref: null | undefined | Ref<R>;
-  readonly props: RegularProps & { readonly children?: unknown };
+  readonly props: RegularProps & { readonly children?: Renderable<R> };
   readonly constructor: undefined;
 }
 
@@ -17,7 +18,7 @@ export interface RegularProps {
 export interface SpecialProps<R> {
   readonly key?: VNode<R>['key'];
   readonly ref?: VNode<R>['ref'];
-  readonly children?: unknown;
+  readonly children?: Renderable<R>;
 }
 
 export type Props<R> = SpecialProps<R> & RegularProps;
@@ -30,7 +31,7 @@ const nilProps: { key: null; ref: null; children?: null } = {
 export function createElement<R>(
   type: VNode<R>['type'],
   _props?: null | undefined | Props<R>,
-  ...children: unknown[]
+  ...children: Renderable<R>[]
 ): VNode<R> {
   const { key = null, ref = null, ...props } = _props || nilProps;
   if (children.length > 0) {
