@@ -5,7 +5,12 @@ type ListenerTypes = import('./event').ListenerTypes;
 import { diffStyle } from './style';
 import { diffEvent } from './event';
 
-export function diffProp(el: HTMLElement, name: string, oldValue: unknown, newValue: unknown): void {
+export function diffProp(
+  el: HTMLElement,
+  name: string,
+  oldValue: unknown,
+  newValue: unknown
+): void {
   if (name === 'children' || name === 'key' || name === 'ref') return;
   if (newValue == oldValue) return;
 

@@ -2,11 +2,16 @@ type Listener = (event: Event) => void;
 export type ListenerElement = HTMLElement & {
   _listeners: {
     [key: string]: Listener | null;
-  },
+  };
 };
 export type ListenerTypes = null | undefined | Listener;
 
-export function diffEvent(el: ListenerElement, name: string, oldValue: ListenerTypes, newValue: ListenerTypes) {
+export function diffEvent(
+  el: ListenerElement,
+  name: string,
+  oldValue: ListenerTypes,
+  newValue: ListenerTypes
+) {
   const useCapture = name.endsWith('Capture');
   if (useCapture) {
     name = name.slice(0, 'Capture'.length);
@@ -27,5 +32,5 @@ export function diffEvent(el: ListenerElement, name: string, oldValue: ListenerT
 
 function listener(this: ListenerElement, event: Event) {
   const listener = this._listeners[event.type]!;
-	listener(event);
+  listener(event);
 }

@@ -41,7 +41,7 @@ function renderableToNode<R>(
     const el = document.createElement(type);
     addProps(el, props);
     insertElement(props.children, el, null);
-    (el as unknown as {_vnode: unknown})._vnode = renderable;
+    ((el as unknown) as { _vnode: unknown })._vnode = renderable;
     return el;
   }
 

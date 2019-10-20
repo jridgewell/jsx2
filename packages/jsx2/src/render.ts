@@ -4,7 +4,9 @@ import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';
 import { Fragment } from './fragment';
 
-export type Container = (Element | Document | ShadowRoot | DocumentFragment) & { _component?: unknown };
+export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
+  _component?: unknown;
+};
 
 export type Renderable<R> =
   | string
@@ -12,7 +14,8 @@ export type Renderable<R> =
   | boolean
   | null
   | undefined
-  | VNode<R> /* | TemplateResult*/
+  | VNode<R>
+  // | TemplateResult
   | RenderableArray<R>;
 interface RenderableArray<R> extends Array<Renderable<R>> {}
 
