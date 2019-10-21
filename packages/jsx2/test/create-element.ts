@@ -162,7 +162,7 @@ describe('createElement', () => {
     });
 
     it('preserves children from props if no static children', () => {
-      const children = {};
+      const children: number[] = [];
       const props = { children };
       const el = createElement('div', props);
 
