@@ -2,8 +2,8 @@ type StyleTypes = import('./style').StyleTypes;
 type ListenerElement = import('./event').ListenerElement;
 type ListenerTypes = import('./event').ListenerTypes;
 
-import { diffStyle } from './style';
 import { diffEvent } from './event';
+import { diffStyle } from './style';
 
 export function diffProp(
   el: HTMLElement,
@@ -12,7 +12,7 @@ export function diffProp(
   newValue: unknown
 ): void {
   if (name === 'children' || name === 'key' || name === 'ref') return;
-  if (newValue == oldValue) return;
+  if (newValue === oldValue) return;
 
   if (name === 'class' || name === 'className') {
     el.className = newValue as string;

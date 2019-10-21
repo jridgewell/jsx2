@@ -26,7 +26,7 @@ export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: Style
 // Copied from Preact. Forgive me.
 const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|^--/i;
 
-function setStyle(style: CSSStyleDeclaration, name: string, value: unknown) {
+function setStyle(style: CSSStyleDeclaration, name: string, value: unknown): void {
   if (name[0] === '-') {
     style.setProperty(name, value as any);
   } else {

@@ -9,5 +9,5 @@ export class Component<R = {}> {
 }
 
 export function isFunctionComponent<R>(value: Function): value is FunctionComponent<R> {
-  return !(value.prototype && value.prototype.render);
+  return !value.prototype || !(value.prototype as { render?: unknown }).render;
 }

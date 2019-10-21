@@ -1,10 +1,12 @@
 type Container = import('../render').Container;
 type Renderable<R> = import('../render').Renderable<R>;
 type VNode<R> = import('../create-element').VNode<R>;
+type Ref<R> = import('../create-ref').Ref<R>;
 
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
 import { diffProp } from './prop';
+import { setRef } from './set-ref';
 
 export function createTree<R>(element: Renderable<R>, container: Container): void {
   let lastChild;
@@ -36,11 +38,12 @@ function renderableToNode<R>(
     return frag;
   }
 
-  const { type, props } = renderable;
+  const { type, ref, props } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
     addProps(el, props);
     insertElement(props.children, el, null);
+    if (ref) setRef(ref as Ref<HTMLElement>, el);
     ((el as unknown) as { _vnode: unknown })._vnode = renderable;
     return el;
   }

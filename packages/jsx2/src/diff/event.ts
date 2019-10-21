@@ -11,7 +11,7 @@ export function diffEvent(
   name: string,
   oldValue: ListenerTypes,
   newValue: ListenerTypes
-) {
+): void {
   const useCapture = name.endsWith('Capture');
   if (useCapture) {
     name = name.slice(0, 'Capture'.length);
@@ -30,7 +30,7 @@ export function diffEvent(
   }
 }
 
-function listener(this: ListenerElement, event: Event) {
+function listener(this: ListenerElement, event: Event): void {
   const listener = this._listeners[event.type]!;
   listener(event);
 }
