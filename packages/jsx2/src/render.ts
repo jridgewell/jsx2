@@ -2,10 +2,11 @@ type VNode<R> = import('./create-element').VNode<R>;
 
 import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';
+// import { diffTree } from './diff/diff-tree';
 import { Fragment } from './fragment';
 
-export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
-  _component?: unknown;
+export type Container<R> = (Element | Document | ShadowRoot | DocumentFragment) & {
+  _component?: Renderable<R>;
 };
 
 export type Renderable<R> =
@@ -19,11 +20,13 @@ export type Renderable<R> =
   | RenderableArray<R>;
 interface RenderableArray<R> extends Array<Renderable<R>> {}
 
-export function render<R>(element: Renderable<R>, container: Container): void {
-  element = createElement<R>(Fragment, null, element);
-  if (container._component) {
-    // patchElement(element, container)
+export function render<R>(renderable: Renderable<R>, container: Container<R>): void {
+  renderable = createElement<R>(Fragment, null, renderable);
+  const old = container._component;
+  if (old) {
+    // diffTree(old, renderable, container, null);
   } else {
-    createTree(element, container);
+    createTree(renderable, container);
+    container._component = renderable;
   }
 }

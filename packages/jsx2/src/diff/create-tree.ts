@@ -1,36 +1,41 @@
-type Container = import('../render').Container;
+type Container<R> = import('../render').Container<R>;
 type Renderable<R> = import('../render').Renderable<R>;
 type VNode<R> = import('../create-element').VNode<R>;
 type Ref<R> = import('../create-ref').Ref<R>;
 
 import { isFunctionComponent } from '../component';
-import { isValidElement } from '../create-element';
 import { diffProp } from './prop';
 import { setRef } from './set-ref';
+import { coerceRenderable } from './coerce-renderable';
 
-export function createTree<R>(element: Renderable<R>, container: Container): void {
+export function createTree<R>(renderable: Renderable<R>, container: Container<R>): void {
   let lastChild;
   while ((lastChild = container.lastChild)) {
     container.removeChild(lastChild);
   }
-  insertElement(element, container, null);
+  insertElement(renderable, container, null);
 }
 
-function insertElement<R>(element: Renderable<R>, container: Container, before: Node | null): void {
-  const dom = renderableToNode(element);
+function insertElement<R>(
+  renderable: Renderable<R>,
+  container: Container<R>,
+  before: null | Node
+): void {
+  const dom = renderableToNode(renderable);
   if (dom) container.insertBefore(dom, before);
 }
 
 function renderableToNode<R>(
-  element: Renderable<R> | void
+  _renderable: Renderable<R> | void
 ): null | Element | Text | DocumentFragment {
-  const renderable = coerceRenderale(element);
+  const renderable = coerceRenderable(_renderable);
   if (renderable === null) return null;
   if (typeof renderable === 'string') {
     return document.createTextNode(renderable);
   }
 
   if (Array.isArray(renderable)) {
+    // TODO: Attach vnode
     const frag = document.createDocumentFragment();
     for (let i = 0; i < renderable.length; i++) {
       insertElement(renderable[i], frag, null);
@@ -48,6 +53,7 @@ function renderableToNode<R>(
     return el;
   }
 
+  // TODO: Attach vnode
   if (isFunctionComponent<R>(type)) {
     return renderableToNode(type(props));
   }
@@ -59,15 +65,4 @@ function addProps<R>(el: HTMLElement, props: VNode<R>['props']): void {
   for (const name in props) {
     diffProp(el, name, null, props[name]);
   }
-}
-
-function coerceRenderale<R>(
-  element: Renderable<R> | void
-): Exclude<Renderable<R>, boolean | number | undefined> {
-  if (element == null) return null;
-  if (typeof element === 'boolean') return null;
-  if (typeof element === 'number') return String(element);
-  if (typeof element === 'string') return element;
-  if (isValidElement<R>(element)) return element;
-  return null;
 }
