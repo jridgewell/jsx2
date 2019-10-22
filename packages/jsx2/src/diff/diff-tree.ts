@@ -1,5 +1,6 @@
 import { coerceRenderable } from './coerce-renderable';
 import { insertElement } from './insert-element';
+import { isArray } from './is-array';
 import { diffProp } from './prop';
 import { setRef } from './set-ref';
 
@@ -31,13 +32,13 @@ export function diffTree<R>(
     return removeNode(node);
   }
 
-  if (Array.isArray(old)) {
+  if (isArray(old)) {
     if (renderable === null || typeof renderable === 'string') {
       // TODO
       return;
     }
 
-    if (Array.isArray(renderable)) {
+    if (isArray(renderable)) {
       // TODO
       return;
     }
@@ -55,7 +56,7 @@ export function diffTree<R>(
       return;
     }
 
-    if (Array.isArray(renderable)) {
+    if (isArray(renderable)) {
       // TODO
       return;
     }

@@ -20,7 +20,7 @@ export type Renderable<R> =
   | VNode<R>
   // | TemplateResult
   | RenderableArray<R>;
-interface RenderableArray<R> extends Array<Renderable<R>> {}
+interface RenderableArray<R> extends ReadonlyArray<Renderable<R>> {}
 
 export function render<R>(_renderable: Renderable<R>, container: Container<R>): void {
   const renderable = coerceRenderable(_renderable);

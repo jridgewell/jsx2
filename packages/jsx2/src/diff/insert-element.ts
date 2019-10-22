@@ -4,6 +4,7 @@ type Ref<R> = import('../create-ref').Ref<R>;
 
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from './coerce-renderable';
+import { isArray } from './is-array';
 import { diffProp } from './prop';
 import { setRef } from './set-ref';
 
@@ -24,7 +25,7 @@ function renderableToNode<R>(renderable: CoercedRenderable<R> | void): Renderabl
     return document.createTextNode(renderable);
   }
 
-  if (Array.isArray(renderable)) {
+  if (isArray(renderable)) {
     const frag = document.createDocumentFragment();
     for (let i = 0; i < renderable.length; i++) {
       insertElement(coerceRenderable(renderable[i]), frag, null);

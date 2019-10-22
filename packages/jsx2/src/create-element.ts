@@ -30,21 +30,21 @@ const nilProps: { key: null; ref: null; children?: null } = {
 
 export function createElement<R>(
   type: VNode<R>['type'],
-  _props?: null | undefined | Props<R>,
+  props?: null | undefined | Props<R>,
   ...children: Renderable<R>[]
 ): VNode<R> {
-  const { key = null, ref = null, ...props } = _props || nilProps;
+  const { key = null, ref = null, ..._props } = props || nilProps;
   if (children.length > 0) {
-    props.children = children.length === 1 ? children[0] : children;
+    _props.children = children.length === 1 ? children[0] : children;
   }
 
-  return {
+  return Object.freeze({
     type,
     key,
     ref,
-    props,
+    props: Object.freeze(_props),
     constructor: void 0,
-  };
+  });
 }
 
 export function isValidElement<R>(value: unknown): value is VNode<R> {
