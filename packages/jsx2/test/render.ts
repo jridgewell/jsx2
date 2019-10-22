@@ -313,13 +313,13 @@ describe('render', () => {
 
       it('removes old prop after render', () => {
         const body = document.createElement('body');
-        render(createElement('div', { id: 'id' }), body);
+        render(createElement('div', { foo: 'bar' }), body);
         const rendered = body.firstChild!;
 
-        render(createElement('div', { foo: 'bar' }), body);
+        render(createElement('div', { baz: 'qux' }), body);
 
         expect(body.firstChild).toBe(rendered);
-        expect((rendered as Element).hasAttribute('id')).toBe(false);
+        expect((rendered as Element).hasAttribute('foo')).toBe(false);
       });
     });
   });
