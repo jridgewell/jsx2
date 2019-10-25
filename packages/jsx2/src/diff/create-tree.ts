@@ -1,4 +1,4 @@
-type CoercedRenderable<R> = import('./coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
 
 import { insertElement } from './insert-element';
 

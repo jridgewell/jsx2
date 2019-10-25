@@ -1,7 +1,7 @@
-type Renderable<R> = import('../render').Renderable<R>;
+type Renderable<R> = import('./render').Renderable<R>;
 
-import { isValidElement } from '../create-element';
-import { isArray } from './is-array';
+import { isValidElement } from './create-element';
+import { isArray } from './diff/is-array';
 
 export type CoercedRenderable<R> = Exclude<Renderable<R>, boolean | number | undefined>;
 

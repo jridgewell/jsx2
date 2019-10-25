@@ -1,10 +1,14 @@
-import { coerceRenderable } from './coerce-renderable';
+import { coerceRenderable } from '../coerce-renderable';
+import { isFunctionComponent } from '../component';
+import { RenderedChild } from '../render';
 import { insertElement } from './insert-element';
 import { isArray } from './is-array';
+import { mark } from './mark';
 import { diffProp } from './prop';
+import { removeRange } from './remove';
 import { setRef } from './set-ref';
 
-type CoercedRenderable<R> = import('./coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
 type VNode<R> = import('../create-element').VNode<R>;
 type Ref<R> = import('../create-ref').Ref<R>;
 
@@ -12,7 +16,7 @@ export function diffTree<R>(
   old: CoercedRenderable<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: null | Node
+  node: null | RenderedChild | Comment
 ): void {
   if (old === renderable) return;
   if (old === null) {
@@ -25,17 +29,18 @@ export function diffTree<R>(
   if (typeof old === 'string') {
     if (typeof renderable === 'string') {
       node.textContent = renderable;
+      mark(renderable, node);
       return;
     }
 
     insertElement(renderable, container, node);
-    return removeNode(node);
+    return removeRange(node);
   }
 
   if (isArray(old)) {
     if (renderable === null || typeof renderable === 'string') {
-      // TODO
-      return;
+      insertElement(renderable, container, node);
+      return removeRange(node);
     }
 
     if (isArray(renderable)) {
@@ -52,16 +57,16 @@ export function diffTree<R>(
   if (typeof oldType === 'string') {
     if (renderable === null || typeof renderable === 'string') {
       insertElement(renderable, container, node);
-      removeNode(node);
+      removeRange(node);
       return;
     }
 
     if (isArray(renderable)) {
-      // TODO
+      insertElement(renderable, container, node);
+      removeRange(node);
       return;
     }
 
-    // TODO
     const { type } = renderable;
 
     if (typeof type === 'string') {
@@ -73,30 +78,59 @@ export function diffTree<R>(
           coerceRenderable(oldProps.children),
           coerceRenderable(props.children),
           node,
-          node.firstChild
+          node.firstChild as null | RenderedChild | Comment
         );
         const { ref } = renderable;
         if (ref) setRef(ref as Ref<HTMLElement>, node as HTMLElement);
-        ((node as unknown) as { _vnode: unknown })._vnode = renderable;
+        mark(renderable, node);
         return;
       }
 
       insertElement(renderable, container, node);
-      removeNode(node);
+      removeRange(node);
       return;
     }
 
-    // renderable;
-    // type;
+    insertElement(renderable, container, node);
+    removeRange(node);
     return;
   }
 
-  // oldType;
-}
+  if (renderable === null || typeof renderable === 'string') {
+    insertElement(renderable, container, node);
+    removeRange(node);
+    return;
+  }
 
-function removeNode(node: Node): void {
-  const { parentNode } = node;
-  if (parentNode) parentNode.removeChild(node);
+  if (isArray(renderable)) {
+    insertElement(renderable, container, node);
+    removeRange(node);
+    return;
+  }
+
+  const { type } = renderable;
+
+  if (typeof type === 'string') {
+    insertElement(renderable, container, node);
+    removeRange(node);
+    return;
+  }
+
+  if (type === oldType) {
+    // const { props } = renderable;
+    // if (isFunctionComponent<R>(type)) {
+    //   const rendered = coerceRenderable(type(props));
+    //   if (rendered === null) return null;
+    //   return markComponent(renderable, rendered);
+    // }
+    // const component = new type(props);
+    // const rendered = renderableToNode(coerceRenderable(component.render(props)));
+    // if (rendered === null) return null;
+    // return markComponent(renderable, rendered);
+  }
+
+  insertElement(renderable, container, node);
+  removeRange(node);
 }
 
 function diffProps<R>(

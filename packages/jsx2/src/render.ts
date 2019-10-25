@@ -1,7 +1,7 @@
 type VNode<R> = import('./create-element').VNode<R>;
-type CoercedRenderable<R> = import('./diff/coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('./coerce-renderable').CoercedRenderable<R>;
 
-import { coerceRenderable } from './diff/coerce-renderable';
+import { coerceRenderable } from './coerce-renderable';
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
 // import { createElement } from './create-element';
@@ -22,9 +22,12 @@ export type Renderable<R> =
   | RenderableArray<R>;
 interface RenderableArray<R> extends ReadonlyArray<Renderable<R>> {}
 
+export type RenderedNodes = Element | Text | DocumentFragment;
+export type RenderedChild = Exclude<RenderedNodes, DocumentFragment>;
+
 export function render<R>(_renderable: Renderable<R>, container: Container<R>): void {
   const renderable = coerceRenderable(_renderable);
-  // renderable = createElement<R>(Fragment, null, renderable);
+  // const renderable = createElement<R>(Fragment, null, _renderable);
   const old = container._component;
   if (old) {
     diffTree(old, renderable, container, container.firstChild);
