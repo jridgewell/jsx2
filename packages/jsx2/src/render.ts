@@ -30,7 +30,7 @@ export function render<R>(_renderable: Renderable<R>, container: Container<R>): 
   // const renderable = createElement<R>(Fragment, null, _renderable);
   const old = container._component;
   if (old) {
-    diffTree(old, renderable, container, container.firstChild);
+    diffTree(old, renderable, container, container.firstChild as RenderedChild | Comment | null);
   } else {
     createTree(renderable, container);
     container._component = renderable;

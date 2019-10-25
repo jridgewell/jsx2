@@ -1,15 +1,14 @@
 import { coerceRenderable } from '../coerce-renderable';
 import { isFunctionComponent } from '../component';
 import { RenderedChild } from '../render';
-import { insertElement } from './insert-element';
+import { insertElement } from './create-tree';
 import { isArray } from './is-array';
 import { mark } from './mark';
-import { diffProp } from './prop';
+import { diffProps } from './prop';
 import { removeRange } from './remove';
 import { setRef } from './set-ref';
 
 type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
-type VNode<R> = import('../create-element').VNode<R>;
 type Ref<R> = import('../create-ref').Ref<R>;
 
 export function diffTree<R>(
@@ -48,9 +47,8 @@ export function diffTree<R>(
       return;
     }
 
-    // TODO
-    // renderable;
-    return;
+    insertElement(renderable, container, node);
+    return removeRange(node);
   }
 
   const oldType = old.type;
@@ -131,17 +129,4 @@ export function diffTree<R>(
 
   insertElement(renderable, container, node);
   removeRange(node);
-}
-
-function diffProps<R>(
-  el: HTMLElement,
-  oldProps: VNode<R>['props'],
-  props: VNode<R>['props']
-): void {
-  for (const name in oldProps) {
-    if (!(name in props)) diffProp(el, name, oldProps[name], null);
-  }
-  for (const name in props) {
-    diffProp(el, name, oldProps[name], props[name]);
-  }
 }
