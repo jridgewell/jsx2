@@ -15,14 +15,14 @@ export function createTree<R>(renderable: CoercedRenderable<R>, container: Node)
 export function insertElement<R>(
   renderable: CoercedRenderable<R>,
   container: Node,
-  before: null | ChildNode
+  before: null | ChildNode,
 ): void {
   const dom = renderableToNode(renderable);
   if (dom) container.insertBefore(dom, before);
 }
 
 function renderableToNode<R>(
-  renderable: CoercedRenderable<R>
+  renderable: CoercedRenderable<R>,
 ): null | Comment | DocumentFragment | Element | Text {
   if (renderable === null) return null;
 

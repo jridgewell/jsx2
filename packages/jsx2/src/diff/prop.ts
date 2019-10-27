@@ -10,7 +10,7 @@ export function diffProp(
   el: HTMLElement,
   name: string,
   oldValue: unknown,
-  newValue: unknown
+  newValue: unknown,
 ): void {
   if (name === 'children' || name === 'key' || name === 'ref') return;
   if (newValue === oldValue) return;
@@ -37,7 +37,7 @@ export function diffProp(
 export function diffProps<R>(
   el: HTMLElement,
   oldProps: VNode<R>['props'],
-  props: VNode<R>['props']
+  props: VNode<R>['props'],
 ): void {
   for (const name in oldProps) {
     if (!(name in props)) diffProp(el, name, oldProps[name], null);

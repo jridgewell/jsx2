@@ -11,7 +11,7 @@ export function mark<R>(
   renderable: MarkedNode<R>['_vnode'],
   start: Node,
   end: MarkedNode<R>['_range'],
-  component?: MarkedNode<R>['_component']
+  component?: MarkedNode<R>['_component'],
 ): void {
   const rendered = start as MarkedNode<R>;
   rendered._component = component;
@@ -21,7 +21,7 @@ export function mark<R>(
 
 export function markFragment<R>(
   renderable: MarkedNode<R>['_vnode'],
-  frag: DocumentFragment
+  frag: DocumentFragment,
 ): DocumentFragment {
   const first = frag.insertBefore(document.createComment(''), null);
   mark(renderable, first, frag.lastChild!);
@@ -31,7 +31,7 @@ export function markFragment<R>(
 export function markComponent<R>(
   renderable: MarkedNode<R>['_vnode'],
   rendered: null | Node,
-  component?: MarkedNode<R>['_component']
+  component?: MarkedNode<R>['_component'],
 ): Comment | DocumentFragment {
   if (rendered === null) {
     const comment = document.createComment('');

@@ -17,7 +17,7 @@ export function diffTree<R>(
   old: CoercedRenderable<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: null | ChildNode
+  node: null | ChildNode,
 ): void {
   if (old === renderable) return;
   if (old === null) return insertElement(renderable, container, node);
@@ -42,7 +42,7 @@ function oldWasText<R>(
   old: string,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: Text
+  node: Text,
 ): void {
   if (old === renderable) return;
   if (typeof renderable !== 'string') {
@@ -59,7 +59,7 @@ function oldWasArray<R>(
   old: RenderableArray<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: ChildNode
+  node: ChildNode,
 ): void {
   if (!isArray(renderable)) {
     insertElement(renderable, container, node);
@@ -98,7 +98,7 @@ function oldWasElement<R>(
   old: VNode<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: Element
+  node: Element,
 ): void {
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
@@ -120,7 +120,7 @@ function oldWasElement<R>(
     coerceRenderable(oldProps.children),
     coerceRenderable(props.children),
     node,
-    node.firstChild
+    node.firstChild,
   );
   diffRef((node as unknown) as R, old.ref, renderable.ref);
   mark(renderable, node, node);
@@ -131,7 +131,7 @@ function oldWasComponent<R>(
   old: VNode<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: ChildNode
+  node: ChildNode,
 ): void {
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);

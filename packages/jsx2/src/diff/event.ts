@@ -10,7 +10,7 @@ export function diffEvent(
   el: ListenerElement,
   name: string,
   oldValue: ListenerTypes,
-  newValue: ListenerTypes
+  newValue: ListenerTypes,
 ): void {
   const useCapture = name.endsWith('Capture');
   if (useCapture) {
