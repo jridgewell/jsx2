@@ -1,9 +1,9 @@
-type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderable<R>;
 
-import { coerceRenderable } from '../coerce-renderable';
+import { coerceRenderable } from '../util/coerce-renderable';
 import { isFunctionComponent } from '../component';
 import { diffRef } from './diff-ref';
-import { isArray } from './is-array';
+import { isArray } from '../util/is-array';
 import { mark, markComponent, markFragment } from './mark';
 import { addProps } from './prop';
 

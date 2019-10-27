@@ -1,7 +1,7 @@
 type VNode<R> = import('./create-element').VNode<R>;
-type CoercedRenderable<R> = import('./coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('./util/coerce-renderable').CoercedRenderable<R>;
 
-import { coerceRenderable } from './coerce-renderable';
+import { coerceRenderable } from './util/coerce-renderable';
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
 

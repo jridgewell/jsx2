@@ -1,4 +1,4 @@
-type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderable<R>;
 type Component<R> = import('../component').Component<R>;
 
 export interface MarkedNode<R> {
@@ -23,7 +23,7 @@ export function markFragment<R>(
   renderable: MarkedNode<R>['_vnode'],
   frag: DocumentFragment
 ): DocumentFragment {
-  const first = frag.firstChild || frag.insertBefore(document.createComment(''), null);
+  const first = frag.insertBefore(document.createComment(''), null);
   mark(renderable, first, frag.lastChild!);
   return frag;
 }

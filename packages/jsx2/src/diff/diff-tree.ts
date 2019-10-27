@@ -1,13 +1,13 @@
-type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderable<R>;
 type RenderableArray<R> = import('../render').RenderableArray<R>;
 type VNode<R> = import('../create-element').VNode<R>;
 type MarkedNode<R> = import('./mark').MarkedNode<R>;
 
-import { coerceRenderable } from '../coerce-renderable';
+import { coerceRenderable } from '../util/coerce-renderable';
 import { Component, isFunctionComponent } from '../component';
 import { insertElement } from './create-tree';
 import { diffRef } from './diff-ref';
-import { isArray } from './is-array';
+import { isArray } from '../util/is-array';
 import { mark, markComponent } from './mark';
 import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
