@@ -1,13 +1,11 @@
 type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
-type Ref<R> = import('../create-ref').Ref<R>;
-type RenderedNodes = import('../render').RenderedNodes;
 
 import { coerceRenderable } from '../coerce-renderable';
 import { isFunctionComponent } from '../component';
+import { diffRef } from './diff-ref';
 import { isArray } from './is-array';
-import { mark, markFragment, markComponent } from './mark';
+import { mark, markComponent, markFragment } from './mark';
 import { addProps } from './prop';
-import { setRef } from './set-ref';
 
 export function createTree<R>(renderable: CoercedRenderable<R>, container: Node): void {
   container.textContent = '';
@@ -17,13 +15,15 @@ export function createTree<R>(renderable: CoercedRenderable<R>, container: Node)
 export function insertElement<R>(
   renderable: CoercedRenderable<R>,
   container: Node,
-  before: null | Node
+  before: null | ChildNode
 ): void {
   const dom = renderableToNode(renderable);
   if (dom) container.insertBefore(dom, before);
 }
 
-function renderableToNode<R>(renderable: CoercedRenderable<R>): null | RenderedNodes {
+function renderableToNode<R>(
+  renderable: CoercedRenderable<R>
+): null | Comment | DocumentFragment | Element | Text {
   if (renderable === null) return null;
 
   if (typeof renderable === 'string') {
@@ -37,28 +37,25 @@ function renderableToNode<R>(renderable: CoercedRenderable<R>): null | RenderedN
     for (let i = 0; i < renderable.length; i++) {
       insertElement(coerceRenderable(renderable[i]), frag, null);
     }
-    if (frag.firstChild === null) return null;
     return markFragment(renderable, frag);
   }
 
-  const { type, ref, props } = renderable;
+  const { type, props } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
     addProps(el, props);
     insertElement(coerceRenderable(props.children), el, null);
-    if (ref) setRef(ref as Ref<HTMLElement>, el);
+    diffRef((el as unknown) as R, null, renderable.ref);
     mark(renderable, el, el);
     return el;
   }
 
   if (isFunctionComponent<R>(type)) {
     const rendered = renderableToNode(coerceRenderable(type(props)));
-    if (rendered === null) return null;
     return markComponent(renderable, rendered);
   }
 
   const component = new type(props);
   const rendered = renderableToNode(coerceRenderable(component.render(props)));
-  if (rendered === null) return null;
-  return markComponent(renderable, rendered);
+  return markComponent(renderable, rendered, component);
 }

@@ -1,14 +1,14 @@
 type MarkedNode<R> = import('./mark').MarkedNode<R>;
-type RenderedChild = import('../render').RenderedChild;
 
-export function removeRange<R>(node: RenderedChild | Comment): void {
+export function removeRange<R>(node: ChildNode): null | ChildNode {
   const { parentNode } = node;
   if (parentNode === null) throw new Error('detached child');
 
   const end = (node as MarkedNode<R>)._range!;
   if (node === end) {
+    const n = node.nextSibling;
     parentNode.removeChild(node);
-    return;
+    return n;
   }
 
   let current = node as null | ChildNode;
@@ -17,4 +17,5 @@ export function removeRange<R>(node: RenderedChild | Comment): void {
     parentNode.removeChild(current!);
     current = n;
   } while (current !== end);
+  return current;
 }

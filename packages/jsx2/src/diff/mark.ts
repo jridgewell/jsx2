@@ -1,56 +1,51 @@
 type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
-type RenderedChild = import('../render').RenderedChild;
-type RenderedNodes = import('../render').RenderedNodes;
+type Component<R> = import('../component').Component<R>;
 
 export interface MarkedNode<R> {
-  _range?: RenderedChild;
+  _component?: Component<R>;
+  _range?: Node;
   _vnode?: Exclude<CoercedRenderable<R>, null>;
 }
 
 export function mark<R>(
-  renderable: Exclude<CoercedRenderable<R>, null>,
-  start: RenderedChild | Comment,
-  end?: RenderedChild
+  renderable: MarkedNode<R>['_vnode'],
+  start: Node,
+  end: MarkedNode<R>['_range'],
+  component?: MarkedNode<R>['_component']
 ): void {
   const rendered = start as MarkedNode<R>;
+  rendered._component = component;
+  rendered._range = end;
   rendered._vnode = renderable;
-  if (end !== undefined) rendered._range = end;
-}
-
-export function alreadyMarked<R>(rendered: RenderedChild | Comment): boolean {
-  return !!(rendered as MarkedNode<R>)._vnode;
 }
 
 export function markFragment<R>(
-  renderable: Exclude<CoercedRenderable<R>, null>,
+  renderable: MarkedNode<R>['_vnode'],
   frag: DocumentFragment
 ): DocumentFragment {
-  let firstChild = frag.firstChild as RenderedChild | Comment;
-
-  if (alreadyMarked(firstChild)) {
-    firstChild = frag.insertBefore(document.createComment(''), firstChild);
-  }
-  mark(renderable, firstChild, frag.lastChild as RenderedChild);
+  const first = frag.firstChild || frag.insertBefore(document.createComment(''), null);
+  mark(renderable, first, frag.lastChild!);
   return frag;
 }
 
 export function markComponent<R>(
-  renderable: Exclude<CoercedRenderable<R>, null>,
-  rendered: RenderedNodes
-): RenderedNodes {
-  if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    return markFragment(renderable, rendered as DocumentFragment);
+  renderable: MarkedNode<R>['_vnode'],
+  rendered: null | Node,
+  component?: MarkedNode<R>['_component']
+): Comment | DocumentFragment {
+  if (rendered === null) {
+    const comment = document.createComment('');
+    mark(renderable, comment, comment, component);
+    return comment;
   }
-  const renderedNotFrag = rendered as Exclude<typeof rendered, DocumentFragment>;
 
-  if (!alreadyMarked(renderedNotFrag)) {
-    mark(renderable, renderedNotFrag, renderedNotFrag);
-    return renderedNotFrag;
+  if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    return markFragment(renderable, (rendered as unknown) as DocumentFragment);
   }
 
   const frag = document.createDocumentFragment();
   const comment = frag.appendChild(document.createComment(''));
-  frag.appendChild(renderedNotFrag);
-  mark(renderable, comment, renderedNotFrag);
+  frag.appendChild(rendered);
+  mark(renderable, comment, rendered, component);
   return frag;
 }

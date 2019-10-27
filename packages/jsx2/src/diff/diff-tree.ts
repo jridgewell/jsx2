@@ -1,132 +1,157 @@
+type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
+type RenderableArray<R> = import('../render').RenderableArray<R>;
+type VNode<R> = import('../create-element').VNode<R>;
+type MarkedNode<R> = import('./mark').MarkedNode<R>;
+
 import { coerceRenderable } from '../coerce-renderable';
-import { isFunctionComponent } from '../component';
-import { RenderedChild } from '../render';
+import { Component, isFunctionComponent } from '../component';
 import { insertElement } from './create-tree';
+import { diffRef } from './diff-ref';
 import { isArray } from './is-array';
-import { mark } from './mark';
+import { mark, markComponent } from './mark';
+import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
 import { removeRange } from './remove';
-import { setRef } from './set-ref';
-
-type CoercedRenderable<R> = import('../coerce-renderable').CoercedRenderable<R>;
-type Ref<R> = import('../create-ref').Ref<R>;
 
 export function diffTree<R>(
   old: CoercedRenderable<R>,
   renderable: CoercedRenderable<R>,
   container: Node,
-  node: null | RenderedChild | Comment
+  node: null | ChildNode
 ): void {
   if (old === renderable) return;
-  if (old === null) {
-    insertElement(renderable, container, node);
-    return;
-  }
-
+  if (old === null) return insertElement(renderable, container, node);
   if (node === null) throw new Error('old vnode was non-null but dom node is null');
 
   if (typeof old === 'string') {
-    if (typeof renderable === 'string') {
-      node.textContent = renderable;
-      mark(renderable, node);
-      return;
-    }
-
-    insertElement(renderable, container, node);
-    return removeRange(node);
+    return oldWasText(old, renderable, container, node as Text);
   }
 
   if (isArray(old)) {
-    if (renderable === null || typeof renderable === 'string') {
-      insertElement(renderable, container, node);
-      return removeRange(node);
-    }
-
-    if (isArray(renderable)) {
-      // TODO
-      return;
-    }
-
-    insertElement(renderable, container, node);
-    return removeRange(node);
+    return oldWasArray(old, renderable, container, node);
   }
 
-  const oldType = old.type;
-  if (typeof oldType === 'string') {
-    if (renderable === null || typeof renderable === 'string') {
-      insertElement(renderable, container, node);
-      removeRange(node);
-      return;
-    }
+  if (typeof old.type === 'string') {
+    return oldWasElement(old, renderable, container, node as Element);
+  }
 
-    if (isArray(renderable)) {
-      insertElement(renderable, container, node);
-      removeRange(node);
-      return;
-    }
+  return oldWasComponent(old, renderable, container, node);
+}
 
-    const { type } = renderable;
-
-    if (typeof type === 'string') {
-      if (type === oldType) {
-        const oldProps = old.props;
-        const { props } = renderable;
-        diffProps(node as HTMLElement, oldProps, props);
-        diffTree(
-          coerceRenderable(oldProps.children),
-          coerceRenderable(props.children),
-          node,
-          node.firstChild as null | RenderedChild | Comment
-        );
-        const { ref } = renderable;
-        if (ref) setRef(ref as Ref<HTMLElement>, node as HTMLElement);
-        mark(renderable, node);
-        return;
-      }
-
-      insertElement(renderable, container, node);
-      removeRange(node);
-      return;
-    }
-
+function oldWasText<R>(
+  old: string,
+  renderable: CoercedRenderable<R>,
+  container: Node,
+  node: Text
+): void {
+  if (old === renderable) return;
+  if (typeof renderable !== 'string') {
     insertElement(renderable, container, node);
     removeRange(node);
     return;
   }
 
-  if (renderable === null || typeof renderable === 'string') {
+  node.data = renderable;
+  mark(renderable, node, node);
+}
+
+function oldWasArray<R>(
+  old: RenderableArray<R>,
+  renderable: CoercedRenderable<R>,
+  container: Node,
+  node: ChildNode
+): void {
+  if (!isArray(renderable)) {
     insertElement(renderable, container, node);
     removeRange(node);
     return;
   }
 
-  if (isArray(renderable)) {
+  // TODO: Figure out key.
+  const previous = node.previousSibling;
+  let current = node as null | ChildNode;
+
+  const shortest = Math.min(old.length, renderable.length);
+  let i = 0;
+  for (; i < shortest; i++) {
+    const n = nextSibling(current!);
+    diffTree(coerceRenderable(old[i]), coerceRenderable(renderable[i]), container, current);
+    current = n;
+  }
+  for (; i < old.length; i++) {
+    current = removeRange(current!);
+  }
+  for (; i < renderable.length; i++) {
+    insertElement(coerceRenderable(renderable[i]), container, current);
+  }
+
+  // TODO: nextSibilng?
+  const first = previous ? previous.nextSibling : container.firstChild;
+  if (first === null) return;
+  if (first === current) return;
+
+  const last = current ? current.previousSibling! : container.lastChild!;
+  mark(renderable, first, last);
+}
+
+function oldWasElement<R>(
+  old: VNode<R>,
+  renderable: CoercedRenderable<R>,
+  container: Node,
+  node: Element
+): void {
+  if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
     removeRange(node);
     return;
   }
 
   const { type } = renderable;
-
-  if (typeof type === 'string') {
+  if (type !== old.type) {
     insertElement(renderable, container, node);
     removeRange(node);
     return;
   }
 
-  if (type === oldType) {
-    // const { props } = renderable;
-    // if (isFunctionComponent<R>(type)) {
-    //   const rendered = coerceRenderable(type(props));
-    //   if (rendered === null) return null;
-    //   return markComponent(renderable, rendered);
-    // }
-    // const component = new type(props);
-    // const rendered = renderableToNode(coerceRenderable(component.render(props)));
-    // if (rendered === null) return null;
-    // return markComponent(renderable, rendered);
+  const oldProps = old.props;
+  const { props } = renderable;
+  diffProps(node as HTMLElement, oldProps, props);
+  diffTree(
+    coerceRenderable(oldProps.children),
+    coerceRenderable(props.children),
+    node,
+    node.firstChild
+  );
+  diffRef((node as unknown) as R, old.ref, renderable.ref);
+  mark(renderable, node, node);
+  return;
+}
+
+function oldWasComponent<R>(
+  old: VNode<R>,
+  renderable: CoercedRenderable<R>,
+  container: Node,
+  node: ChildNode
+): void {
+  if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
+    insertElement(renderable, container, node);
+    removeRange(node);
+    return;
   }
 
-  insertElement(renderable, container, node);
-  removeRange(node);
+  const { type } = renderable;
+  if (typeof type === 'string' || type !== old.type) {
+    insertElement(renderable, container, node);
+    removeRange(node);
+    return;
+  }
+
+  const { props } = renderable;
+  const next = nextSibling(node);
+  const component = (node as MarkedNode<R>)._component;
+  const rendered = isFunctionComponent<R>(type) ? type(props) : component!.render(props);
+
+  diffTree(old, coerceRenderable(rendered), container, node.nextSibling);
+  const end = next ? next.previousSibling! : container.lastChild!;
+  mark(renderable, node, end, component);
 }
