@@ -43,8 +43,8 @@ describe('diffEvent', () => {
       const el = document.createElement('div');
       const old = () => {};
       const spy = jest.spyOn(el, 'removeEventListener');
-      diffEvent(el, 'onfooCapture', null, old);
 
+      diffEvent(el, 'onfooCapture', null, old);
       diffEvent(el, 'onfooCapture', old, null);
 
       expect(spy).toHaveBeenCalledTimes(1);
@@ -68,8 +68,8 @@ describe('diffEvent', () => {
           const el = document.createElement('div');
           const old = () => {};
           const spy = jest.spyOn(el, 'removeEventListener');
-          diffEvent(el, 'onMouseMoveCapture', null, old);
 
+          diffEvent(el, 'onMouseMoveCapture', null, old);
           diffEvent(el, 'onMouseMoveCapture', old, null);
 
           expect(spy).toHaveBeenCalledTimes(1);
@@ -93,8 +93,8 @@ describe('diffEvent', () => {
           const el = document.createElement('div');
           const old = () => {};
           const spy = jest.spyOn(el, 'removeEventListener');
-          diffEvent(el, 'onFooCapture', null, old);
 
+          diffEvent(el, 'onFooCapture', null, old);
           diffEvent(el, 'onFooCapture', old, null);
 
           expect(spy).toHaveBeenCalledTimes(1);

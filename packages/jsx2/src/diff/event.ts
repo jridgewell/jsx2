@@ -30,7 +30,7 @@ export function diffEvent(
       el.addEventListener(name, listener, useCapture);
     }
     el._listeners[name] = newValue;
-  } else if (oldValue) {
+  } else {
     el._listeners[name] = null;
     el.removeEventListener(name, listener, useCapture);
   }
