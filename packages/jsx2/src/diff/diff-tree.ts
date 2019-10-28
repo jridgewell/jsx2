@@ -11,7 +11,7 @@ import { diffRef } from './diff-ref';
 import { mark, markComponent } from './mark';
 import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
-import { removeRange } from './remove';
+import { remove } from './remove';
 
 export function diffTree<R>(
   old: CoercedRenderable<R>,
@@ -47,7 +47,7 @@ function oldWasText<R>(
   if (old === renderable) return;
   if (typeof renderable !== 'string') {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 
@@ -63,7 +63,7 @@ function oldWasArray<R>(
 ): void {
   if (!isArray(renderable)) {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 
@@ -79,7 +79,7 @@ function oldWasArray<R>(
     current = n;
   }
   for (; i < old.length; i++) {
-    current = removeRange(current!);
+    current = remove(current!);
   }
   for (; i < renderable.length; i++) {
     insertElement(coerceRenderable(renderable[i]), container, current);
@@ -101,14 +101,14 @@ function oldWasElement<R>(
 ): void {
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 
   const { type } = renderable;
   if (type !== old.type) {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 
@@ -134,14 +134,14 @@ function oldWasComponent<R>(
 ): void {
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 
   const { type } = renderable;
   if (typeof type === 'string' || type !== old.type) {
     insertElement(renderable, container, node);
-    removeRange(node);
+    remove(node);
     return;
   }
 

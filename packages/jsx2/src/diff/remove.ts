@@ -1,16 +1,16 @@
-type MarkedNode<R> = import('./mark').MarkedNode<R>;
+import { nextSibling } from './next-sibling';
 
-export function removeRange<R>(node: ChildNode & MarkedNode<R>): null | ChildNode {
+export function remove<R>(node: ChildNode): null | ChildNode {
   const { parentNode } = node;
+  // istanbul ignore next
   if (parentNode === null) throw new Error('detached child');
 
-  const end = node._range!;
-  let next = node as null | ChildNode;
-  let current;
+  const next = nextSibling(node);
+  let current = node as null | ChildNode;
   do {
-    current = next;
-    next = next!.nextSibling;
+    const n = current!.nextSibling;
     parentNode.removeChild(current!);
-  } while (current !== end);
+    current = n;
+  } while (current !== next);
   return next;
 }
