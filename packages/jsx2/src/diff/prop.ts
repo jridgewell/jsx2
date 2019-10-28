@@ -1,5 +1,4 @@
 type StyleTypes = import('./style').StyleTypes;
-type ListenerElement = import('./event').ListenerElement;
 type ListenerTypes = import('./event').ListenerTypes;
 type VNode<R> = import('../create-element').VNode<R>;
 
