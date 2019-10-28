@@ -1,10 +1,10 @@
 type MarkedNode<R> = import('./mark').MarkedNode<R>;
 
-export function removeRange<R>(node: ChildNode): null | ChildNode {
+export function removeRange<R>(node: ChildNode & MarkedNode<R>): null | ChildNode {
   const { parentNode } = node;
   if (parentNode === null) throw new Error('detached child');
 
-  const end = (node as MarkedNode<R>)._range!;
+  const end = node._range!;
   let next = node as null | ChildNode;
   let current;
   do {

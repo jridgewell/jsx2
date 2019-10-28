@@ -6,7 +6,7 @@ import { diffTree } from './diff/diff-tree';
 import { coerceRenderable } from './util/coerce-renderable';
 
 export type Container<R> = (Element | Document | ShadowRoot | DocumentFragment) & {
-  _component?: CoercedRenderable<R>;
+  _root?: CoercedRenderable<R>;
 };
 
 export type Renderable<R> =
@@ -22,11 +22,11 @@ export interface RenderableArray<R> extends ReadonlyArray<Renderable<R>> {}
 
 export function render<R>(_renderable: Renderable<R>, container: Container<R>): void {
   const renderable = coerceRenderable(_renderable);
-  const old = container._component;
+  const old = container._root;
   if (old) {
     diffTree(old, renderable, container, container.firstChild);
   } else {
     createTree(renderable, container);
-    container._component = renderable;
+    container._root = renderable;
   }
 }
