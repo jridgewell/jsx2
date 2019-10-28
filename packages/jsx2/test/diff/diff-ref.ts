@@ -49,8 +49,8 @@ describe('diffRef', () => {
         diffRef(current, ref, ref);
 
         expect(ref).not.toHaveBeenCalled();
-      })
-    })
+      });
+    });
 
     describe('old ref is object', () => {
       it("sets ref's current", () => {
@@ -89,7 +89,7 @@ describe('diffRef', () => {
         expect(ref).toHaveBeenCalledWith(current);
       });
     });
-  })
+  });
 
   describe('new ref is object', () => {
     describe('old ref is function', () => {
@@ -115,7 +115,7 @@ describe('diffRef', () => {
         expect(old).toHaveBeenCalledTimes(1);
         expect(old).toHaveBeenCalledWith(null);
       });
-    })
+    });
 
     describe('old ref is object', () => {
       it("sets ref's current", () => {
@@ -150,7 +150,7 @@ describe('diffRef', () => {
         diffRef(current, ref, ref);
 
         expect(spy).not.toHaveBeenCalled();
-      })
+      });
     });
 
     describe('old ref is null', () => {
@@ -166,7 +166,7 @@ describe('diffRef', () => {
         expect(spy).toHaveBeenCalledWith(current);
       });
     });
-  })
+  });
 
   describe('new ref is null', () => {
     describe('old ref is function', () => {
@@ -180,7 +180,7 @@ describe('diffRef', () => {
         expect(old).toHaveBeenCalledTimes(1);
         expect(old).toHaveBeenCalledWith(null);
       });
-    })
+    });
 
     describe('old ref is object', () => {
       it("unsets old ref's current", () => {
@@ -204,7 +204,7 @@ describe('diffRef', () => {
         expect(() => {
           diffRef(current, ref, ref);
         }).not.toThrow();
-      })
+      });
     });
-  })
+  });
 });

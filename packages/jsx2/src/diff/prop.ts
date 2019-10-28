@@ -22,7 +22,7 @@ export function diffProp(
   } else if (name === 'dangerouslySetInnerHTML') {
     throw new Error('dangerouslySetInnerHTML is not supported yet');
   } else if (name.startsWith('on')) {
-    diffEvent(el as ListenerElement, name, oldValue as ListenerTypes, newValue as ListenerTypes);
+    diffEvent(el, name, oldValue as ListenerTypes, newValue as ListenerTypes);
   } else if (name in el) {
     (el as any)[name] = newValue == null ? '' : newValue;
   } else if (typeof newValue !== 'function') {
