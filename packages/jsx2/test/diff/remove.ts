@@ -6,6 +6,17 @@ describe('remove', () => {
     it('removes the node', () => {
       const container = document.createElement('div');
       const node = document.createTextNode('');
+      container.appendChild(node);
+      mark('', node, node);
+
+      remove(node);
+
+      expect(node.parentNode).toBe(null);
+    });
+
+    it('does not remove the nextSibling', () => {
+      const container = document.createElement('div');
+      const node = document.createTextNode('');
       const next = document.createTextNode('');
       container.appendChild(node);
       container.appendChild(next);
@@ -13,7 +24,7 @@ describe('remove', () => {
 
       remove(node);
 
-      expect(node.parentNode).toBe(null);
+      expect(next.parentNode).toBe(container);
     });
 
     it('returns the next sibling', () => {
@@ -42,6 +53,20 @@ describe('remove', () => {
       const container = document.createElement('div');
       const node = document.createTextNode('');
       const end = document.createTextNode('');
+      container.appendChild(node);
+      container.appendChild(end);
+      mark('', node, end);
+
+      remove(node);
+
+      expect(node.parentNode).toBe(null);
+      expect(end.parentNode).toBe(null);
+    });
+
+    it('does not remove the next sibling', () => {
+      const container = document.createElement('div');
+      const node = document.createTextNode('');
+      const end = document.createTextNode('');
       const next = document.createTextNode('');
       container.appendChild(node);
       container.appendChild(end);
@@ -50,8 +75,7 @@ describe('remove', () => {
 
       remove(node);
 
-      expect(node.parentNode).toBe(null);
-      expect(end.parentNode).toBe(null);
+      expect(next.parentNode).toBe(container);
     });
 
     it('returns the next sibling', () => {
