@@ -22,9 +22,10 @@ export function mark<R>(
 export function markFragment<R>(
   renderable: MarkedNode<R>['_vnode'],
   frag: DocumentFragment,
+  component?: MarkedNode<R>['_component'],
 ): DocumentFragment {
   const first = frag.insertBefore(document.createComment(''), null);
-  mark(renderable, first, frag.lastChild!);
+  mark(renderable, first, frag.lastChild!, component);
   return frag;
 }
 
@@ -40,7 +41,7 @@ export function markComponent<R>(
   }
 
   if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-    return markFragment(renderable, (rendered as unknown) as DocumentFragment);
+    return markFragment(renderable, rendered as DocumentFragment, component);
   }
 
   const frag = document.createDocumentFragment();

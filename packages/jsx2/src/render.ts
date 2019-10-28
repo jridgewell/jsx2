@@ -1,9 +1,9 @@
 type VNode<R> = import('./create-element').VNode<R>;
 type CoercedRenderable<R> = import('./util/coerce-renderable').CoercedRenderable<R>;
 
-import { coerceRenderable } from './util/coerce-renderable';
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
+import { coerceRenderable } from './util/coerce-renderable';
 
 export type Container<R> = (Element | Document | ShadowRoot | DocumentFragment) & {
   _component?: CoercedRenderable<R>;

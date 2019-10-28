@@ -11,7 +11,6 @@ export function coerceRenderable<R>(renderable: Renderable<R> | void): CoercedRe
   if (typeof renderable === 'number') return String(renderable);
   if (typeof renderable === 'string') return renderable;
 
-  // TOOD: Maybe map?
   if (isArray(renderable)) return renderable;
 
   if (isValidElement<R>(renderable)) return renderable;

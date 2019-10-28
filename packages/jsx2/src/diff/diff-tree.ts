@@ -3,11 +3,11 @@ type RenderableArray<R> = import('../render').RenderableArray<R>;
 type VNode<R> = import('../create-element').VNode<R>;
 type MarkedNode<R> = import('./mark').MarkedNode<R>;
 
-import { coerceRenderable } from '../util/coerce-renderable';
 import { Component, isFunctionComponent } from '../component';
+import { coerceRenderable } from '../util/coerce-renderable';
+import { isArray } from '../util/is-array';
 import { insertElement } from './create-tree';
 import { diffRef } from './diff-ref';
-import { isArray } from '../util/is-array';
 import { mark, markComponent } from './mark';
 import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
@@ -85,7 +85,6 @@ function oldWasArray<R>(
     insertElement(coerceRenderable(renderable[i]), container, current);
   }
 
-  // TODO: nextSibilng?
   const first = previous ? previous.nextSibling : container.firstChild;
   if (first === null) return;
   if (first === current) return;

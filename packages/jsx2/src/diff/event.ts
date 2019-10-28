@@ -14,7 +14,7 @@ export function diffEvent(
 ): void {
   const useCapture = name.endsWith('Capture');
   if (useCapture) {
-    name = name.slice(0, 'Capture'.length);
+    name = name.slice(0, -'Capture'.length);
   }
 
   const nameLower = name.toLowerCase();
@@ -24,8 +24,8 @@ export function diffEvent(
     if (!el._listeners) el._listeners = {};
     if (!oldValue) el.addEventListener(name, listener, useCapture);
     el._listeners[name] = newValue;
-  } else {
-    if (oldValue) el._listeners[name] = null;
+  } else if (oldValue) {
+    el._listeners[name] = null;
     el.removeEventListener(name, listener, useCapture);
   }
 }
