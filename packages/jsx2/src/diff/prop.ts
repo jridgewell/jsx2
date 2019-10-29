@@ -14,9 +14,9 @@ export function diffProp(
   if (name === 'children' || name === 'key' || name === 'ref') return;
   if (newValue === oldValue) return;
 
-  if (name === 'class' || name === 'className') {
-    el.className = newValue as string;
-  } else if (name === 'style') {
+  if (name === 'class') name = 'className';
+
+  if (name === 'style') {
     diffStyle(el, oldValue as StyleTypes, newValue as StyleTypes);
   } else if (name === 'dangerouslySetInnerHTML') {
     throw new Error('dangerouslySetInnerHTML is not supported yet');
