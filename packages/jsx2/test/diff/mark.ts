@@ -180,7 +180,10 @@ describe('markComponent', () => {
       const rendered = document.createTextNode('test');
       const renderable = 'test';
 
-      expect(markComponent(renderable, rendered)).toHaveProperty('nodeType', Node.DOCUMENT_FRAGMENT_NODE);
+      expect(markComponent(renderable, rendered)).toHaveProperty(
+        'nodeType',
+        Node.DOCUMENT_FRAGMENT_NODE,
+      );
     });
 
     it('does not mark fragment', () => {
