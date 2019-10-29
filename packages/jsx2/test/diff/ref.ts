@@ -1,4 +1,4 @@
-import { diffRef } from '../../src/diff/diff-ref';
+import { diffRef } from '../../src/diff/ref';
 import { createRef } from '../../src/create-ref';
 
 describe('diffRef', () => {

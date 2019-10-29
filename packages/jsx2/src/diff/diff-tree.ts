@@ -7,7 +7,7 @@ import { Component, isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { insertElement } from './create-tree';
-import { diffRef } from './diff-ref';
+import { diffRef } from './ref';
 import { mark, markComponent } from './mark';
 import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
