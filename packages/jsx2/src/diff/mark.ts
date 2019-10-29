@@ -24,7 +24,7 @@ export function markFragment<R>(
   frag: DocumentFragment,
   component?: MarkedNode<R>['_component'],
 ): DocumentFragment {
-  const first = frag.insertBefore(document.createComment(''), null);
+  const first = frag.insertBefore(document.createComment(''), frag.firstChild);
   mark(renderable, first, frag.lastChild!, component);
   return frag;
 }
