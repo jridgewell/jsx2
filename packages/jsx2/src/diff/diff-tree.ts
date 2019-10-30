@@ -7,10 +7,10 @@ import { Component, isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { insertElement } from './create-tree';
-import { diffRef } from './ref';
 import { mark, markComponent } from './mark';
 import { nextSibling } from './next-sibling';
 import { diffProps } from './prop';
+import { diffRef } from './ref';
 import { remove } from './remove';
 
 export function diffTree<R>(
@@ -148,9 +148,21 @@ function oldWasComponent<R>(
   const { props } = renderable;
   const next = nextSibling(node);
   const component = (node as MarkedNode<R>)._component;
-  const rendered = isFunctionComponent<R>(type) ? type(props) : component!.render(props);
+  const rendered = coerceRenderable(
+    isFunctionComponent<R>(type) ? type(props) : component!.render(props),
+  );
 
-  diffTree(old, coerceRenderable(rendered), container, node.nextSibling);
+  const start = node.nextSibling!;
+  const oldRendered = (start as MarkedNode<R>)._vnode as CoercedRenderable<R>;
+  diffTree(oldRendered, rendered, container, start);
+
+  // TODO: I think all this difficutly is caused by `render(null, Container)`
+  // not inserting a comment.
+  if (node.nextSibling === next) {
+    container.insertBefore(start, next);
+    mark(rendered, start, start);
+  }
+
   const end = next ? next.previousSibling! : container.lastChild!;
   mark(renderable, node, end, component);
 }

@@ -88,53 +88,105 @@ describe('markFragment', () => {
 
 describe('markComponent', () => {
   describe('null', () => {
-    it('returns a comment', () => {
+    it('returns a fragment', () => {
       const rendered = null;
       const renderable = 'test';
 
-      expect(markComponent(renderable, rendered)).toHaveProperty('nodeType', Node.COMMENT_NODE);
+      expect(markComponent(renderable, rendered)).toHaveProperty(
+        'nodeType',
+        Node.DOCUMENT_FRAGMENT_NODE,
+      );
     });
 
-    it('marks comment', () => {
+    it('does not mark fragment', () => {
       const rendered = null;
       const renderable = 'test';
 
-      const comment = markComponent(renderable, rendered);
+      const frag = markComponent(renderable, rendered);
+      expect(isMarked(frag)).toBe(false);
+    });
 
-      expect(isMarked(comment)).toBe(true);
+    it('inserts comment as first child of fragment', () => {
+      const rendered = null;
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(frag.firstChild).toHaveProperty('nodeType', Node.COMMENT_NODE);
+    });
+
+    it('marks comment node', () => {
+      const rendered = null;
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(isMarked(frag.firstChild)).toBe(true);
+    });
+
+    it('appends another comment as last child', () => {
+      const rendered = null;
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(frag.lastChild).toHaveProperty('nodeType', Node.COMMENT_NODE);
+      expect(frag.lastChild).not.toBe(frag.firstChild);
+    });
+
+    it('marks last comment node', () => {
+      const rendered = document.createDocumentFragment();
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(isMarked(frag.lastChild)).toBe(true);
     });
   });
 
   describe('empty frag', () => {
-    it('does not mark the fragment', () => {
-      const frag = document.createDocumentFragment();
+    it('does not mark fragment', () => {
+      const rendered = document.createDocumentFragment();
       const renderable = 'test';
 
-      markComponent(renderable, frag);
+      const frag = markComponent(renderable, rendered);
       expect(isMarked(frag)).toBe(false);
     });
 
     it('returns the fragment', () => {
-      const frag = document.createDocumentFragment();
+      const rendered = document.createDocumentFragment();
       const renderable = 'test';
 
-      expect(markComponent(renderable, frag)).toBe(frag);
+      expect(markComponent(renderable, rendered)).toBe(rendered);
     });
 
-    it('inserts comment into empty frag', () => {
-      const frag = document.createDocumentFragment();
+    it('inserts comment as first child of fragment', () => {
+      const rendered = document.createDocumentFragment();
       const renderable = 'test';
 
-      markComponent(renderable, frag);
+      const frag = markComponent(renderable, rendered);
       expect(frag.firstChild).toHaveProperty('nodeType', Node.COMMENT_NODE);
     });
 
-    it('marks the comment', () => {
-      const frag = document.createDocumentFragment();
+    it('marks comment node', () => {
+      const rendered = document.createDocumentFragment();
       const renderable = 'test';
 
-      markComponent(renderable, frag);
+      const frag = markComponent(renderable, rendered);
       expect(isMarked(frag.firstChild)).toBe(true);
+    });
+
+    it('appends another comment as last child', () => {
+      const rendered = document.createDocumentFragment();
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(frag.lastChild).toHaveProperty('nodeType', Node.COMMENT_NODE);
+      expect(frag.lastChild).not.toBe(frag.firstChild);
+    });
+
+    it('marks last comment node', () => {
+      const rendered = document.createDocumentFragment();
+      const renderable = 'test';
+
+      const frag = markComponent(renderable, rendered);
+      expect(isMarked(frag.lastChild)).toBe(true);
     });
   });
 

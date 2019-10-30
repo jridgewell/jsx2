@@ -4,7 +4,7 @@ type Component<R> = import('../component').Component<R>;
 export interface MarkedNode<R> {
   _component?: Component<R>;
   _range?: Node;
-  _vnode?: Exclude<CoercedRenderable<R>, null>;
+  _vnode?: CoercedRenderable<R>;
 }
 
 export function mark<R>(
@@ -34,13 +34,18 @@ export function markComponent<R>(
   rendered: null | Node,
   component?: MarkedNode<R>['_component'],
 ): Comment | DocumentFragment {
+  // TODO: I think all this difficutly is caused by `render(null, Container)`
+  // not inserting a comment.
   if (rendered === null) {
-    const comment = document.createComment('');
-    mark(renderable, comment, comment, component);
-    return comment;
-  }
-
-  if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    rendered = document.createComment('');
+    mark(renderable, rendered, rendered);
+  } else if (rendered.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+    // TODO: I think all this difficutly is caused by `render(null, Container)`
+    // not inserting a comment.
+    if (rendered.firstChild === null) {
+      const comment = rendered.appendChild(document.createComment(''));
+      mark(renderable, comment, comment);
+    }
     return markFragment(renderable, rendered as DocumentFragment, component);
   }
 

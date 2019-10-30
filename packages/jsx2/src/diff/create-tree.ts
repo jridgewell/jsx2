@@ -3,9 +3,9 @@ type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderabl
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
-import { diffRef } from './ref';
 import { mark, markComponent, markFragment } from './mark';
 import { addProps } from './prop';
+import { diffRef } from './ref';
 
 export function createTree<R>(renderable: CoercedRenderable<R>, container: Node): void {
   container.textContent = '';

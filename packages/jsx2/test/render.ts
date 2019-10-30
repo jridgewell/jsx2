@@ -1,4 +1,4 @@
-import { render, createElement } from '../src/jsx2';
+import { render, createElement, Component } from '../src/jsx2';
 
 describe('render', () => {
   function expectTextNode(node: Node, text: string) {
@@ -321,6 +321,177 @@ describe('render', () => {
         expect(body.firstChild).toBe(rendered);
         expect((rendered as Element).hasAttribute('foo')).toBe(false);
       });
+    });
+
+    describe('with children', () => {
+      it('renders children', () => {
+        const body = document.createElement('body');
+
+        render(createElement('div', null, 'text'), body);
+
+        expectTextNode(body.firstChild!.firstChild!, 'text');
+      });
+
+      it('renders multiple children', () => {
+        const body = document.createElement('body');
+
+        render(createElement('div', null, 'text', 0), body);
+
+        expectTextNode(body.firstChild!.firstChild!.nextSibling!, 'text');
+        expectTextNode(body.firstChild!.lastChild!, '0');
+      });
+
+      it('updates already rendered children', () => {
+        const body = document.createElement('body');
+        render(createElement('div', null, 'text'), body);
+        const rendered = body.firstChild!.lastChild;
+
+        render(createElement('div', null, 0), body);
+
+        expect(body.firstChild!.lastChild).toBe(rendered);
+        expectTextNode(body.firstChild!.lastChild!, '0');
+      });
+
+      it('replaces already rendered child', () => {
+        const body = document.createElement('body');
+        render(createElement('div', null, 'text'), body);
+        const rendered = body.firstChild!.lastChild;
+
+        render(createElement('div', null, createElement('div', null)), body);
+
+        expect(body.firstChild!.lastChild).not.toBe(rendered);
+        expectElement(body.firstChild!.lastChild!, 'div');
+      });
+
+      it('removes child', () => {
+        const body = document.createElement('body');
+        render(createElement('div', null, 'text'), body);
+
+        render(createElement('div', null), body);
+
+        expect(body.firstChild!.firstChild).toBe(null);
+      });
+
+      it('removes multiple children', () => {
+        const body = document.createElement('body');
+        render(createElement('div', null, 'text', 0), body);
+
+        render(createElement('div', null), body);
+
+        expect(body.firstChild!.firstChild).toBe(null);
+      });
+    });
+  });
+
+  describe('rendering function component', () => {
+    it('renders return value', () => {
+      const body = document.createElement('body');
+      render(
+        createElement(() => {
+          return 'hello';
+        }),
+        body,
+      );
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'hello');
+      expect(lastChild.nextSibling).toBe(null);
+    });
+
+    it('removes rendered text', () => {
+      const body = document.createElement('body');
+      render('before', body);
+
+      render(
+        createElement(() => {
+          return 'hello';
+        }),
+        body,
+      );
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'hello');
+      expect(lastChild.nextSibling).toBe(null);
+    });
+
+    it('updates rendered text', () => {
+      const body = document.createElement('body');
+      let first = true;
+      const C = () => {
+        if (first) {
+          first = false;
+          return 'first';
+        } else {
+          return 'second';
+        }
+      };
+
+      render(createElement(C, null), body);
+      const rendered = body.lastChild!;
+
+      render(createElement(C, null), body);
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'second');
+      expect(lastChild).toBe(rendered);
+      expect(lastChild.nextSibling).toBe(null);
+    });
+  });
+
+  describe('rendering class component', () => {
+    it('renders return value', () => {
+      const body = document.createElement('body');
+      class C extends Component {
+        render() {
+          return 'hello';
+        }
+      }
+      render(createElement(C, null), body);
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'hello');
+      expect(lastChild.nextSibling).toBe(null);
+    });
+
+    it('removes rendered text', () => {
+      const body = document.createElement('body');
+      class C extends Component {
+        render() {
+          return 'hello';
+        }
+      }
+      render('before', body);
+
+      render(createElement(C, null), body);
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'hello');
+      expect(lastChild.nextSibling).toBe(null);
+    });
+
+    it('updates rendered text', () => {
+      const body = document.createElement('body');
+      let first = true;
+      class C extends Component {
+        render() {
+          if (first) {
+            first = false;
+            return 'first';
+          } else {
+            return 'second';
+          }
+        }
+      }
+
+      render(createElement(C, null), body);
+      const rendered = body.lastChild!;
+
+      render(createElement(C, null), body);
+
+      const lastChild = body.lastChild!;
+      expectTextNode(lastChild, 'second');
+      expect(lastChild).toBe(rendered);
+      expect(lastChild.nextSibling).toBe(null);
     });
   });
 });
