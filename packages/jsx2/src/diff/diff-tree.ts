@@ -45,6 +45,7 @@ function oldWasText<R>(
   node: Text,
 ): void {
   if (old === renderable) return;
+
   if (typeof renderable !== 'string') {
     insertElement(renderable, container, node);
     remove(node);
@@ -99,6 +100,8 @@ function oldWasElement<R>(
   container: Node,
   node: Element,
 ): void {
+  if (old === renderable) return;
+
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
     remove(node);
@@ -132,6 +135,8 @@ function oldWasComponent<R>(
   container: Node,
   node: ChildNode,
 ): void {
+  if (old === renderable) return;
+
   if (renderable === null || typeof renderable === 'string' || isArray(renderable)) {
     insertElement(renderable, container, node);
     remove(node);
