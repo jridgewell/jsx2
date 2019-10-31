@@ -1,11 +1,11 @@
-type Renderable<R> = import('../render').Renderable<R>;
+type Renderable = import('../render').Renderable;
 
 import { isValidElement } from '../create-element';
 import { isArray } from './is-array';
 
-export type CoercedRenderable<R> = Exclude<Renderable<R>, boolean | number | undefined>;
+export type CoercedRenderable = Exclude<Renderable, boolean | number | undefined>;
 
-export function coerceRenderable<R>(renderable: Renderable<R> | void): CoercedRenderable<R> {
+export function coerceRenderable(renderable: Renderable | void): CoercedRenderable {
   if (renderable == null) return null;
   if (typeof renderable === 'boolean') return null;
   if (typeof renderable === 'number') return String(renderable);
@@ -13,6 +13,6 @@ export function coerceRenderable<R>(renderable: Renderable<R> | void): CoercedRe
 
   if (isArray(renderable)) return renderable;
 
-  if (isValidElement<R>(renderable)) return renderable;
+  if (isValidElement(renderable)) return renderable;
   return null;
 }

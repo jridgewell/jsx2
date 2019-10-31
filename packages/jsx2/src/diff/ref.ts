@@ -1,9 +1,9 @@
-type Ref<R> = import('../create-ref').Ref<R>;
+type Ref = import('../create-ref').Ref;
 
-export function diffRef<R>(
-  current: R,
-  old: null | undefined | Ref<R>,
-  ref: null | undefined | Ref<R>,
+export function diffRef(
+  current: unknown,
+  old: null | undefined | Ref,
+  ref: null | undefined | Ref,
 ): void {
   // tslint:disable-next-line triple-equals
   if (old == ref) return;
@@ -11,7 +11,7 @@ export function diffRef<R>(
   if (ref) setRef(current, ref);
 }
 
-function setRef<R>(current: R, ref: Ref<R>): void {
+function setRef(current: unknown, ref: Ref): void {
   if (typeof ref === 'function') {
     ref(current);
   } else {

@@ -1,9 +1,10 @@
-export interface RefObject<R> {
-  current: R | null;
+// TODO: Generic-ize
+export interface RefObject {
+  current: unknown | null;
 }
 
-export type Ref<R> = RefObject<R> | ((current: R | null) => void);
+export type Ref = RefObject | ((current: unknown | null) => void);
 
-export function createRef<R>(): RefObject<R> {
+export function createRef(): RefObject {
   return { current: null };
 }

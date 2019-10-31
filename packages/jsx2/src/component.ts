@@ -1,13 +1,13 @@
-type Renderable<R> = import('./render').Renderable<R>;
+type Renderable = import('./render').Renderable;
 
-export interface FunctionComponent<R> {
-  (props: object): void | Renderable<R>;
+export interface FunctionComponent {
+  (props: object): void | Renderable;
 }
 
-export class Component<R = {}> {
-  render(props: object): void | Renderable<R> {}
+export class Component {
+  render(props: object): void | Renderable {}
 }
 
-export function isFunctionComponent<R>(value: Function): value is FunctionComponent<R> {
+export function isFunctionComponent(value: Function): value is FunctionComponent {
   return !value.prototype || !(value.prototype as { render?: unknown }).render;
 }

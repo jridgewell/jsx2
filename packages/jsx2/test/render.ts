@@ -337,8 +337,20 @@ describe('render', () => {
 
         render(createElement('div', null, 'text', 0), body);
 
-        expectTextNode(body.firstChild!.firstChild!.nextSibling!, 'text');
-        expectTextNode(body.firstChild!.lastChild!, '0');
+        const div = body.firstChild!;
+        expectTextNode(div.firstChild!, 'text');
+        expectTextNode(div.lastChild!, '0');
+      });
+
+      it('skips nullish children', () => {
+        const body = document.createElement('body');
+
+        render(createElement('div', null, 'text', true, 0), body);
+
+        const div = body.firstChild!;
+        expectTextNode(div.firstChild!, 'text');
+        expectTextNode(div.lastChild!, '0');
+        expect(div.firstChild!.nextSibling).toBe(div.lastChild);
       });
 
       it('updates already rendered children', () => {
@@ -348,8 +360,9 @@ describe('render', () => {
 
         render(createElement('div', null, 0), body);
 
-        expect(body.firstChild!.lastChild).toBe(rendered);
-        expectTextNode(body.firstChild!.lastChild!, '0');
+        const lastChild = body.firstChild!.lastChild;
+        expect(lastChild).toBe(rendered);
+        expectTextNode(lastChild!, '0');
       });
 
       it('replaces already rendered child', () => {
@@ -359,8 +372,9 @@ describe('render', () => {
 
         render(createElement('div', null, createElement('div', null)), body);
 
-        expect(body.firstChild!.lastChild).not.toBe(rendered);
-        expectElement(body.firstChild!.lastChild!, 'div');
+        const lastChild = body.firstChild!.lastChild;
+        expect(lastChild).not.toBe(rendered);
+        expectElement(lastChild!, 'div');
       });
 
       it('removes child', () => {

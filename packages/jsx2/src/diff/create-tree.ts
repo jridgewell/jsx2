@@ -1,61 +1,88 @@
-type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderable<R>;
+type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
+type Fiber = import('../util/fiber').Fiber;
 
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
-import { mark, markComponent, markFragment } from './mark';
 import { addProps } from './prop';
 import { diffRef } from './ref';
+import { fiber } from '../util/fiber';
 
-export function createTree<R>(renderable: CoercedRenderable<R>, container: Node): void {
-  container.textContent = '';
-  insertElement(renderable, container, null);
+export function createTree(renderable: CoercedRenderable, container: Node): void {
+  const root = fiber(null, null);
+  createChild(renderable, root, null);
+  mount(container, root);
+  (container as {_fiber?: Fiber})._fiber = root.child!;
 }
 
-export function insertElement<R>(
-  renderable: CoercedRenderable<R>,
-  container: Node,
-  before: null | ChildNode,
-): void {
-  const dom = renderableToNode(renderable);
-  if (dom) container.insertBefore(dom, before);
-}
-
-function renderableToNode<R>(
-  renderable: CoercedRenderable<R>,
-): null | Comment | DocumentFragment | Element | Text {
+export function createChild(
+  renderable: CoercedRenderable,
+  parentFiber: Fiber,
+  previousFiber: null | Fiber,
+): null | Fiber {
   if (renderable === null) return null;
 
   if (typeof renderable === 'string') {
-    const text = document.createTextNode(renderable);
-    mark(renderable, text, text);
-    return text;
+    const f = fiber(null, renderable);
+    f.dom = document.createTextNode(renderable);
+    return mark(parentFiber, f, previousFiber);
   }
 
   if (isArray(renderable)) {
-    const frag = document.createDocumentFragment();
+    let f: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
-      insertElement(coerceRenderable(renderable[i]), frag, null);
+      const child = createChild(coerceRenderable(renderable[i]), parentFiber, previousFiber);
+      if (child === null) continue;
+      f = child;
+      previousFiber = mark(parentFiber, child, previousFiber);
     }
-    return markFragment(renderable, frag);
+    return f;
   }
+
+  const f = fiber(renderable.key, renderable);
+  f.data = renderable;
+  mark(parentFiber, f, previousFiber);
 
   const { type, props } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
+    f.dom = el;
     addProps(el, props);
-    insertElement(coerceRenderable(props.children), el, null);
-    diffRef((el as unknown) as R, null, renderable.ref);
-    mark(renderable, el, el);
-    return el;
+    createChild(coerceRenderable(props.children), f, null);
+    diffRef(el, null, renderable.ref);
+    return f;
   }
 
-  if (isFunctionComponent<R>(type)) {
-    const rendered = renderableToNode(coerceRenderable(type(props)));
-    return markComponent(renderable, rendered);
+  if (isFunctionComponent(type)) {
+    createChild(coerceRenderable(type(props)), f, null);
+    return f;
   }
 
-  const component = new type(props);
-  const rendered = renderableToNode(coerceRenderable(component.render(props)));
-  return markComponent(renderable, rendered, component);
+  f.component = new type(props);
+  createChild(coerceRenderable(f.component.render(props)), f, null);
+  return f;
+}
+
+function mark(parent: Fiber, current: null | Fiber, previous: null | Fiber): null | Fiber {
+  if (current === null) return previous;
+  if (previous) {
+    current.index = previous.index + 1;
+    previous.next = current;
+  } else {
+    parent.child = current;
+  }
+  return current;
+}
+
+export function mount(container: Node, fiber: null | Fiber): void {
+  while (fiber !== null) {
+    const { dom, child } = fiber;
+    if (dom) {
+      if (child) mount(dom, child);
+      container.appendChild(dom);
+    } else if (child) {
+      mount(container, child);
+    }
+    fiber = fiber.next;
+  }
 }

@@ -1,6 +1,6 @@
 type StyleTypes = import('./style').StyleTypes;
 type ListenerTypes = import('./event').ListenerTypes;
-type VNode<R> = import('../create-element').VNode<R>;
+type VNode = import('../create-element').VNode;
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';
@@ -33,10 +33,10 @@ export function diffProp(
   }
 }
 
-export function diffProps<R>(
+export function diffProps(
   el: HTMLElement,
-  oldProps: VNode<R>['props'],
-  props: VNode<R>['props'],
+  oldProps: VNode['props'],
+  props: VNode['props'],
 ): void {
   for (const name in oldProps) {
     if (!(name in props)) diffProp(el, name, oldProps[name], null);
@@ -46,7 +46,7 @@ export function diffProps<R>(
   }
 }
 
-export function addProps<R>(el: HTMLElement, props: VNode<R>['props']): void {
+export function addProps(el: HTMLElement, props: VNode['props']): void {
   for (const name in props) {
     diffProp(el, name, null, props[name]);
   }

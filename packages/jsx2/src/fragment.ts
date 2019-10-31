@@ -1,5 +1,5 @@
-type Renderable<R> = import('./render').Renderable<R>;
+type Renderable = import('./render').Renderable;
 
-export function Fragment<R>(props: object): Renderable<R> {
-  return (props as { children?: Renderable<R> }).children;
+export function Fragment(props: object): Renderable {
+  return (props as { children?: Renderable }).children;
 }

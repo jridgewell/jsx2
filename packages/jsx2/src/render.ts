@@ -1,32 +1,34 @@
-type VNode<R> = import('./create-element').VNode<R>;
-type CoercedRenderable<R> = import('./util/coerce-renderable').CoercedRenderable<R>;
+type VNode = import('./create-element').VNode;
+type Fiber = import('./util/fiber').Fiber;
 
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
 import { coerceRenderable } from './util/coerce-renderable';
+import { createElement } from './create-element';
+import { Fragment } from './fragment';
 
-export type Container<R> = (Element | Document | ShadowRoot | DocumentFragment) & {
-  _root?: CoercedRenderable<R>;
+export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
+  _fiber?: Fiber;
 };
 
-export type Renderable<R> =
+export type Renderable =
   | string
   | number
   | boolean
   | null
   | undefined
-  | VNode<R>
+  | VNode
   // | TemplateResult
-  | RenderableArray<R>;
-export interface RenderableArray<R> extends ReadonlyArray<Renderable<R>> {}
+  | RenderableArray;
+export interface RenderableArray extends ReadonlyArray<Renderable> {}
 
-export function render<R>(_renderable: Renderable<R>, container: Container<R>): void {
-  const renderable = coerceRenderable(_renderable);
-  const old = container._root;
+export function render(_renderable: Renderable, container: Container): void {
+  const renderable = createElement(Fragment, null, coerceRenderable(_renderable));
+  const old = container._fiber;
   if (old) {
-    diffTree(old, renderable, container, container.firstChild);
+    diffTree(old, renderable);
   } else {
+    container.textContent = '';
     createTree(renderable, container);
-    container._root = renderable;
   }
 }

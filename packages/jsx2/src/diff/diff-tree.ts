@@ -1,24 +1,19 @@
-type CoercedRenderable<R> = import('../util/coerce-renderable').CoercedRenderable<R>;
-type RenderableArray<R> = import('../render').RenderableArray<R>;
-type VNode<R> = import('../create-element').VNode<R>;
-type MarkedNode<R> = import('./mark').MarkedNode<R>;
+type Fiber = import('../util/fiber').Fiber;
+type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
 
-import { Component, isFunctionComponent } from '../component';
-import { coerceRenderable } from '../util/coerce-renderable';
-import { isArray } from '../util/is-array';
-import { insertElement } from './create-tree';
-import { mark, markComponent } from './mark';
-import { nextSibling } from './next-sibling';
-import { diffProps } from './prop';
-import { diffRef } from './ref';
-import { remove } from './remove';
 
-export function diffTree<R>(
-  old: CoercedRenderable<R>,
-  renderable: CoercedRenderable<R>,
-  container: Node,
-  node: null | ChildNode,
+export function diffTree(
+  old: Fiber,
+  renderable: CoercedRenderable,
 ): void {
+  const { data } = old;
+  if (data === renderable) return;
+}
+
+function renderText(old: CoercedRenderable, renderable: string, container: Node, node: Text) {
+
+}
+/*
   if (old === renderable) return;
   if (old === null) return insertElement(renderable, container, node);
   if (node === null) throw new Error('old vnode was non-null but dom node is null');
@@ -38,9 +33,9 @@ export function diffTree<R>(
   return oldWasComponent(old, renderable, container, node);
 }
 
-function oldWasText<R>(
+function oldWasText(
   old: string,
-  renderable: CoercedRenderable<R>,
+  renderable: CoercedRenderable,
   container: Node,
   node: Text,
 ): void {
@@ -56,9 +51,9 @@ function oldWasText<R>(
   mark(renderable, node, node);
 }
 
-function oldWasArray<R>(
-  old: RenderableArray<R>,
-  renderable: CoercedRenderable<R>,
+function oldWasArray(
+  old: RenderableArray,
+  renderable: CoercedRenderable,
   container: Node,
   node: ChildNode,
 ): void {
@@ -94,9 +89,9 @@ function oldWasArray<R>(
   mark(renderable, first, last);
 }
 
-function oldWasElement<R>(
-  old: VNode<R>,
-  renderable: CoercedRenderable<R>,
+function oldWasElement(
+  old: VNode,
+  renderable: CoercedRenderable,
   container: Node,
   node: Element,
 ): void {
@@ -124,14 +119,14 @@ function oldWasElement<R>(
     node,
     node.firstChild,
   );
-  diffRef((node as unknown) as R, old.ref, renderable.ref);
+  diffRef(node, old.ref, renderable.ref);
   mark(renderable, node, node);
   return;
 }
 
-function oldWasComponent<R>(
-  old: VNode<R>,
-  renderable: CoercedRenderable<R>,
+function oldWasComponent(
+  old: VNode,
+  renderable: CoercedRenderable,
   container: Node,
   node: ChildNode,
 ): void {
@@ -152,13 +147,13 @@ function oldWasComponent<R>(
 
   const { props } = renderable;
   const next = nextSibling(node);
-  const component = (node as MarkedNode<R>)._component;
+  const component = (node as MarkedNode)._component;
   const rendered = coerceRenderable(
-    isFunctionComponent<R>(type) ? type(props) : component!.render(props),
+    isFunctionComponent(type) ? type(props) : component!.render(props),
   );
 
   const start = node.nextSibling!;
-  const oldRendered = (start as MarkedNode<R>)._vnode as CoercedRenderable<R>;
+  const oldRendered = (start as MarkedNode)._vnode as CoercedRenderable;
   diffTree(oldRendered, rendered, container, start);
 
   // TODO: I think all this difficutly is caused by `render(null, Container)`
@@ -171,3 +166,4 @@ function oldWasComponent<R>(
   const end = next ? next.previousSibling! : container.lastChild!;
   mark(renderable, node, end, component);
 }
+*/
