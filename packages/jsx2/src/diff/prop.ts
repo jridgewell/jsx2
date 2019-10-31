@@ -33,11 +33,7 @@ export function diffProp(
   }
 }
 
-export function diffProps(
-  el: HTMLElement,
-  oldProps: VNode['props'],
-  props: VNode['props'],
-): void {
+export function diffProps(el: HTMLElement, oldProps: VNode['props'], props: VNode['props']): void {
   for (const name in oldProps) {
     if (!(name in props)) diffProp(el, name, oldProps[name], null);
   }

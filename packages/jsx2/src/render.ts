@@ -1,11 +1,11 @@
 type VNode = import('./create-element').VNode;
 type Fiber = import('./util/fiber').Fiber;
 
+import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
-import { coerceRenderable } from './util/coerce-renderable';
-import { createElement } from './create-element';
 import { Fragment } from './fragment';
+import { coerceRenderable } from './util/coerce-renderable';
 
 export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
   _fiber?: Fiber;
@@ -26,7 +26,7 @@ export function render(_renderable: Renderable, container: Container): void {
   const renderable = createElement(Fragment, null, coerceRenderable(_renderable));
   const old = container._fiber;
   if (old) {
-    diffTree(old, renderable);
+    diffTree(old, renderable, container);
   } else {
     container.textContent = '';
     createTree(renderable, container);
