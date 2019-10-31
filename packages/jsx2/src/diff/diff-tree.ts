@@ -76,7 +76,32 @@ function renderArray(
   previousFiber: null | Fiber,
   container: Node,
 ): void {
-  // TODO: Figure out keys.
+  const { data } = old;
+  if (!isArray(data)) {
+    return replaceFiber(old, renderable, parentFiber, previousFiber, container);
+  }
+
+  // TODO: Figure out key.
+  let i = 0;
+  let current: null | Fiber = old.child;
+  let last: null | Fiber = null;
+  for (; i < renderable.length && current !== null; i++) {
+    const next: null | Fiber = current.next;
+    diffChild(current, coerceRenderable(renderable[i]), old, last, container);
+    last = last ? last.next : old.child;
+    current = next;
+  }
+  while (current !== null) {
+    current = remove(current, last, container);
+  }
+  for (; i < renderable.length; i++) {
+    const next = last ? last.next : old.child;
+    const f = createChild(coerceRenderable(renderable[i]), old, last);
+    if (f !== null) {
+      last = f;
+      mount(container, f, getNextSibling(next));
+    }
+  }
 }
 
 function renderElement(

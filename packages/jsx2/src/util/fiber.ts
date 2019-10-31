@@ -1,11 +1,10 @@
 type Component = import('../component').Component;
 type VNode = import('../create-element').VNode;
-
-type RenderedData = string | null | VNode;
+type CoercedRenderable = import('./coerce-renderable').CoercedRenderable;
 
 export interface Fiber {
   index: number;
-  data: RenderedData;
+  data: CoercedRenderable;
   key: VNode['key'];
   dom: null | Node;
   child: null | Fiber;

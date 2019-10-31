@@ -206,6 +206,36 @@ describe('render', () => {
     });
   });
 
+  describe('rendering array', () => {
+    it('renders multiple children', () => {
+      const body = document.createElement('body');
+
+      render(['text', 0], body);
+
+      expectTextNode(body.firstChild!, 'text');
+      expectTextNode(body.lastChild!, '0');
+    });
+
+    it('skips nullish children', () => {
+      const body = document.createElement('body');
+
+      render(['text', true, 0], body);
+
+      expectTextNode(body.firstChild!, 'text');
+      expectTextNode(body.lastChild!, '0');
+      expect(body.firstChild!.nextSibling).toBe(body.lastChild);
+    });
+
+    it('removes multiple children', () => {
+      const body = document.createElement('body');
+      render(['text', 0], body);
+
+      render([], body);
+
+      expect(body.firstChild).toBe(null);
+    });
+  });
+
   describe('rendering element', () => {
     it('renders element', () => {
       const body = document.createElement('body');
@@ -332,27 +362,6 @@ describe('render', () => {
         expectTextNode(body.firstChild!.firstChild!, 'text');
       });
 
-      it('renders multiple children', () => {
-        const body = document.createElement('body');
-
-        render(createElement('div', null, 'text', 0), body);
-
-        const div = body.firstChild!;
-        expectTextNode(div.firstChild!, 'text');
-        expectTextNode(div.lastChild!, '0');
-      });
-
-      it('skips nullish children', () => {
-        const body = document.createElement('body');
-
-        render(createElement('div', null, 'text', true, 0), body);
-
-        const div = body.firstChild!;
-        expectTextNode(div.firstChild!, 'text');
-        expectTextNode(div.lastChild!, '0');
-        expect(div.firstChild!.nextSibling).toBe(div.lastChild);
-      });
-
       it('updates already rendered children', () => {
         const body = document.createElement('body');
         render(createElement('div', null, 'text'), body);
@@ -380,15 +389,6 @@ describe('render', () => {
       it('removes child', () => {
         const body = document.createElement('body');
         render(createElement('div', null, 'text'), body);
-
-        render(createElement('div', null), body);
-
-        expect(body.firstChild!.firstChild).toBe(null);
-      });
-
-      it('removes multiple children', () => {
-        const body = document.createElement('body');
-        render(createElement('div', null, 'text', 0), body);
 
         render(createElement('div', null), body);
 

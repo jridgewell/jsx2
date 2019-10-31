@@ -29,14 +29,14 @@ export function createChild(
   }
 
   if (isArray(renderable)) {
-    let f: null | Fiber = null;
+    const f = fiber(null, renderable);
+    let last: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
-      const child = createChild(coerceRenderable(renderable[i]), parentFiber, previousFiber);
+      const child = createChild(coerceRenderable(renderable[i]), f, last);
       if (child === null) continue;
-      f = child;
-      previousFiber = mark(parentFiber, child, previousFiber);
+      last = mark(f, child, last);
     }
-    return f;
+    return mark(parentFiber, f, previousFiber);
   }
 
   const f = fiber(renderable.key, renderable);
