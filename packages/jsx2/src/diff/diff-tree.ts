@@ -5,7 +5,6 @@ type VNode = import('../create-element').VNode;
 
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
-import { fiber } from '../util/fiber';
 import { isArray } from '../util/is-array';
 import { createChild, mount } from './create-tree';
 import { diffProps } from './prop';
@@ -25,7 +24,7 @@ function diffChild(
 ): void {
   if (old === null) {
     const f = createChild(renderable, parentFiber, previousFiber);
-    if (f) mount(container, f, null);
+    mount(container, f, null);
     return;
   }
 
@@ -33,8 +32,7 @@ function diffChild(
   if (data === renderable) return;
 
   if (renderable === null) {
-    remove(old, previousFiber, container);
-    return;
+    return renderNull(old, renderable, parentFiber, previousFiber, container);
   }
 
   if (typeof renderable === 'string') {
@@ -53,6 +51,18 @@ function diffChild(
   renderComponent(old, renderable, parentFiber, previousFiber, container);
 }
 
+function renderNull(
+  old: Fiber,
+  renderable: null,
+  parentFiber: Fiber,
+  previousFiber: null | Fiber,
+  container: Node,
+): void {
+  if (old.data !== renderable) {
+    return replaceFiber(old, renderable, parentFiber, previousFiber, container);
+  }
+}
+
 function renderText(
   old: Fiber,
   renderable: string,
@@ -64,8 +74,8 @@ function renderText(
   if (typeof data !== 'string') {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
   }
-
   old.data = renderable;
+
   (old.dom as Text).data = renderable;
 }
 
@@ -80,6 +90,7 @@ function renderArray(
   if (!isArray(data)) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
   }
+  old.data = renderable;
 
   // TODO: Figure out key.
   let i = 0;
@@ -94,13 +105,11 @@ function renderArray(
   while (current !== null) {
     current = remove(current, last, container);
   }
+  const before = getNextSibling(last ? last.next : old.child);
   for (; i < renderable.length; i++) {
-    const next = last ? last.next : old.child;
     const f = createChild(coerceRenderable(renderable[i]), old, last);
-    if (f !== null) {
-      last = f;
-      mount(container, f, getNextSibling(next));
-    }
+    last = f;
+    mount(container, f, before);
   }
 }
 
@@ -120,6 +129,7 @@ function renderElement(
   if (type !== data.type) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
   }
+  old.data = renderable;
 
   const oldProps = data.props;
   const { props } = renderable;
@@ -140,6 +150,7 @@ function renderComponent(
   if (data === null || typeof data === 'string' || isArray(data)) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
   }
+  old.data = renderable;
 
   const { type } = renderable;
   if (typeof data.type === 'string' || type !== data.type) {
@@ -156,17 +167,15 @@ function renderComponent(
 
 function replaceFiber(
   old: Fiber,
-  renderable: Exclude<CoercedRenderable, null>,
+  renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
 ): void {
   const next = remove(old, previousFiber, container);
   const f = createChild(renderable, parentFiber, previousFiber);
-  if (f !== null) {
-    f.next = next;
-    mount(container, f, getNextSibling(next));
-  }
+  f.next = next;
+  mount(container, f, getNextSibling(next));
 }
 
 function getNextSibling(fiber: null | Fiber): null | Node {

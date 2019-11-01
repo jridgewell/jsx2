@@ -19,30 +19,28 @@ export function createChild(
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
-): null | Fiber {
-  if (renderable === null) return null;
+): Fiber {
+  const f = fiber(null, renderable);
+  mark(parentFiber, f, previousFiber);
+
+  if (renderable === null) return f;
 
   if (typeof renderable === 'string') {
-    const f = fiber(null, renderable);
     f.dom = document.createTextNode(renderable);
-    return mark(parentFiber, f, previousFiber);
+    return f;
   }
 
   if (isArray(renderable)) {
-    const f = fiber(null, renderable);
     let last: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
       const child = createChild(coerceRenderable(renderable[i]), f, last);
-      if (child === null) continue;
-      last = mark(f, child, last);
+      mark(f, child, last);
+      last = child;
     }
-    return mark(parentFiber, f, previousFiber);
+    return f;
   }
 
-  const f = fiber(renderable.key, renderable);
-  f.data = renderable;
-  mark(parentFiber, f, previousFiber);
-
+  f.key = renderable.key;
   const { type, props } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
@@ -63,15 +61,13 @@ export function createChild(
   return f;
 }
 
-export function mark(parent: Fiber, current: null | Fiber, previous: null | Fiber): null | Fiber {
-  if (current === null) return previous;
+export function mark(parent: Fiber, current: Fiber, previous: null | Fiber): void {
   if (previous) {
     current.index = previous.index + 1;
     previous.next = current;
   } else {
     parent.child = current;
   }
-  return current;
 }
 
 export function mount(container: Node, fiber: null | Fiber, before: null | Node): void {
