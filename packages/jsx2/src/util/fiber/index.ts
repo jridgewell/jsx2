@@ -6,20 +6,20 @@ export interface Fiber {
   data: CoercedRenderable;
   key: VNode['key'];
   dom: null | Node;
+  component: null | Component;
   parent: null | Fiber;
   child: null | Fiber;
   next: null | Fiber;
-  component: null | Component;
 }
 
-export function fiber(key: Fiber['key'], data: Fiber['data']): Fiber {
+export function fiber(data: Fiber['data']): Fiber {
   return {
-    key,
     data,
+    key: null,
     dom: null,
+    component: null,
     parent: null,
     child: null,
     next: null,
-    component: null,
   };
 }

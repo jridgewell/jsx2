@@ -11,7 +11,7 @@ import { addProps } from './prop';
 import { diffRef } from './ref';
 
 export function createTree(renderable: CoercedRenderable, container: Node): Fiber {
-  const root = fiber(null, null);
+  const root = fiber(null);
   createChild(renderable, root, null);
   mount(root, container, null);
   return root;
@@ -22,7 +22,7 @@ export function createChild(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
 ): Fiber {
-  const f = fiber(null, renderable);
+  const f = fiber(renderable);
   mark(f, parentFiber, previousFiber);
 
   if (renderable === null) return f;
