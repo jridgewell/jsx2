@@ -104,18 +104,16 @@ function renderArray(
     current = f.next;
   }
 
-  const before = getNextSibling(current || old, container, !current);
+  const before = getNextSibling(last || old, container, true);
   for (; i < renderable.length; i++) {
     current = createChild(coerceRenderable(renderable[i]), old, last);
     last = current;
     mount(current, container, before);
   }
 
-  if (current) {
-    current = current.next;
-    while (current !== null) {
-      current = remove(current, last, container);
-    }
+  current = last ? last.next : old.child;
+  while (current !== null) {
+    current = remove(current, last, container);
   }
   return old;
 }
