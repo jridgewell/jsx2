@@ -29,6 +29,6 @@ export function render(_renderable: Renderable, container: Container): void {
     diffTree(old, renderable, container);
   } else {
     container.textContent = '';
-    createTree(renderable, container);
+    container._fiber = createTree(renderable, container);
   }
 }

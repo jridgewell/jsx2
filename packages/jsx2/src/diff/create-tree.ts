@@ -8,11 +8,11 @@ import { isArray } from '../util/is-array';
 import { addProps } from './prop';
 import { diffRef } from './ref';
 
-export function createTree(renderable: CoercedRenderable, container: Node): void {
+export function createTree(renderable: CoercedRenderable, container: Node): Fiber {
   const root = fiber(null, null);
   createChild(renderable, root, null);
   mount(container, root, null);
-  (container as { _fiber?: Fiber })._fiber = root.child!;
+  return root;
 }
 
 export function createChild(

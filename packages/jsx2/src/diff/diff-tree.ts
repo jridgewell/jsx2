@@ -13,7 +13,7 @@ import { diffRef } from './ref';
 import { remove } from './remove';
 
 export function diffTree(old: Fiber, renderable: CoercedRenderable, container: Node): void {
-  diffChild(old, renderable, fiber(null, null), null, container);
+  diffChild(old.child, renderable, old, null, container);
 }
 
 function diffChild(
