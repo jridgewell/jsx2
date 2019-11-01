@@ -63,7 +63,6 @@ export function createChild(
 
 export function mark(parent: Fiber, current: Fiber, previous: null | Fiber): void {
   if (previous) {
-    current.index = previous.index + 1;
     previous.next = current;
   } else {
     parent.child = current;
