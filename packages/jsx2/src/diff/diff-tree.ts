@@ -21,15 +21,15 @@ function diffChild(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   if (old === null) {
     const f = createChild(renderable, parentFiber, previousFiber);
     mount(container, f, null);
-    return;
+    return f;
   }
 
   const { data } = old;
-  if (data === renderable) return;
+  if (data === renderable) return old;
 
   if (renderable === null) {
     return renderNull(old, renderable, parentFiber, previousFiber, container);
@@ -48,7 +48,7 @@ function diffChild(
     return renderElement(old, renderable, parentFiber, previousFiber, container);
   }
 
-  renderComponent(old, renderable, parentFiber, previousFiber, container);
+  return renderComponent(old, renderable, parentFiber, previousFiber, container);
 }
 
 function renderNull(
@@ -57,10 +57,8 @@ function renderNull(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
-  if (old.data !== renderable) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container);
-  }
+): Fiber {
+  return replaceFiber(old, renderable, parentFiber, previousFiber, container);
 }
 
 function renderText(
@@ -69,7 +67,7 @@ function renderText(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   const { data } = old;
   if (typeof data !== 'string') {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
@@ -77,6 +75,7 @@ function renderText(
   old.data = renderable;
 
   (old.dom as Text).data = renderable;
+  return old;
 }
 
 function renderArray(
@@ -85,7 +84,7 @@ function renderArray(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   const { data } = old;
   if (!isArray(data)) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
@@ -97,20 +96,21 @@ function renderArray(
   let current: null | Fiber = old.child;
   let last: null | Fiber = null;
   for (; i < renderable.length && current !== null; i++) {
-    const next: null | Fiber = current.next;
-    diffChild(current, coerceRenderable(renderable[i]), old, last, container);
-    last = last ? last.next : old.child;
-    current = next;
+    const f = diffChild(current, coerceRenderable(renderable[i]), old, last, container);
+    last = f;
+    current = f.next;
   }
   while (current !== null) {
     current = remove(current, last, container);
   }
+
   const before = getNextSibling(last ? last.next : old.child);
   for (; i < renderable.length; i++) {
     const f = createChild(coerceRenderable(renderable[i]), old, last);
     last = f;
     mount(container, f, before);
   }
+  return old;
 }
 
 function renderElement(
@@ -119,7 +119,7 @@ function renderElement(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
@@ -137,6 +137,7 @@ function renderElement(
   diffProps(dom as HTMLElement, oldProps, props);
   diffChild(old.child, coerceRenderable(props.children), old, null, dom);
   diffRef(dom, data.ref, renderable.ref);
+  return old;
 }
 
 function renderComponent(
@@ -145,7 +146,7 @@ function renderComponent(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container);
@@ -163,6 +164,7 @@ function renderComponent(
   );
 
   diffChild(old.child, rendered, old, null, container);
+  return old;
 }
 
 function replaceFiber(
@@ -171,11 +173,12 @@ function replaceFiber(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
-): void {
+): Fiber {
   const next = remove(old, previousFiber, container);
   const f = createChild(renderable, parentFiber, previousFiber);
   f.next = next;
   mount(container, f, getNextSibling(next));
+  return f;
 }
 
 function getNextSibling(fiber: null | Fiber): null | Node {
