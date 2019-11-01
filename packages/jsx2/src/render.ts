@@ -1,5 +1,5 @@
 type VNode = import('./create-element').VNode;
-type Fiber = import('./util/fiber').Fiber;
+type Fiber = import('./fiber').Fiber;
 
 import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';

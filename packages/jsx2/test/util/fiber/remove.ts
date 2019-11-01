@@ -1,8 +1,8 @@
-import { fiber } from '../../../src/util/fiber';
-import { mark } from '../../../src/util/fiber/mark';
+import { fiber } from '../../../src/fiber';
+import { mark } from '../../../src/fiber/mark';
 import { createElement } from '../../../src/create-element';
-import { remove } from '../../../src/util/fiber/remove';
-import { mount } from '../../../src/util/fiber/mount';
+import { remove } from '../../../src/fiber/remove';
+import { mount } from '../../../src/fiber/mount';
 
 describe('remove', () => {
   function makeElementFiber(tag: string) {

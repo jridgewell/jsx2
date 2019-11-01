@@ -1,8 +1,8 @@
-type Component = import('../../component').Component;
-type ElementVNode = import('../../create-element').ElementVNode;
-type FunctionComponentVNode = import('../../create-element').FunctionComponentVNode;
-type ClassComponentVNode = import('../../create-element').ClassComponentVNode;
-type RenderableArray = import('../../render').RenderableArray;
+type Component = import('../component').Component;
+type ElementVNode = import('../create-element').ElementVNode;
+type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
+type ClassComponentVNode = import('../create-element').ClassComponentVNode;
+type RenderableArray = import('../render').RenderableArray;
 
 export interface SharedFiber {
   parent: null | Fiber;

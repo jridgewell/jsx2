@@ -7,8 +7,8 @@
 //   }
 // }
 
-import { fiber } from '../../../src/util/fiber';
-import { mark } from '../../../src/util/fiber/mark';
+import { fiber } from '../../../src/fiber';
+import { mark } from '../../../src/fiber/mark';
 
 describe('mark', () => {
   describe('when previousFiber is null', () => {

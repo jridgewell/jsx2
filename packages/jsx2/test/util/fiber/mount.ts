@@ -1,6 +1,6 @@
-import { fiber } from '../../../src/util/fiber';
-import { mount } from '../../../src/util/fiber/mount';
-import { mark } from '../../../src/util/fiber/mark';
+import { fiber } from '../../../src/fiber';
+import { mount } from '../../../src/fiber/mount';
+import { mark } from '../../../src/fiber/mark';
 import { createElement } from '../../../src/create-element';
 
 describe('mount', () => {

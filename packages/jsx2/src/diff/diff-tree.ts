@@ -1,4 +1,4 @@
-type Fiber = import('../util/fiber').Fiber;
+type Fiber = import('../fiber').Fiber;
 type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
 type RenderableArray = import('../render').RenderableArray;
 type ElementVNode = import('../create-element').ElementVNode;
@@ -6,11 +6,11 @@ type FunctionComponentVNode = import('../create-element').FunctionComponentVNode
 type ClassComponentVNode = import('../create-element').ClassComponentVNode;
 
 import { isFunctionComponent } from '../component';
+import { getNextSibling } from '../fiber/get-next-sibling';
+import { mount } from '../fiber/mount';
+import { remove } from '../fiber/remove';
+import { replace } from '../fiber/replace';
 import { coerceRenderable } from '../util/coerce-renderable';
-import { getNextSibling } from '../util/fiber/get-next-sibling';
-import { mount } from '../util/fiber/mount';
-import { remove } from '../util/fiber/remove';
-import { replace } from '../util/fiber/replace';
 import { isArray } from '../util/is-array';
 import { createChild } from './create-tree';
 import { diffProps } from './prop';

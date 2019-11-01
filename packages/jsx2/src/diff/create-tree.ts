@@ -1,11 +1,11 @@
 type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
-type Fiber = import('../util/fiber').Fiber;
+type Fiber = import('../fiber').Fiber;
 
 import { isFunctionComponent } from '../component';
+import { fiber } from '../fiber';
+import { mark } from '../fiber/mark';
+import { mount } from '../fiber/mount';
 import { coerceRenderable } from '../util/coerce-renderable';
-import { fiber } from '../util/fiber';
-import { mark } from '../util/fiber/mark';
-import { mount } from '../util/fiber/mount';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
 import { diffRef } from './ref';
