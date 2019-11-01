@@ -5,11 +5,14 @@ type VNode = import('../create-element').VNode;
 
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
+import { getNextSibling } from '../util/fiber/get-next-sibling';
+import { mount } from '../util/fiber/mount';
+import { remove } from '../util/fiber/remove';
+import { replace } from '../util/fiber/replace';
 import { isArray } from '../util/is-array';
-import { createChild, mount } from './create-tree';
+import { createChild } from './create-tree';
 import { diffProps } from './prop';
 import { diffRef } from './ref';
-import { remove } from './remove';
 
 export function diffTree(old: Fiber, renderable: CoercedRenderable, container: Node): void {
   diffChild(old.child, renderable, old, null, container);
@@ -24,7 +27,7 @@ function diffChild(
 ): Fiber {
   if (old === null) {
     const f = createChild(renderable, parentFiber, previousFiber);
-    mount(container, f, null);
+    mount(f, container, null);
     return f;
   }
 
@@ -100,15 +103,19 @@ function renderArray(
     last = f;
     current = f.next;
   }
-  while (current !== null) {
-    current = remove(current, last, container);
+
+  const before = getNextSibling(current || old, container, !current);
+  for (; i < renderable.length; i++) {
+    current = createChild(coerceRenderable(renderable[i]), old, last);
+    last = current;
+    mount(current, container, before);
   }
 
-  const before = getNextSibling(last ? last.next : old.child);
-  for (; i < renderable.length; i++) {
-    const f = createChild(coerceRenderable(renderable[i]), old, last);
-    last = f;
-    mount(container, f, before);
+  if (current) {
+    current = current.next;
+    while (current !== null) {
+      current = remove(current, last, container);
+    }
   }
   return old;
 }
@@ -174,23 +181,7 @@ function replaceFiber(
   previousFiber: null | Fiber,
   container: Node,
 ): Fiber {
-  const next = remove(old, previousFiber, container);
-  const f = createChild(renderable, parentFiber, previousFiber);
-  f.next = next;
-  mount(container, f, getNextSibling(next));
+  const f = createChild(renderable, parentFiber, null);
+  replace(old, f, parentFiber, previousFiber, container);
   return f;
-}
-
-function getNextSibling(fiber: null | Fiber): null | Node {
-  while (fiber !== null) {
-    const { dom, child } = fiber;
-    if (dom) {
-      return dom;
-    } else if (child) {
-      const next = getNextSibling(child);
-      if (next) return next;
-    }
-    fiber = fiber.next;
-  }
-  return null;
 }

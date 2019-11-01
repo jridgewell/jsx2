@@ -1,4 +1,4 @@
-type Fiber = import('../util/fiber').Fiber;
+type Fiber = import('.').Fiber;
 
 export function remove(fiber: Fiber, previousFiber: null | Fiber, container: Node): null | Fiber {
   const { next } = fiber;

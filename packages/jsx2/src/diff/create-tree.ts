@@ -4,6 +4,8 @@ type Fiber = import('../util/fiber').Fiber;
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { fiber } from '../util/fiber';
+import { mark } from '../util/fiber/mark';
+import { mount } from '../util/fiber/mount';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
 import { diffRef } from './ref';
@@ -11,7 +13,7 @@ import { diffRef } from './ref';
 export function createTree(renderable: CoercedRenderable, container: Node): Fiber {
   const root = fiber(null, null);
   createChild(renderable, root, null);
-  mount(container, root, null);
+  mount(root, container, null);
   return root;
 }
 
@@ -21,7 +23,7 @@ export function createChild(
   previousFiber: null | Fiber,
 ): Fiber {
   const f = fiber(null, renderable);
-  mark(parentFiber, f, previousFiber);
+  mark(f, parentFiber, previousFiber);
 
   if (renderable === null) return f;
 
@@ -34,7 +36,7 @@ export function createChild(
     let last: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
       const child = createChild(coerceRenderable(renderable[i]), f, last);
-      mark(f, child, last);
+      mark(child, f, last);
       last = child;
     }
     return f;
@@ -59,25 +61,4 @@ export function createChild(
   f.component = new type(props);
   createChild(coerceRenderable(f.component.render(props)), f, null);
   return f;
-}
-
-export function mark(parent: Fiber, current: Fiber, previous: null | Fiber): void {
-  if (previous) {
-    previous.next = current;
-  } else {
-    parent.child = current;
-  }
-}
-
-export function mount(container: Node, fiber: null | Fiber, before: null | Node): void {
-  while (fiber !== null) {
-    const { dom, child } = fiber;
-    if (dom) {
-      if (child) mount(dom, child, null);
-      container.insertBefore(dom, null);
-    } else if (child) {
-      mount(container, child, before);
-    }
-    fiber = fiber.next;
-  }
 }
