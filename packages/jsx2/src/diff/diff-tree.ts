@@ -1,7 +1,9 @@
 type Fiber = import('../util/fiber').Fiber;
 type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
 type RenderableArray = import('../render').RenderableArray;
-type VNode = import('../create-element').VNode;
+type ElementVNode = import('../create-element').ElementVNode;
+type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
+type ClassComponentVNode = import('../create-element').ClassComponentVNode;
 
 import { isFunctionComponent } from '../component';
 import { coerceRenderable } from '../util/coerce-renderable';
@@ -48,10 +50,16 @@ function diffChild(
 
   const { type } = renderable;
   if (typeof type === 'string') {
-    return renderElement(old, renderable, parentFiber, previousFiber, container);
+    return renderElement(old, renderable as ElementVNode, parentFiber, previousFiber, container);
   }
 
-  return renderComponent(old, renderable, parentFiber, previousFiber, container);
+  return renderComponent(
+    old,
+    renderable as FunctionComponentVNode | ClassComponentVNode,
+    parentFiber,
+    previousFiber,
+    container,
+  );
 }
 
 function renderNull(
@@ -120,7 +128,7 @@ function renderArray(
 
 function renderElement(
   old: Fiber,
-  renderable: VNode,
+  renderable: ElementVNode,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
@@ -147,7 +155,7 @@ function renderElement(
 
 function renderComponent(
   old: Fiber,
-  renderable: VNode,
+  renderable: FunctionComponentVNode | ClassComponentVNode,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
