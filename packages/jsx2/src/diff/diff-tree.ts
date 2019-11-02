@@ -187,7 +187,6 @@ function replaceFiber(
   previousFiber: null | Fiber,
   container: Node,
 ): Fiber {
-  const f = createChild(renderable, parentFiber, null);
-  replace(old, f, parentFiber, previousFiber, container);
-  return f;
+  const f = createChild(renderable, parentFiber, previousFiber);
+  return replace(old, f, container);
 }
