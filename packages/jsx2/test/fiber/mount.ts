@@ -1,7 +1,7 @@
-import { fiber } from '../../../src/fiber';
-import { mount } from '../../../src/fiber/mount';
-import { mark } from '../../../src/fiber/mark';
-import { createElement } from '../../../src/create-element';
+import { fiber } from '../../src/fiber';
+import { mount } from '../../src/fiber/mount';
+import { mark } from '../../src/fiber/mark';
+import { createElement } from '../../src/create-element';
 
 describe('mount', () => {
   function makeElementFiber(tag: string) {

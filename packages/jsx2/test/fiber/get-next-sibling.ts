@@ -17,11 +17,11 @@
 //   return null;
 // }
 
-import { fiber } from '../../../src/fiber';
-import { mark } from '../../../src/fiber/mark';
-import { createElement } from '../../../src/create-element';
-import { getNextSibling } from '../../../src/fiber/get-next-sibling';
-import { mount } from '../../../src/fiber/mount';
+import { fiber } from '../../src/fiber';
+import { mark } from '../../src/fiber/mark';
+import { createElement } from '../../src/create-element';
+import { getNextSibling } from '../../src/fiber/get-next-sibling';
+import { mount } from '../../src/fiber/mount';
 
 describe('getNextSibling', () => {
   function makeElementFiber(tag: string) {

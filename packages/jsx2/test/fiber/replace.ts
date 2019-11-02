@@ -11,11 +11,11 @@
 //   return fiber;
 // }
 
-import { fiber } from '../../../src/fiber';
-import { mark } from '../../../src/fiber/mark';
-import { createElement } from '../../../src/create-element';
-import { mount } from '../../../src/fiber/mount';
-import { replace } from '../../../src/fiber/replace';
+import { fiber } from '../../src/fiber';
+import { mark } from '../../src/fiber/mark';
+import { createElement } from '../../src/create-element';
+import { mount } from '../../src/fiber/mount';
+import { replace } from '../../src/fiber/replace';
 
 describe('replace', () => {
   function makeElementFiber(tag: string) {
