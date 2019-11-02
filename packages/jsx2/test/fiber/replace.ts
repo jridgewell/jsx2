@@ -1,16 +1,3 @@
-// export function replace(
-//   old: Fiber,
-//   fiber: Fiber,
-//   parentFiber: Fiber,
-//   previousFiber: null | Fiber,
-//   container: Node,
-// ): Fiber {
-//   mark(fiber, parentFiber, previousFiber);
-//   mount(fiber, container, getNextSibling(old, container));
-//   remove(old, fiber, container);
-//   return fiber;
-// }
-
 import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';

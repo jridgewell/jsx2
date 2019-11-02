@@ -1,22 +1,3 @@
-// export function getNextSibling(fiber: Fiber, container: Node, skipSelf?: boolean): null | Node {
-//   let current = skipSelf ? nextFiber(fiber, container) : fiber;
-//   while (current !== null) {
-//     const { dom } = current;
-//     if (dom) return dom;
-//     current = current.child || nextFiber(current, container);
-//   }
-//   return null;
-// }
-// function nextFiber(fiber: Fiber, container: Node): null | Fiber {
-//   let current: null | Fiber = fiber;
-//   do {
-//     const { next } = current;
-//     if (nextSibling) return next;
-//     current = current.parent;
-//   } while (current !== null && current.dom !== container);
-//   return null;
-// }
-
 import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';
