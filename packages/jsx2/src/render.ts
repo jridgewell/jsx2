@@ -5,7 +5,6 @@ import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
 import { Fragment } from './fragment';
-import { coerceRenderable } from './util/coerce-renderable';
 
 export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
   _fiber?: Fiber;
@@ -23,7 +22,7 @@ export type Renderable =
 export interface RenderableArray extends ReadonlyArray<Renderable> {}
 
 export function render(_renderable: Renderable, container: Container): void {
-  const renderable = createElement(Fragment, null, coerceRenderable(_renderable));
+  const renderable = createElement(Fragment, null, _renderable);
   const old = container._fiber;
   if (old) {
     diffTree(old, renderable, container);

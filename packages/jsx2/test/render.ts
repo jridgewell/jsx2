@@ -16,6 +16,7 @@ describe('render', () => {
   it('renders from blank slate', () => {
     const el = createElement('div', { id: 'foo' }, 'test');
     const container = document.createElement('body');
+    container.appendChild(document.createElement('div'));
 
     render(el, container);
 
@@ -27,8 +28,20 @@ describe('render', () => {
     expect(container.firstChild).toBe(container.lastChild);
   });
 
+  it('removes SSR children', () => {
+    const el = createElement('div', { id: 'foo' }, 'test');
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+
+    render(el, container);
+
+    expect(Array.from(container.childNodes)).not.toContain(child);
+  });
+
   it('rerenders already rendered DOM', () => {
     const container = document.createElement('body');
+    container.appendChild(document.createElement('div'));
+
     render(createElement('div', { id: 'foo' }, 'test'), container);
     const div = container.firstChild! as HTMLElement;
 
