@@ -12,6 +12,7 @@ function removeRange(fiber: Fiber, end: null | Fiber, container: Node): void {
   do {
     const { dom, child } = current!;
     if (dom) {
+      // TODO: Should unmount ref before removing.
       container.removeChild(dom);
     } else if (child) {
       removeRange(child, null, container);

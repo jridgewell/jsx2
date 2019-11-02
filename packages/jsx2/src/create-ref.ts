@@ -1,9 +1,9 @@
 // TODO: Generic-ize
 export interface RefObject {
-  current: unknown | null;
+  current: any | null;
 }
 
-export type Ref = RefObject | ((current: unknown | null) => void);
+export type Ref = RefObject | ((current: any | null) => void);
 
 export function createRef(): RefObject {
   return { current: null };

@@ -49,6 +49,7 @@ export function createChild(
     f.dom = el;
     addProps(el, props);
     createChild(coerceRenderable(props.children), f, null);
+    // TODO: Ref diffing should happen after full mount
     diffRef(el, null, renderable.ref);
     return f;
   }
@@ -58,7 +59,9 @@ export function createChild(
     return f;
   }
 
-  f.component = new type(props);
-  createChild(coerceRenderable(f.component.render(props)), f, null);
+  const component = f.component = new type(props);
+  createChild(coerceRenderable(component.render(props)), f, null);
+  // TODO: Ref diffing should happen after full mount
+  diffRef(component, null, renderable.ref);
   return f;
 }
