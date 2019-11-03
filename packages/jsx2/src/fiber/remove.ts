@@ -1,5 +1,3 @@
-import { setRef } from '../diff/ref';
-
 type Fiber = import('.').Fiber;
 
 export function remove(fiber: Fiber, previousFiber: null | Fiber, container: Node): null | Fiber {
@@ -12,9 +10,8 @@ export function remove(fiber: Fiber, previousFiber: null | Fiber, container: Nod
 function removeRange(fiber: Fiber, end: null | Fiber, container: Node): void {
   let current: null | Fiber = fiber;
   do {
-    const { dom, child, ref } = current!;
+    const { dom, child } = current!;
     if (dom) {
-      if (ref) setRef(null, ref);
       container.removeChild(dom);
     } else if (child) {
       removeRange(child, null, container);

@@ -11,6 +11,7 @@ import { getNextSibling } from '../fiber/get-next-sibling';
 import { mount } from '../fiber/mount';
 import { remove } from '../fiber/remove';
 import { replace } from '../fiber/replace';
+import { unmount } from '../fiber/unmount';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { createChild } from './create-tree';
@@ -139,6 +140,7 @@ function renderArray(
 
   current = last ? last.next : old.child;
   while (current !== null) {
+    unmount(current);
     current = remove(current, last, container);
   }
   return old;

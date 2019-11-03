@@ -145,6 +145,7 @@ describe('createTree', () => {
       const ref = jest.fn((el: Element) => {
         expect(el.id).toBe('id');
         expectTextNode(el.firstChild!, 'text');
+        expect(body.contains(el)).toBe(true);
       });
 
       const refs: RefWork[] = [];
@@ -220,6 +221,7 @@ describe('createTree', () => {
       const nested = jest.fn();
       const ref = jest.fn(() => {
         expect(nested).toHaveBeenCalled();
+        expect(body.querySelector('div')).not.toBe(null);
       });
       class C extends Component {
         render() {

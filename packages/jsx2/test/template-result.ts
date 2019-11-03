@@ -1,5 +1,6 @@
-import { templateResult } from '../src/jsx2';
 type TemplateResult = import('../src/template-result').TemplateResult;
+
+import { templateResult } from '../src/jsx2';
 
 describe('templateResult', () => {
   function div(): TemplateResult {

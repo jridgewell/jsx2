@@ -12,6 +12,24 @@ describe('replace', () => {
   }
 
   describe('without next', () => {
+    it('unmounts any refs', () => {
+      const parent = fiber('parent');
+      const previous = makeElementFiber('previous');
+      const current = makeElementFiber('current');
+      const old = makeElementFiber('old');
+      const container = document.createElement('div');
+      const ref = jest.fn();
+      old.ref = ref;
+      mark(previous, parent, null);
+      mark(old, parent, previous);
+      mount(parent, container, null);
+
+      replace(old, current, container);
+
+      expect(ref).toHaveBeenCalledTimes(1);
+      expect(ref).toHaveBeenCalledWith(null);
+    });
+
     it('mounts fiber inside container', () => {
       const parent = fiber('parent');
       const previous = makeElementFiber('previous');
@@ -59,6 +77,26 @@ describe('replace', () => {
       replace(old, current, container);
 
       expect(current.next).toBe(next);
+    });
+
+    it('unmounts any refs', () => {
+      const parent = fiber('parent');
+      const previous = makeElementFiber('previous');
+      const current = makeElementFiber('current');
+      const old = makeElementFiber('old');
+      const next = makeElementFiber('next');
+      const container = document.createElement('div');
+      const ref = jest.fn();
+      old.ref = ref;
+      mark(previous, parent, null);
+      mark(old, parent, previous);
+      mark(next, parent, old);
+      mount(parent, container, null);
+
+      replace(old, current, container);
+
+      expect(ref).toHaveBeenCalledTimes(1);
+      expect(ref).toHaveBeenCalledWith(null);
     });
 
     it('mounts fiber inside container', () => {
