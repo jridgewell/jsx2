@@ -1,7 +1,7 @@
 type RefWork = import('../../src/diff/ref').RefWork;
 
 import { applyRefs, deferRef } from '../../src/diff/ref';
-import { createRef } from '../..';
+import { createRef } from '../../src/jsx2';
 
 describe('deferRef', () => {
   describe('old ref was null', () => {
