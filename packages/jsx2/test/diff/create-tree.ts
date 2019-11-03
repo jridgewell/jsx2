@@ -23,10 +23,17 @@ describe('createTree', () => {
     return createElement(Fragment, null, renderable);
   }
 
+  function create(renderable: Renderable, container: Node) {
+    const refs: RefWork[] = [];
+    createTree(data(renderable), container, refs);
+    applyRefs(refs);
+  }
+
   describe('rendering null', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(null), body, []);
+
+      create(null, body);
 
       expect(body.firstChild).toBe(null);
     });
@@ -35,7 +42,8 @@ describe('createTree', () => {
   describe('rendering undefined', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(undefined), body, []);
+
+      create(undefined, body);
 
       expect(body.firstChild).toBe(null);
     });
@@ -44,7 +52,8 @@ describe('createTree', () => {
   describe('rendering boolean', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(true), body, []);
+
+      create(true, body);
 
       expect(body.firstChild).toBe(null);
     });
@@ -53,7 +62,8 @@ describe('createTree', () => {
   describe('rendering number', () => {
     it('renders value', () => {
       const body = document.createElement('body');
-      createTree(data(1), body, []);
+
+      create(1, body);
 
       expectTextNode(body.firstChild!, '1');
       expect(body.firstChild).toBe(body.lastChild);
@@ -63,7 +73,8 @@ describe('createTree', () => {
   describe('rendering string', () => {
     it('renders value', () => {
       const body = document.createElement('body');
-      createTree(data('hello'), body, []);
+
+      create('hello', body);
 
       expectTextNode(body.firstChild!, 'hello');
       expect(body.firstChild).toBe(body.lastChild);
@@ -74,7 +85,7 @@ describe('createTree', () => {
     it('renders single child', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text']), body, []);
+      create(['text'], body);
 
       expectTextNode(body.firstChild!, 'text');
       expect(body.firstChild).toBe(body.lastChild);
@@ -83,7 +94,7 @@ describe('createTree', () => {
     it('renders multiple children', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text', 0]), body, []);
+      create(['text', 0], body);
 
       expectTextNode(body.firstChild!, 'text');
       expectTextNode(body.lastChild!, '0');
@@ -93,7 +104,7 @@ describe('createTree', () => {
     it('skips nullish children', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text', true, 0]), body, []);
+      create(['text', true, 0], body);
 
       expectTextNode(body.firstChild!, 'text');
       expectTextNode(body.lastChild!, '0');
@@ -105,7 +116,7 @@ describe('createTree', () => {
     it('renders element', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div')), body, []);
+      create(createElement('div'), body);
 
       expectElement(body.firstChild!, 'div');
     });
@@ -113,7 +124,7 @@ describe('createTree', () => {
     it('renders props', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div', { id: 'id' })), body, []);
+      create(createElement('div', { id: 'id' }), body);
 
       const firstChild = body.firstChild!;
       expectElement(firstChild, 'div');
@@ -123,7 +134,7 @@ describe('createTree', () => {
     it('renders children', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div', null, 'text')), body, []);
+      create(createElement('div', null, 'text'), body);
 
       expectTextNode(body.firstChild!.firstChild!, 'text');
     });
@@ -132,9 +143,7 @@ describe('createTree', () => {
       const body = document.createElement('body');
       const ref = jest.fn();
 
-      const refs: RefWork[] = [];
-      createTree(data(createElement('div', { ref }, 'text')), body, refs);
-      applyRefs(refs);
+      create(createElement('div', { ref }, 'text'), body);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(body.firstChild);
@@ -148,9 +157,7 @@ describe('createTree', () => {
         expect(body.contains(el)).toBe(true);
       });
 
-      const refs: RefWork[] = [];
-      createTree(data(createElement('div', { id: 'id', ref }, 'text')), body, refs);
-      applyRefs(refs);
+      create(createElement('div', { id: 'id', ref }, 'text'), body);
 
       expect(ref).toHaveBeenCalled();
     });
@@ -162,13 +169,10 @@ describe('createTree', () => {
         expect(nested).toHaveBeenCalled();
       });
 
-      const refs: RefWork[] = [];
-      createTree(
+      create(
         data(createElement('div', { id: 'id', ref }, createElement('nested', { ref: nested }))),
         body,
-        refs,
       );
-      applyRefs(refs);
 
       expect(ref).toHaveBeenCalled();
     });
@@ -180,7 +184,7 @@ describe('createTree', () => {
       const C = () => {
         return 'hello';
       };
-      createTree(data(createElement(C, null)), body, []);
+      create(createElement(C, null), body);
 
       const lastChild = body.lastChild!;
       expectTextNode(lastChild, 'hello');
@@ -197,7 +201,7 @@ describe('createTree', () => {
 
     it('renders return value', () => {
       const body = document.createElement('body');
-      createTree(data(createElement(C, null)), body, []);
+      create(createElement(C, null), body);
 
       const lastChild = body.lastChild!;
       expectTextNode(lastChild, 'hello');
@@ -208,9 +212,7 @@ describe('createTree', () => {
       const body = document.createElement('body');
       const ref = jest.fn();
 
-      const refs: RefWork[] = [];
-      createTree(data(createElement(C, { ref })), body, refs);
-      applyRefs(refs);
+      create(createElement(C, { ref }), body);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(expect.any(C));
@@ -229,9 +231,7 @@ describe('createTree', () => {
         }
       }
 
-      const refs: RefWork[] = [];
-      createTree(data(createElement(C, { ref })), body, refs);
-      applyRefs(refs);
+      create(createElement(C, { ref }), body);
 
       expect(ref).toHaveBeenCalled();
     });
