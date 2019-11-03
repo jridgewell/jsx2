@@ -212,13 +212,14 @@ module.exports = function({ types: t, template }, options = {}) {
 
   function extractAttributeValue(value, state) {
     if (!value.node) return t.booleanLiteral(true);
-    return extractValue(value, state);
+    return extractValue(value, state, true);
   }
 
-  function extractValue(value, state) {
+  function extractValue(value, state, disallowElements = false) {
     if (value.isJSXExpressionContainer()) value = value.get('expression');
 
     if (value.isJSXElement() || value.isJSXFragment()) {
+      if (state && disallowElements) return state.expressionMarker(value.node);
       if (state) return buildElement(value, state);
       return buildTemplate(value);
     }
