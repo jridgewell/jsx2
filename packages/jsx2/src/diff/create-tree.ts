@@ -4,8 +4,8 @@ type RefWork = import('./ref').RefWork;
 
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
+import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
-import { mount } from '../fiber/mount';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
@@ -14,7 +14,7 @@ import { deferRef } from './ref';
 export function createTree(renderable: CoercedRenderable, container: Node, refs: RefWork[]): Fiber {
   const root = fiber(null);
   createChild(renderable, root, null, refs);
-  mount(root, container, null);
+  insert(root, container, null);
   return root;
 }
 

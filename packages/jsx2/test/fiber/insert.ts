@@ -1,9 +1,9 @@
 import { fiber } from '../../src/fiber';
-import { mount } from '../../src/fiber/mount';
+import { insert } from '../../src/fiber/insert';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';
 
-describe('mount', () => {
+describe('insert', () => {
   function makeElementFiber(tag: string) {
     const f = fiber(createElement(tag));
     f.dom = document.createElement(tag);
@@ -24,7 +24,7 @@ describe('mount', () => {
             const root = fiber('root');
             const container = document.createElement('div');
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(container.firstChild).toBe(null);
           });
@@ -37,7 +37,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(container.firstChild).toBe(null);
           });
@@ -48,7 +48,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([child.dom]);
           });
@@ -61,7 +61,7 @@ describe('mount', () => {
             mark(child1, root, null);
             mark(child2, root, child1);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([child1.dom, child2.dom]);
           });
@@ -78,7 +78,7 @@ describe('mount', () => {
             mark(child3, root, child2);
             mark(child4, root, child3);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([child2.dom, child4.dom]);
           });
@@ -91,7 +91,7 @@ describe('mount', () => {
             const root = makeTextFiber('root');
             const container = document.createElement('div');
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
           });
@@ -100,7 +100,7 @@ describe('mount', () => {
             const root = makeElementFiber('root');
             const container = document.createElement('div');
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
           });
@@ -113,7 +113,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
             expect(root.dom!.firstChild).toBe(null);
@@ -125,7 +125,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child.dom]);
@@ -139,7 +139,7 @@ describe('mount', () => {
             mark(child1, root, null);
             mark(child2, root, child1);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child1.dom, child2.dom]);
@@ -157,7 +157,7 @@ describe('mount', () => {
             mark(child3, root, child2);
             mark(child4, root, child3);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child2.dom, child4.dom]);
@@ -174,7 +174,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             const inserted = container.appendChild(document.createTextNode('inserted'));
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted]);
           });
@@ -188,7 +188,7 @@ describe('mount', () => {
             const inserted = container.appendChild(document.createTextNode('inserted'));
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted]);
           });
@@ -200,7 +200,7 @@ describe('mount', () => {
             const inserted = container.appendChild(document.createTextNode('inserted'));
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, child.dom]);
           });
@@ -214,7 +214,7 @@ describe('mount', () => {
             mark(child1, root, null);
             mark(child2, root, child1);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, child1.dom, child2.dom]);
           });
@@ -232,7 +232,7 @@ describe('mount', () => {
             mark(child3, root, child2);
             mark(child4, root, child3);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, child2.dom, child4.dom]);
           });
@@ -246,7 +246,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             const inserted = container.appendChild(document.createTextNode('inserted'));
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
           });
@@ -256,7 +256,7 @@ describe('mount', () => {
             const container = document.createElement('div');
             const inserted = container.appendChild(document.createTextNode('inserted'));
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
           });
@@ -270,7 +270,7 @@ describe('mount', () => {
             const inserted = container.appendChild(document.createTextNode('inserted'));
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
             expect(root.dom!.firstChild).toBe(null);
@@ -283,7 +283,7 @@ describe('mount', () => {
             const inserted = container.appendChild(document.createTextNode('inserted'));
             mark(child, root, null);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child.dom]);
@@ -298,7 +298,7 @@ describe('mount', () => {
             mark(child1, root, null);
             mark(child2, root, child1);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child1.dom, child2.dom]);
@@ -317,7 +317,7 @@ describe('mount', () => {
             mark(child3, root, child2);
             mark(child4, root, child3);
 
-            mount(root, container, null);
+            insert(root, container, null);
 
             expect(Array.from(container.childNodes)).toEqual([inserted, root.dom]);
             expect(Array.from(root.dom!.childNodes)).toEqual([child2.dom, child4.dom]);
@@ -335,7 +335,7 @@ describe('mount', () => {
           const container = document.createElement('div');
           const inserted = container.appendChild(document.createTextNode('inserted'));
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([inserted]);
         });
@@ -349,7 +349,7 @@ describe('mount', () => {
           const inserted = container.appendChild(document.createTextNode('inserted'));
           mark(child, root, null);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([inserted]);
         });
@@ -361,7 +361,7 @@ describe('mount', () => {
           const inserted = container.appendChild(document.createTextNode('inserted'));
           mark(child, root, null);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([child.dom, inserted]);
         });
@@ -375,7 +375,7 @@ describe('mount', () => {
           mark(child1, root, null);
           mark(child2, root, child1);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([child1.dom, child2.dom, inserted]);
         });
@@ -393,7 +393,7 @@ describe('mount', () => {
           mark(child3, root, child2);
           mark(child4, root, child3);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([child2.dom, child4.dom, inserted]);
         });
@@ -407,7 +407,7 @@ describe('mount', () => {
           const container = document.createElement('div');
           const inserted = container.appendChild(document.createTextNode('inserted'));
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
         });
@@ -417,7 +417,7 @@ describe('mount', () => {
           const container = document.createElement('div');
           const inserted = container.appendChild(document.createTextNode('inserted'));
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
         });
@@ -431,7 +431,7 @@ describe('mount', () => {
           const inserted = container.appendChild(document.createTextNode('inserted'));
           mark(child, root, null);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
           expect(root.dom!.firstChild).toBe(null);
@@ -444,7 +444,7 @@ describe('mount', () => {
           const inserted = container.appendChild(document.createTextNode('inserted'));
           mark(child, root, null);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
           expect(Array.from(root.dom!.childNodes)).toEqual([child.dom]);
@@ -459,7 +459,7 @@ describe('mount', () => {
           mark(child1, root, null);
           mark(child2, root, child1);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
           expect(Array.from(root.dom!.childNodes)).toEqual([child1.dom, child2.dom]);
@@ -478,7 +478,7 @@ describe('mount', () => {
           mark(child3, root, child2);
           mark(child4, root, child3);
 
-          mount(root, container, inserted);
+          insert(root, container, inserted);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom, inserted]);
           expect(Array.from(root.dom!.childNodes)).toEqual([child2.dom, child4.dom]);

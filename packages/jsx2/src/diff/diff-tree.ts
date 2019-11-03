@@ -8,7 +8,7 @@ type RefWork = import('./ref').RefWork;
 
 import { isFunctionComponent } from '../component';
 import { getNextSibling } from '../fiber/get-next-sibling';
-import { mount } from '../fiber/mount';
+import { insert } from '../fiber/insert';
 import { remove } from '../fiber/remove';
 import { replace } from '../fiber/replace';
 import { unmount } from '../fiber/unmount';
@@ -37,7 +37,7 @@ function diffChild(
 ): Fiber {
   if (old === null) {
     const f = createChild(renderable, parentFiber, previousFiber, refs);
-    mount(f, container, null);
+    insert(f, container, null);
     return f;
   }
 
@@ -135,7 +135,7 @@ function renderArray(
   for (; i < renderable.length; i++) {
     current = createChild(coerceRenderable(renderable[i]), old, last, refs);
     last = current;
-    mount(current, container, before);
+    insert(current, container, before);
   }
 
   current = last ? last.next : old.child;

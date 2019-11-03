@@ -2,7 +2,7 @@ import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';
 import { remove } from '../../src/fiber/remove';
-import { mount } from '../../src/fiber/mount';
+import { insert } from '../../src/fiber/insert';
 
 describe('remove', () => {
   function makeElementFiber(tag: string) {
@@ -21,7 +21,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -36,7 +36,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -48,7 +48,7 @@ describe('remove', () => {
           const current = fiber('current');
           const container = document.createElement('div');
           mark(current, root, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -66,7 +66,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -83,7 +83,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -97,7 +97,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(previous, root, null);
           mark(current, root, previous);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -113,7 +113,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -127,7 +127,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(previous, root, null);
           mark(current, root, previous);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -147,7 +147,7 @@ describe('remove', () => {
           mark(current, root, null);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -164,7 +164,7 @@ describe('remove', () => {
           mark(current, root, null);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -178,7 +178,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -198,7 +198,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -217,7 +217,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -233,7 +233,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -251,7 +251,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -267,7 +267,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -289,7 +289,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -308,7 +308,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -326,7 +326,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -348,7 +348,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -369,7 +369,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -387,7 +387,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -407,7 +407,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -425,7 +425,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -445,7 +445,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -460,7 +460,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -472,7 +472,7 @@ describe('remove', () => {
           const current = makeElementFiber('current');
           const container = document.createElement('div');
           mark(current, root, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -490,7 +490,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -507,7 +507,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -521,7 +521,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(previous, root, null);
           mark(current, root, previous);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -537,7 +537,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(sibling, root, current);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -551,7 +551,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(previous, root, null);
           mark(current, root, previous);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -571,7 +571,7 @@ describe('remove', () => {
           mark(current, root, null);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -588,7 +588,7 @@ describe('remove', () => {
           mark(current, root, null);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -604,7 +604,7 @@ describe('remove', () => {
           mark(current, root, null);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -618,7 +618,7 @@ describe('remove', () => {
           const container = document.createElement('div');
           mark(current, root, null);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -638,7 +638,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -657,7 +657,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -675,7 +675,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -691,7 +691,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -709,7 +709,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(sibling, root, current);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -725,7 +725,7 @@ describe('remove', () => {
           mark(previous, root, null);
           mark(current, root, previous);
           mark(child1, current, null);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -747,7 +747,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -766,7 +766,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, null, root.dom!);
 
@@ -784,7 +784,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -802,7 +802,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, null, root.dom!);
 
@@ -824,7 +824,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -845,7 +845,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -865,7 +865,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -883,7 +883,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           const next = remove(current, previous, root.dom!);
 
@@ -903,7 +903,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 
@@ -921,7 +921,7 @@ describe('remove', () => {
           mark(current, root, previous);
           mark(child1, current, null);
           mark(child2, current, child1);
-          mount(root, container, null);
+          insert(root, container, null);
 
           remove(current, previous, root.dom!);
 

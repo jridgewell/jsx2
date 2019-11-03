@@ -1,7 +1,7 @@
 import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';
-import { mount } from '../../src/fiber/mount';
+import { insert } from '../../src/fiber/insert';
 import { replace } from '../../src/fiber/replace';
 
 describe('replace', () => {
@@ -22,7 +22,7 @@ describe('replace', () => {
       old.ref = ref;
       mark(previous, parent, null);
       mark(old, parent, previous);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -38,7 +38,7 @@ describe('replace', () => {
       const container = document.createElement('div');
       mark(previous, parent, null);
       mark(old, parent, previous);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -53,7 +53,7 @@ describe('replace', () => {
       const container = document.createElement('div');
       mark(previous, parent, null);
       mark(old, parent, previous);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -72,7 +72,7 @@ describe('replace', () => {
       mark(previous, parent, null);
       mark(old, parent, previous);
       mark(next, parent, old);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -91,7 +91,7 @@ describe('replace', () => {
       mark(previous, parent, null);
       mark(old, parent, previous);
       mark(next, parent, old);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -109,7 +109,7 @@ describe('replace', () => {
       mark(previous, parent, null);
       mark(old, parent, previous);
       mark(next, parent, old);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 
@@ -126,7 +126,7 @@ describe('replace', () => {
       mark(previous, parent, null);
       mark(old, parent, previous);
       mark(next, parent, old);
-      mount(parent, container, null);
+      insert(parent, container, null);
 
       replace(old, current, container);
 

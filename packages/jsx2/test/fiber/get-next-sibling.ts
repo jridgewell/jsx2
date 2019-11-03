@@ -2,7 +2,7 @@ import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/create-element';
 import { getNextSibling } from '../../src/fiber/get-next-sibling';
-import { mount } from '../../src/fiber/mount';
+import { insert } from '../../src/fiber/insert';
 
 describe('getNextSibling', () => {
   function makeElementFiber(tag: string) {
@@ -19,7 +19,7 @@ describe('getNextSibling', () => {
             it('returns null', () => {
               const current = fiber('current');
               const container = document.createElement('div');
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -33,7 +33,7 @@ describe('getNextSibling', () => {
               const child = fiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -47,7 +47,7 @@ describe('getNextSibling', () => {
               const child = makeElementFiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -63,7 +63,7 @@ describe('getNextSibling', () => {
             it("returns fiber's dom", () => {
               const current = makeElementFiber('current');
               const container = document.createElement('div');
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -77,7 +77,7 @@ describe('getNextSibling', () => {
               const child = fiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -91,7 +91,7 @@ describe('getNextSibling', () => {
               const child = makeElementFiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, false);
 
@@ -112,7 +112,7 @@ describe('getNextSibling', () => {
                 const current = fiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -128,7 +128,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -144,7 +144,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -162,7 +162,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -180,7 +180,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -198,7 +198,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -216,7 +216,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -234,7 +234,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -252,7 +252,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -270,7 +270,7 @@ describe('getNextSibling', () => {
                 const current = makeElementFiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -286,7 +286,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -302,7 +302,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -320,7 +320,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -338,7 +338,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -356,7 +356,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -374,7 +374,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -392,7 +392,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -410,7 +410,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -434,7 +434,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -454,7 +454,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -474,7 +474,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -496,7 +496,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -518,7 +518,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -540,7 +540,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -562,7 +562,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -584,7 +584,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -606,7 +606,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -628,7 +628,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -648,7 +648,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -668,7 +668,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -690,7 +690,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -712,7 +712,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -734,7 +734,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -756,7 +756,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -778,7 +778,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -800,7 +800,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -824,7 +824,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -844,7 +844,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -864,7 +864,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -886,7 +886,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -908,7 +908,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -930,7 +930,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -952,7 +952,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -974,7 +974,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -996,7 +996,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1018,7 +1018,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1038,7 +1038,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1058,7 +1058,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1080,7 +1080,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1102,7 +1102,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1124,7 +1124,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1146,7 +1146,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1168,7 +1168,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1190,7 +1190,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, false);
 
@@ -1212,7 +1212,7 @@ describe('getNextSibling', () => {
                 const current = fiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1228,7 +1228,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1244,7 +1244,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1262,7 +1262,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1280,7 +1280,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1298,7 +1298,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1316,7 +1316,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1334,7 +1334,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1352,7 +1352,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1370,7 +1370,7 @@ describe('getNextSibling', () => {
                 const current = makeElementFiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1386,7 +1386,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1402,7 +1402,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1420,7 +1420,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1438,7 +1438,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1456,7 +1456,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1474,7 +1474,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1492,7 +1492,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1510,7 +1510,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, false);
 
@@ -1534,7 +1534,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1554,7 +1554,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1574,7 +1574,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1596,7 +1596,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1618,7 +1618,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1640,7 +1640,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1662,7 +1662,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1684,7 +1684,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1706,7 +1706,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1728,7 +1728,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1748,7 +1748,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1768,7 +1768,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1790,7 +1790,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1812,7 +1812,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1834,7 +1834,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1856,7 +1856,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1878,7 +1878,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1900,7 +1900,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1924,7 +1924,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1944,7 +1944,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1964,7 +1964,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -1986,7 +1986,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2008,7 +2008,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2030,7 +2030,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2052,7 +2052,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2074,7 +2074,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2096,7 +2096,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2118,7 +2118,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2138,7 +2138,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2158,7 +2158,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2180,7 +2180,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2202,7 +2202,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2224,7 +2224,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2246,7 +2246,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2268,7 +2268,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2290,7 +2290,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, false);
 
@@ -2311,7 +2311,7 @@ describe('getNextSibling', () => {
             it('returns null', () => {
               const current = fiber('current');
               const container = document.createElement('div');
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2325,7 +2325,7 @@ describe('getNextSibling', () => {
               const child = fiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2339,7 +2339,7 @@ describe('getNextSibling', () => {
               const child = makeElementFiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2355,7 +2355,7 @@ describe('getNextSibling', () => {
             it('returns null', () => {
               const current = makeElementFiber('current');
               const container = document.createElement('div');
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2369,7 +2369,7 @@ describe('getNextSibling', () => {
               const child = fiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2383,7 +2383,7 @@ describe('getNextSibling', () => {
               const child = makeElementFiber('child');
               const container = document.createElement('div');
               mark(child, current, null);
-              mount(current, container, null);
+              insert(current, container, null);
 
               const nextSibling = getNextSibling(current, container, true);
 
@@ -2404,7 +2404,7 @@ describe('getNextSibling', () => {
                 const current = fiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2420,7 +2420,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2436,7 +2436,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2454,7 +2454,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2472,7 +2472,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2490,7 +2490,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2508,7 +2508,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2526,7 +2526,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2544,7 +2544,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2562,7 +2562,7 @@ describe('getNextSibling', () => {
                 const current = makeElementFiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2578,7 +2578,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2594,7 +2594,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2612,7 +2612,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2630,7 +2630,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2648,7 +2648,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2666,7 +2666,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2684,7 +2684,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2702,7 +2702,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2726,7 +2726,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2746,7 +2746,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2766,7 +2766,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2788,7 +2788,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2810,7 +2810,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2832,7 +2832,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2854,7 +2854,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2876,7 +2876,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2898,7 +2898,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2920,7 +2920,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2940,7 +2940,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2960,7 +2960,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -2982,7 +2982,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3004,7 +3004,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3026,7 +3026,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3048,7 +3048,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3070,7 +3070,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3092,7 +3092,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3116,7 +3116,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3136,7 +3136,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3156,7 +3156,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3178,7 +3178,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3200,7 +3200,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3222,7 +3222,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3244,7 +3244,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3266,7 +3266,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3288,7 +3288,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3310,7 +3310,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3330,7 +3330,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3350,7 +3350,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3372,7 +3372,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3394,7 +3394,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3416,7 +3416,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3438,7 +3438,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3460,7 +3460,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3482,7 +3482,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, container, true);
 
@@ -3504,7 +3504,7 @@ describe('getNextSibling', () => {
                 const current = fiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3520,7 +3520,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3536,7 +3536,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3554,7 +3554,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3572,7 +3572,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3590,7 +3590,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3608,7 +3608,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3626,7 +3626,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3644,7 +3644,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3662,7 +3662,7 @@ describe('getNextSibling', () => {
                 const current = makeElementFiber('current');
                 const container = document.createElement('div');
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3678,7 +3678,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3694,7 +3694,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(child, current, null);
                 mark(current, root, null);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3712,7 +3712,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3730,7 +3730,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3748,7 +3748,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3766,7 +3766,7 @@ describe('getNextSibling', () => {
                 const container = document.createElement('div');
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3784,7 +3784,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3802,7 +3802,7 @@ describe('getNextSibling', () => {
                 mark(child, current, null);
                 mark(current, root, null);
                 mark(next, root, current);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, root.dom!, true);
 
@@ -3826,7 +3826,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3846,7 +3846,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3866,7 +3866,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3888,7 +3888,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3910,7 +3910,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3932,7 +3932,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3954,7 +3954,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3976,7 +3976,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -3998,7 +3998,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4020,7 +4020,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4040,7 +4040,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4060,7 +4060,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4082,7 +4082,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4104,7 +4104,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4126,7 +4126,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4148,7 +4148,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4170,7 +4170,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4192,7 +4192,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4216,7 +4216,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4236,7 +4236,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4256,7 +4256,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4278,7 +4278,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4300,7 +4300,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4322,7 +4322,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4344,7 +4344,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4366,7 +4366,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4388,7 +4388,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4410,7 +4410,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4430,7 +4430,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4450,7 +4450,7 @@ describe('getNextSibling', () => {
                 mark(current, parent, null);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4472,7 +4472,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4494,7 +4494,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4516,7 +4516,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4538,7 +4538,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4560,7 +4560,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
@@ -4582,7 +4582,7 @@ describe('getNextSibling', () => {
                 mark(next, parent, current);
                 mark(parent, root, null);
                 mark(parentNext, root, parent);
-                mount(root, container, null);
+                insert(root, container, null);
 
                 const nextSibling = getNextSibling(current, parent.dom!, true);
 
