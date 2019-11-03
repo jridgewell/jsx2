@@ -6,7 +6,7 @@ export function unmount(fiber: Fiber): void {
   unmountRange(fiber, fiber.next);
 }
 
-function unmountRange(fiber: Fiber, end: null | Fiber) {
+function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
     const { ref, child } = current!;

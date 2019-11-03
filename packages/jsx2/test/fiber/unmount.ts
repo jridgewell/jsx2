@@ -94,7 +94,6 @@ describe('unmount', () => {
     });
   });
 
-
   describe('fiber with ref', () => {
     describe('fiber without dom', () => {
       describe('without children', () => {
