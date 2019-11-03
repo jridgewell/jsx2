@@ -1,8 +1,10 @@
 type Renderable = import('../../src/render').Renderable;
 type FunctionComponentVNode = import('../../src/create-element').FunctionComponentVNode;
+type RefWork = import('../../src/diff/ref').RefWork;
 
 import { createElement, Component, Fragment } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
+import { applyRefs } from '../../src/diff/ref';
 
 describe('createTree', () => {
   function expectTextNode(node: Node, text: string) {
@@ -24,7 +26,7 @@ describe('createTree', () => {
   describe('rendering null', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(null), body);
+      createTree(data(null), body, []);
 
       expect(body.firstChild).toBe(null);
     });
@@ -33,7 +35,7 @@ describe('createTree', () => {
   describe('rendering undefined', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(undefined), body);
+      createTree(data(undefined), body, []);
 
       expect(body.firstChild).toBe(null);
     });
@@ -42,7 +44,7 @@ describe('createTree', () => {
   describe('rendering boolean', () => {
     it('renders nothing', () => {
       const body = document.createElement('body');
-      createTree(data(true), body);
+      createTree(data(true), body, []);
 
       expect(body.firstChild).toBe(null);
     });
@@ -51,7 +53,7 @@ describe('createTree', () => {
   describe('rendering number', () => {
     it('renders value', () => {
       const body = document.createElement('body');
-      createTree(data(1), body);
+      createTree(data(1), body, []);
 
       expectTextNode(body.firstChild!, '1');
       expect(body.firstChild).toBe(body.lastChild);
@@ -61,7 +63,7 @@ describe('createTree', () => {
   describe('rendering string', () => {
     it('renders value', () => {
       const body = document.createElement('body');
-      createTree(data('hello'), body);
+      createTree(data('hello'), body, []);
 
       expectTextNode(body.firstChild!, 'hello');
       expect(body.firstChild).toBe(body.lastChild);
@@ -72,7 +74,7 @@ describe('createTree', () => {
     it('renders single child', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text']), body);
+      createTree(data(['text']), body, []);
 
       expectTextNode(body.firstChild!, 'text');
       expect(body.firstChild).toBe(body.lastChild);
@@ -81,7 +83,7 @@ describe('createTree', () => {
     it('renders multiple children', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text', 0]), body);
+      createTree(data(['text', 0]), body, []);
 
       expectTextNode(body.firstChild!, 'text');
       expectTextNode(body.lastChild!, '0');
@@ -91,7 +93,7 @@ describe('createTree', () => {
     it('skips nullish children', () => {
       const body = document.createElement('body');
 
-      createTree(data(['text', true, 0]), body);
+      createTree(data(['text', true, 0]), body, []);
 
       expectTextNode(body.firstChild!, 'text');
       expectTextNode(body.lastChild!, '0');
@@ -103,7 +105,7 @@ describe('createTree', () => {
     it('renders element', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div')), body);
+      createTree(data(createElement('div')), body, []);
 
       expectElement(body.firstChild!, 'div');
     });
@@ -111,7 +113,7 @@ describe('createTree', () => {
     it('renders props', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div', { id: 'id' })), body);
+      createTree(data(createElement('div', { id: 'id' })), body, []);
 
       const firstChild = body.firstChild!;
       expectElement(firstChild, 'div');
@@ -121,43 +123,53 @@ describe('createTree', () => {
     it('renders children', () => {
       const body = document.createElement('body');
 
-      createTree(data(createElement('div', null, 'text')), body);
+      createTree(data(createElement('div', null, 'text')), body, []);
 
       expectTextNode(body.firstChild!.firstChild!, 'text');
     });
 
-    it('sets ref on element', () => {
+    it('collects ref on element', () => {
       const body = document.createElement('body');
       const ref = jest.fn();
 
-      createTree(data(createElement('div', { ref }, 'text')), body);
+      const refs: RefWork[] = [];
+      createTree(data(createElement('div', { ref }, 'text')), body, refs);
+      applyRefs(refs);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(body.firstChild);
     });
 
-    it('sets ref after initializing element', () => {
+    it('collects ref after with initialized element', () => {
       const body = document.createElement('body');
-      const ref = (el: Element) => {
+      const ref = jest.fn((el: Element) => {
         expect(el.id).toBe('id');
-        // TODO: Ref should diff after full mount.
-        // expectTextNode(el.firstChild!, 'text');
-      };
+        expectTextNode(el.firstChild!, 'text');
+      });
 
-      createTree(data(createElement('div', { id: 'id', ref }, 'text')), body);
+      const refs: RefWork[] = [];
+      createTree(data(createElement('div', { id: 'id', ref }, 'text')), body, refs);
+      applyRefs(refs);
+
+      expect(ref).toHaveBeenCalled();
     });
 
-    it('sets ref after nested children refs', () => {
+    it('collects ref after nested children refs', () => {
       const body = document.createElement('body');
       const nested = jest.fn();
-      const ref = () => {
+      const ref = jest.fn(() => {
         expect(nested).toHaveBeenCalled();
-      };
+      });
 
+      const refs: RefWork[] = [];
       createTree(
         data(createElement('div', { id: 'id', ref }, createElement('nested', { ref: nested }))),
         body,
+        refs,
       );
+      applyRefs(refs);
+
+      expect(ref).toHaveBeenCalled();
     });
   });
 
@@ -167,7 +179,7 @@ describe('createTree', () => {
       const C = () => {
         return 'hello';
       };
-      createTree(data(createElement(C, null)), body);
+      createTree(data(createElement(C, null)), body, []);
 
       const lastChild = body.lastChild!;
       expectTextNode(lastChild, 'hello');
@@ -184,36 +196,42 @@ describe('createTree', () => {
 
     it('renders return value', () => {
       const body = document.createElement('body');
-      createTree(data(createElement(C, null)), body);
+      createTree(data(createElement(C, null)), body, []);
 
       const lastChild = body.lastChild!;
       expectTextNode(lastChild, 'hello');
       expect(lastChild.nextSibling).toBe(null);
     });
 
-    it('sets ref on component', () => {
+    it('collects ref on component', () => {
       const body = document.createElement('body');
       const ref = jest.fn();
 
-      createTree(data(createElement(C, { ref })), body);
+      const refs: RefWork[] = [];
+      createTree(data(createElement(C, { ref })), body, refs);
+      applyRefs(refs);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(expect.any(C));
     });
 
-    it('sets ref after rendering component', () => {
+    it('collects ref after rendering component', () => {
       const body = document.createElement('body');
       const nested = jest.fn();
-      const ref = () => {
+      const ref = jest.fn(() => {
         expect(nested).toHaveBeenCalled();
-      };
+      });
       class C extends Component {
         render() {
           return createElement('div', { ref: nested });
         }
       }
 
-      createTree(data(createElement(C, { ref })), body);
+      const refs: RefWork[] = [];
+      createTree(data(createElement(C, { ref })), body, refs);
+      applyRefs(refs);
+
+      expect(ref).toHaveBeenCalled();
     });
   });
 });

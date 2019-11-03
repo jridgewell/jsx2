@@ -4,8 +4,8 @@ type Component = import('./component').Component;
 type Renderable = import('./render').Renderable;
 
 export interface SharedVNode {
-  readonly key: string | number | null | undefined;
-  readonly ref: null | undefined | Ref;
+  readonly key: string | number | null;
+  readonly ref: null | Ref;
   readonly props: RegularProps & { readonly children?: Renderable };
   readonly constructor: undefined;
 }

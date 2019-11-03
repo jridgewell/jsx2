@@ -53,4 +53,47 @@ describe('render', () => {
     expect(div.firstChild).toBe(div.lastChild);
     expect(container.firstChild).toBe(container.lastChild);
   });
+
+  it('applies refs after fully mounting DOM', () => {
+    const ref = jest.fn((el: Element) => {
+      expect(container.contains(el)).toBe(true);
+    });
+    const el = createElement(
+      'div',
+      { id: 'foo' },
+      createElement('inner', {
+        ref,
+      }),
+    );
+    const container = document.createElement('body');
+
+    render(el, container);
+
+    expect(ref).toHaveBeenCalled();
+  });
+
+  it('applies refs after fully rerendering', () => {
+    let lastEl: null | Element = null;
+    const ref1 = jest.fn((el: null | Element) => {
+      if (lastEl) {
+        expect(container.contains(lastEl)).toBe(true);
+        lastEl = null;
+      }
+      lastEl = el;
+    });
+    const ref2 = jest.fn((el: Element) => {
+      expect(container.contains(el)).toBe(true);
+    });
+    const container = document.createElement('body');
+
+    render(createElement('div', { id: 'foo' }, createElement('first', { ref: ref1 })), container);
+    expect(ref1).toHaveBeenCalledTimes(1);
+    expect(lastEl).toBeTruthy();
+
+    render(createElement('div', { id: 'foo' }, createElement('second', { ref: ref2 })), container);
+
+    expect(ref1).toHaveBeenCalledTimes(2);
+    expect(ref2).toHaveBeenCalledTimes(1);
+    expect(lastEl).toBe(null);
+  });
 });

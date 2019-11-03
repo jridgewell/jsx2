@@ -3,6 +3,7 @@ type ElementVNode = import('../create-element').ElementVNode;
 type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
 type ClassComponentVNode = import('../create-element').ClassComponentVNode;
 type RenderableArray = import('../render').RenderableArray;
+type Ref = import('../create-ref').Ref;
 
 export interface SharedFiber {
   parent: null | Fiber;
@@ -15,6 +16,7 @@ export interface NullFiber extends SharedFiber {
   key: null;
   dom: null;
   component: null;
+  ref: null;
 }
 
 export interface TextFiber extends SharedFiber {
@@ -22,6 +24,7 @@ export interface TextFiber extends SharedFiber {
   key: null;
   dom: null | Text;
   component: null;
+  ref: null;
 }
 
 export interface ElementFiber extends SharedFiber {
@@ -29,6 +32,7 @@ export interface ElementFiber extends SharedFiber {
   key: ElementVNode['key'];
   dom: null | Element;
   component: null;
+  ref: null | Ref;
 }
 
 export interface FunctionComponentFiber extends SharedFiber {
@@ -36,6 +40,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   key: FunctionComponentVNode['key'];
   dom: null;
   component: null;
+  ref: null;
 }
 
 export interface ClassComponentFiber extends SharedFiber {
@@ -43,6 +48,7 @@ export interface ClassComponentFiber extends SharedFiber {
   key: ClassComponentVNode['key'];
   dom: null;
   component: null | Component;
+  ref: null | Ref;
 }
 
 export interface ArrayFiber extends SharedFiber {
@@ -50,6 +56,7 @@ export interface ArrayFiber extends SharedFiber {
   key: null;
   dom: null;
   component: null;
+  ref: null;
 }
 
 export type Fiber =
@@ -83,5 +90,6 @@ export function fiber<T extends Fiber['data']>(
     parent: null,
     child: null,
     next: null,
+    ref: null,
   } as any;
 }
