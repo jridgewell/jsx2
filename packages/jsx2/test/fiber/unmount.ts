@@ -22,24 +22,36 @@ describe('unmount', () => {
     describe('fiber without dom', () => {
       describe('without children', () => {
         it('does nothing', () => {
+          const parent = fiber('parent');
           const current = fiber('current');
+          const next = makeElementFiber('next');
+          next.ref = jest.fn();
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-          expect(() => unmount(current)).not.toThrow();
+          unmount(current);
+
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
 
       describe('with child', () => {
         it("unmounts child's ref", () => {
+          const parent = fiber('parent');
           const current = fiber('current');
           const child = makeElementFiber('child');
-          const childRef = jest.fn();
-          child.ref = childRef;
+          const next = makeElementFiber('next');
+          child.ref = jest.fn();
+          next.ref = jest.fn();
           mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(childRef).toHaveBeenCalledTimes(1);
-          expect(childRef).toHaveBeenCalledWith(null);
+          expect(child.ref).toHaveBeenCalledTimes(1);
+          expect(child.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
     });
@@ -47,120 +59,125 @@ describe('unmount', () => {
     describe('fiber with dom', () => {
       describe('without children', () => {
         it('does nothing', () => {
-          const current = fiber('current');
+          const parent = fiber('parent');
+          const current = makeElementFiber('current');
+          const next = makeElementFiber('next');
+          next.ref = jest.fn();
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-          expect(() => unmount(current)).not.toThrow();
+          unmount(current);
+
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
 
       describe('with child', () => {
         it("unmounts child's ref", () => {
+          const parent = fiber('parent');
           const current = makeElementFiber('current');
           const child = makeElementFiber('child');
-          const childRef = jest.fn();
-          child.ref = childRef;
+          const next = makeElementFiber('next');
+          child.ref = jest.fn();
+          next.ref = jest.fn();
           mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(childRef).toHaveBeenCalledTimes(1);
-          expect(childRef).toHaveBeenCalledWith(null);
+          expect(child.ref).toHaveBeenCalledTimes(1);
+          expect(child.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
     });
   });
 
+
   describe('fiber with ref', () => {
     describe('fiber without dom', () => {
       describe('without children', () => {
-        it("unmounts fiber's ref", () => {
+        it('does nothing', () => {
+          const parent = fiber('parent');
           const current = makeComponentFiber();
-          const ref = jest.fn();
-          current.ref = ref;
+          const next = makeElementFiber('next');
+          current.ref = jest.fn();
+          next.ref = jest.fn();
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(ref).toHaveBeenCalledTimes(1);
-          expect(ref).toHaveBeenCalledWith(null);
+          expect(current.ref).toHaveBeenCalledTimes(1);
+          expect(current.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
 
       describe('with child', () => {
-        it("unmounts fiber's ref", () => {
-          const current = makeComponentFiber();
-          const child = makeElementFiber('child');
-          const ref = jest.fn();
-          const childRef = jest.fn();
-          current.ref = ref;
-          child.ref = childRef;
-          mark(child, current, null);
-
-          unmount(current);
-
-          expect(ref).toHaveBeenCalledTimes(1);
-          expect(ref).toHaveBeenCalledWith(null);
-        });
-
         it("unmounts child's ref", () => {
+          const parent = fiber('parent');
           const current = makeComponentFiber();
           const child = makeElementFiber('child');
-          const ref = jest.fn();
-          const childRef = jest.fn();
-          current.ref = ref;
-          child.ref = childRef;
+          const next = makeElementFiber('next');
+          current.ref = jest.fn();
+          child.ref = jest.fn();
+          next.ref = jest.fn();
           mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(childRef).toHaveBeenCalledTimes(1);
-          expect(childRef).toHaveBeenCalledWith(null);
+          expect(current.ref).toHaveBeenCalledTimes(1);
+          expect(current.ref).toHaveBeenCalledWith(null);
+          expect(child.ref).toHaveBeenCalledTimes(1);
+          expect(child.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
     });
 
     describe('fiber with dom', () => {
       describe('without children', () => {
-        it("unmounts fiber's ref", () => {
+        it('does nothing', () => {
+          const parent = fiber('parent');
           const current = makeElementFiber('current');
-          const ref = jest.fn();
-          current.ref = ref;
+          const next = makeElementFiber('next');
+          current.ref = jest.fn();
+          next.ref = jest.fn();
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(ref).toHaveBeenCalledTimes(1);
-          expect(ref).toHaveBeenCalledWith(null);
+          expect(current.ref).toHaveBeenCalledTimes(1);
+          expect(current.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
 
       describe('with child', () => {
-        it("unmounts fiber's ref", () => {
-          const current = makeElementFiber('current');
-          const child = makeElementFiber('child');
-          const ref = jest.fn();
-          const childRef = jest.fn();
-          current.ref = ref;
-          child.ref = childRef;
-          mark(child, current, null);
-
-          unmount(current);
-
-          expect(ref).toHaveBeenCalledTimes(1);
-          expect(ref).toHaveBeenCalledWith(null);
-        });
-
         it("unmounts child's ref", () => {
+          const parent = fiber('parent');
           const current = makeElementFiber('current');
           const child = makeElementFiber('child');
-          const ref = jest.fn();
-          const childRef = jest.fn();
-          current.ref = ref;
-          child.ref = childRef;
+          const next = makeElementFiber('next');
+          current.ref = jest.fn();
+          child.ref = jest.fn();
+          next.ref = jest.fn();
           mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
           unmount(current);
 
-          expect(childRef).toHaveBeenCalledTimes(1);
-          expect(childRef).toHaveBeenCalledWith(null);
+          expect(current.ref).toHaveBeenCalledTimes(1);
+          expect(current.ref).toHaveBeenCalledWith(null);
+          expect(child.ref).toHaveBeenCalledTimes(1);
+          expect(child.ref).toHaveBeenCalledWith(null);
+          expect(next.ref).not.toHaveBeenCalled();
         });
       });
     });
