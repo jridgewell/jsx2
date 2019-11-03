@@ -1,6 +1,6 @@
 import { fiber } from '../../src/fiber';
 import { mark } from '../../src/fiber/mark';
-import { createElement } from '../../src/create-element';
+import { createElement } from '../..';
 import { remove } from '../../src/fiber/remove';
 import { insert } from '../../src/fiber/insert';
 

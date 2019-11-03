@@ -1,7 +1,7 @@
 import { fiber } from '../../src/fiber';
 import { insert } from '../../src/fiber/insert';
 import { mark } from '../../src/fiber/mark';
-import { createElement } from '../../src/create-element';
+import { createElement } from '../..';
 
 describe('insert', () => {
   function makeElementFiber(tag: string) {

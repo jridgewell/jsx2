@@ -7,7 +7,7 @@ type Fiber = import('../../src/fiber').Fiber;
 type CoercedRenderable = import('../../src/util/coerce-renderable').CoercedRenderable;
 type ElementVNode = import('../../src/create-element').ElementVNode;
 
-import { createElement, Component, Fragment } from '../../src/jsx2';
+import { createElement, Component, Fragment } from '../..';
 import { createTree } from '../../src/diff/create-tree';
 import { applyRefs } from '../../src/diff/ref';
 import { diffTree } from '../../src/diff/diff-tree';

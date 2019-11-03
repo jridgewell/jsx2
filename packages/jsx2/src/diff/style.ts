@@ -26,7 +26,7 @@ export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: Style
 }
 
 // Copied from Preact. Forgive me.
-// https://github.com/facebook/react/blob/0f64703edf5970b12a878ea3b5e1e30ef1d71c74/packages/react-dom/src/shared/CSSProperty.js
+// https://github.com/facebook/react/blob/0f64703e/packages/react-dom/src/shared/CSSProperty.js
 const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
 
 function setStyle(style: CSSStyleDeclaration, name: string, value: unknown): void {

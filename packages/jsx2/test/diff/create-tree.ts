@@ -2,7 +2,7 @@ type Renderable = import('../../src/render').Renderable;
 type FunctionComponentVNode = import('../../src/create-element').FunctionComponentVNode;
 type RefWork = import('../../src/diff/ref').RefWork;
 
-import { createElement, Component, Fragment, render } from '../../src/jsx2';
+import { createElement, Component, Fragment, render } from '../..';
 import { createTree } from '../../src/diff/create-tree';
 import { applyRefs } from '../../src/diff/ref';
 

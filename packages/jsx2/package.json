@@ -30,7 +30,7 @@
     "test:lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
     "test:only": "jest --coverage",
     "test:watch": "jest --coverage --watch",
-    "preversion": "run-s test:prod build",
+    "preversion": "run-s test build",
     "prepublishOnly": "npm run preversion"
   },
   "devDependencies": {
