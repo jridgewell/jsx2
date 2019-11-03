@@ -2,7 +2,7 @@ type Renderable = import('../../src/render').Renderable;
 type FunctionComponentVNode = import('../../src/create-element').FunctionComponentVNode;
 type RefWork = import('../../src/diff/ref').RefWork;
 
-import { createElement, Component, Fragment } from '../../src/jsx2';
+import { createElement, Component, Fragment, render } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
 import { applyRefs } from '../../src/diff/ref';
 
@@ -186,9 +186,19 @@ describe('createTree', () => {
       };
       create(createElement(C, null), body);
 
-      const lastChild = body.lastChild!;
-      expectTextNode(lastChild, 'hello');
-      expect(lastChild.nextSibling).toBe(null);
+      expectTextNode(body.firstChild!, 'hello');
+      expect(body.firstChild).toBe(body.lastChild);
+    });
+
+    it('passes props to compoment', () => {
+      const body = document.createElement('body');
+      const C = (props: any) => {
+        return props.test;
+      };
+      create(createElement(C, { test: 'test' }), body);
+
+      expectTextNode(body.firstChild!, 'test');
+      expect(body.firstChild).toBe(body.lastChild);
     });
   });
 
@@ -203,9 +213,21 @@ describe('createTree', () => {
       const body = document.createElement('body');
       create(createElement(C, null), body);
 
-      const lastChild = body.lastChild!;
-      expectTextNode(lastChild, 'hello');
-      expect(lastChild.nextSibling).toBe(null);
+      expectTextNode(body.firstChild!, 'hello');
+      expect(body.firstChild).toBe(body.lastChild);
+    });
+
+    it('passes props to compoment', () => {
+      const body = document.createElement('body');
+      class C extends Component {
+        render(props: any) {
+          return props.test;
+        }
+      }
+      create(createElement(C, { test: 'test' }), body);
+
+      expectTextNode(body.firstChild!, 'test');
+      expect(body.firstChild).toBe(body.lastChild);
     });
 
     it('collects ref on component', () => {
