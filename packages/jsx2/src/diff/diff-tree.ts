@@ -24,23 +24,17 @@ export function diffTree(
   container: Node,
   refs: RefWork[],
 ): void {
-  diffChild(old.child, renderable, old, null, container, refs);
+  diffChild(old.child!, renderable, old, null, container, refs);
 }
 
 function diffChild(
-  old: null | Fiber,
+  old: Fiber,
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
 ): Fiber {
-  if (old === null) {
-    const f = createChild(renderable, parentFiber, previousFiber, refs);
-    insert(f, container, null);
-    return f;
-  }
-
   const { data } = old;
   if (data === renderable) return old;
 
@@ -169,7 +163,7 @@ function renderElement(
   const { props } = renderable;
   const dom = old.dom!;
   diffProps(dom as HTMLElement, oldProps, props);
-  diffChild(old.child, coerceRenderable(props.children), old, null, dom, refs);
+  diffChild(old.child!, coerceRenderable(props.children), old, null, dom, refs);
   deferRef(refs, dom, data.ref, renderable.ref);
   return old;
 }
@@ -189,7 +183,7 @@ function renderComponent(
   old.data = renderable;
 
   const { type } = renderable;
-  if (typeof data.type === 'string' || type !== data.type) {
+  if (type !== data.type) {
     return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
   }
 
@@ -198,7 +192,7 @@ function renderComponent(
     isFunctionComponent(type) ? type(props) : old.component!.render(props),
   );
 
-  diffChild(old.child, rendered, old, null, container, refs);
+  diffChild(old.child!, rendered, old, null, container, refs);
   return old;
 }
 
