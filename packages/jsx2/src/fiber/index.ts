@@ -2,6 +2,9 @@ type Component = import('../component').Component;
 type ElementVNode = import('../create-element').ElementVNode;
 type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
 type ClassComponentVNode = import('../create-element').ClassComponentVNode;
+type TemplateResult = import('../template-result').TemplateResult;
+type StaticNode = import('../template-result').StaticNode;
+type SpreadProps = import('../template-result').SpreadProps;
 type RenderableArray = import('../render').RenderableArray;
 type Ref = import('../create-ref').Ref;
 
@@ -17,6 +20,7 @@ export interface NullFiber extends SharedFiber {
   dom: null;
   component: null;
   ref: null;
+  dynamics: null;
 }
 
 export interface TextFiber extends SharedFiber {
@@ -25,6 +29,7 @@ export interface TextFiber extends SharedFiber {
   dom: null | Text;
   component: null;
   ref: null;
+  dynamics: null;
 }
 
 export interface ElementFiber extends SharedFiber {
@@ -33,6 +38,7 @@ export interface ElementFiber extends SharedFiber {
   dom: null | Element;
   component: null;
   ref: null | Ref;
+  dynamics: null;
 }
 
 export interface FunctionComponentFiber extends SharedFiber {
@@ -41,6 +47,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   dom: null;
   component: null;
   ref: null;
+  dynamics: null;
 }
 
 export interface ClassComponentFiber extends SharedFiber {
@@ -49,6 +56,7 @@ export interface ClassComponentFiber extends SharedFiber {
   dom: null;
   component: null | Component;
   ref: null | Ref;
+  dynamics: null;
 }
 
 export interface ArrayFiber extends SharedFiber {
@@ -57,7 +65,54 @@ export interface ArrayFiber extends SharedFiber {
   dom: null;
   component: null;
   ref: null;
+  dynamics: null;
 }
+
+export interface StaticNodeFiber extends SharedFiber {
+  data: null | StaticNode;
+  key: StaticNode['key'];
+  dom: null | HTMLElement;
+  component: null;
+  ref: StaticNode['ref'];
+  dynamics: null;
+}
+
+export interface TemplateResultFiber extends SharedFiber {
+  data: TemplateResult;
+  key: null;
+  dom: null;
+  component: null;
+  ref: null;
+  dynamics: null | DynamicExpression[];
+}
+
+interface AttributeExpression {
+  type: 'attribute';
+  fiber: Fiber;
+  el: HTMLElement;
+  name: string;
+  old: unknown;
+}
+interface SpreadAttributeExpression {
+  type: 'spread';
+  fiber: Fiber;
+  el: HTMLElement;
+  spread: SpreadProps;
+  old: object;
+}
+interface FiberExpression {
+  type: 'fiber';
+  fiber: Fiber;
+  previous: null | Fiber;
+}
+
+interface FiberExpression {
+  type: 'fiber';
+  fiber: Fiber;
+  previous: null | Fiber;
+}
+
+export type DynamicExpression = FiberExpression | AttributeExpression | SpreadAttributeExpression;
 
 export type Fiber =
   | NullFiber
@@ -65,7 +120,9 @@ export type Fiber =
   | ElementFiber
   | FunctionComponentFiber
   | ClassComponentFiber
-  | ArrayFiber;
+  | ArrayFiber
+  | StaticNodeFiber
+  | TemplateResultFiber;
 
 export function fiber<T extends Fiber['data']>(
   data: T,
@@ -81,6 +138,10 @@ export function fiber<T extends Fiber['data']>(
   ? ClassComponentFiber
   : T extends ArrayFiber['data']
   ? ArrayFiber
+  : T extends StaticNodeFiber['data']
+  ? StaticNodeFiber
+  : T extends TemplateResultFiber['data']
+  ? TemplateResultFiber
   : never {
   return {
     data,
@@ -91,5 +152,6 @@ export function fiber<T extends Fiber['data']>(
     child: null,
     next: null,
     ref: null,
+    dynamics: null,
   } as any;
 }

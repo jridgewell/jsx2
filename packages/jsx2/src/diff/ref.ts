@@ -2,8 +2,8 @@ type Ref = import('../create-ref').Ref;
 
 export interface RefWork {
   current: unknown;
-  old: null | Ref;
-  ref: null | Ref;
+  old: null | undefined | Ref;
+  ref: null | undefined | Ref;
 }
 
 export function setRef(current: unknown, ref: Ref): void {
@@ -20,7 +20,8 @@ export function deferRef(
   old: RefWork['old'],
   ref: RefWork['ref'],
 ): void {
-  if (old === ref) return;
+  // tslint:disable-next-line triple-equals
+  if (old == ref) return;
   refs.push({ current, old, ref });
 }
 

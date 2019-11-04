@@ -1,6 +1,7 @@
 type VNode = import('./create-element').VNode;
 type Fiber = import('./fiber').Fiber;
 type RefWork = import('./diff/ref').RefWork;
+type TemplateResult = import('./template-result').TemplateResult;
 
 import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';
@@ -19,7 +20,7 @@ export type Renderable =
   | null
   | undefined
   | VNode
-  // | TemplateResult
+  | TemplateResult
   | RenderableArray;
 export interface RenderableArray extends ReadonlyArray<Renderable> {}
 
