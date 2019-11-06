@@ -1,8 +1,6 @@
 type Listener = (event: Event) => void;
 type ListenerElement = HTMLElement & {
-  _listeners: {
-    [key: string]: Listener | null;
-  };
+  _listeners: Record<string, null | Listener>;
 };
 export type ListenerTypes = null | undefined | Listener;
 

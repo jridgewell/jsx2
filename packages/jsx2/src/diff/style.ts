@@ -1,6 +1,4 @@
-interface StyleObject {
-  [key: string]: unknown;
-}
+type StyleObject = Record<string, unknown>;
 export type StyleTypes = string | null | undefined | StyleObject;
 
 export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: StyleTypes): void {

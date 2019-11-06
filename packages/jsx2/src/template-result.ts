@@ -4,9 +4,7 @@ export type Marker = number;
 export type PropValue = Primitive | Marker | StaticNode;
 export type Props = {
   readonly children?: PropValue | readonly PropValue[];
-} & {
-  readonly [key: string]: PropValue;
-};
+} & Readonly<Record<string, PropValue>>;
 
 export interface StaticNode {
   readonly type: string | Marker;

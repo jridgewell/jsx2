@@ -24,9 +24,7 @@ export interface ClassComponentVNode extends SharedVNode {
 
 export type VNode = ElementVNode | FunctionComponentVNode | ClassComponentVNode;
 
-export interface RegularProps {
-  readonly [key: string]: unknown;
-}
+export type RegularProps = Record<string, unknown>;
 
 export interface SpecialProps {
   readonly key?: SharedVNode['key'];
