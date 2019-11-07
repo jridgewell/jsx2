@@ -23,7 +23,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -38,7 +38,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -50,7 +50,7 @@ describe('remove', () => {
           mark(current, root, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -68,7 +68,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -85,7 +85,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -99,7 +99,7 @@ describe('remove', () => {
           mark(current, root, previous);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -115,7 +115,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -129,7 +129,7 @@ describe('remove', () => {
           mark(current, root, previous);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });
@@ -149,7 +149,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -166,7 +166,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -180,7 +180,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -200,7 +200,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -219,7 +219,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -235,7 +235,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -253,7 +253,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -269,7 +269,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });
@@ -291,7 +291,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -310,7 +310,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -328,7 +328,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -350,7 +350,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -371,7 +371,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -389,7 +389,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -409,7 +409,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -427,7 +427,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });
@@ -447,7 +447,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -462,7 +462,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -474,7 +474,7 @@ describe('remove', () => {
           mark(current, root, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -492,7 +492,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -509,7 +509,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -523,7 +523,7 @@ describe('remove', () => {
           mark(current, root, previous);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -539,7 +539,7 @@ describe('remove', () => {
           mark(sibling, root, current);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -553,7 +553,7 @@ describe('remove', () => {
           mark(current, root, previous);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });
@@ -573,7 +573,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -590,7 +590,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(current.dom!.childNodes)).toEqual([child1.dom]);
         });
@@ -606,7 +606,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -620,7 +620,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -640,7 +640,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -659,7 +659,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(current.dom!.childNodes)).toEqual([child1.dom]);
         });
@@ -677,7 +677,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -693,7 +693,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -711,7 +711,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -727,7 +727,7 @@ describe('remove', () => {
           mark(child1, current, null);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });
@@ -749,7 +749,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([sibling.dom]);
@@ -768,7 +768,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, null, root.dom!);
+          remove(current, root, null, root.dom!);
 
           expect(Array.from(current.dom!.childNodes)).toEqual([child1.dom, child2.dom]);
         });
@@ -786,7 +786,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -804,7 +804,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, null, root.dom!);
+          const next = remove(current, root, null, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -826,7 +826,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(container.childNodes)).toEqual([root.dom]);
           expect(Array.from(root.dom!.childNodes)).toEqual([previous.dom, sibling.dom]);
@@ -847,7 +847,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(Array.from(current.dom!.childNodes)).toEqual([child1.dom, child2.dom]);
         });
@@ -867,7 +867,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(sibling);
         });
@@ -885,7 +885,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          const next = remove(current, previous, root.dom!);
+          const next = remove(current, root, previous, root.dom!);
 
           expect(next).toBe(null);
         });
@@ -905,7 +905,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(sibling);
         });
@@ -923,7 +923,7 @@ describe('remove', () => {
           mark(child2, current, child1);
           insert(root, container, null);
 
-          remove(current, previous, root.dom!);
+          remove(current, root, previous, root.dom!);
 
           expect(previous.next).toBe(null);
         });

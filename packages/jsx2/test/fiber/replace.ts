@@ -24,7 +24,8 @@ describe('replace', () => {
       mark(old, parent, previous);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(null);
@@ -40,7 +41,8 @@ describe('replace', () => {
       mark(old, parent, previous);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(Array.from(container.childNodes)).toEqual([previous.dom, current.dom]);
     });
@@ -55,7 +57,8 @@ describe('replace', () => {
       mark(old, parent, previous);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(Array.from(container.childNodes)).not.toContain(old.dom);
     });
@@ -74,7 +77,8 @@ describe('replace', () => {
       mark(next, parent, old);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(current.next).toBe(next);
     });
@@ -93,7 +97,8 @@ describe('replace', () => {
       mark(next, parent, old);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(ref).toHaveBeenCalledTimes(1);
       expect(ref).toHaveBeenCalledWith(null);
@@ -111,7 +116,8 @@ describe('replace', () => {
       mark(next, parent, old);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(Array.from(container.childNodes)).toEqual([previous.dom, current.dom, next.dom]);
     });
@@ -128,7 +134,8 @@ describe('replace', () => {
       mark(next, parent, old);
       insert(parent, container, null);
 
-      replace(old, current, container);
+      mark(current, parent, previous);
+      replace(old, current, parent, container);
 
       expect(Array.from(container.childNodes)).not.toContain(old.dom);
     });

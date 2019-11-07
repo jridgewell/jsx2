@@ -12,6 +12,7 @@ import { insert } from '../fiber/insert';
 import { remove } from '../fiber/remove';
 import { replace } from '../fiber/replace';
 import { unmount } from '../fiber/unmount';
+import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { createChild } from './create-tree';
@@ -25,6 +26,7 @@ export function diffTree(
   refs: RefWork[],
 ): void {
   diffChild(old.child!, renderable, old, null, container, refs);
+  verify(old);
 }
 
 function diffChild(
@@ -135,7 +137,7 @@ function renderArray(
   current = last ? last.next : old.child;
   while (current !== null) {
     unmount(current);
-    current = remove(current, last, container);
+    current = remove(current, old, last, container);
   }
   return old;
 }
@@ -205,5 +207,5 @@ function replaceFiber(
   refs: RefWork[],
 ): Fiber {
   const f = createChild(renderable, parentFiber, previousFiber, refs);
-  return replace(old, f, container);
+  return replace(old, f, parentFiber, container);
 }

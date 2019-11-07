@@ -9,6 +9,7 @@ export interface SharedFiber {
   parent: null | Fiber;
   child: null | Fiber;
   next: null | Fiber;
+  index: number;
 }
 
 export interface NullFiber extends SharedFiber {
@@ -84,6 +85,7 @@ export function fiber<T extends Fiber['data']>(
   : never {
   return {
     data,
+    index: 0,
     key: null,
     dom: null,
     component: null,

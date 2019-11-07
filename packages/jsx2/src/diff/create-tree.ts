@@ -6,6 +6,7 @@ import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
 import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
+import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
@@ -15,6 +16,7 @@ export function createTree(renderable: CoercedRenderable, container: Node, refs:
   const root = fiber(null);
   createChild(renderable, root, null, refs);
   insert(root, container, null);
+  verify(root);
   return root;
 }
 
