@@ -7,7 +7,7 @@ import { insert } from './insert';
 import { remove } from './remove';
 import { unmount } from './unmount';
 
-const __DEBUG__ = true;
+const __DEBUG__ = process.env.NODE_ENV !== 'production';
 
 export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node): Fiber {
   // istanbul ignore next

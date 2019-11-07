@@ -3,7 +3,7 @@ type Fiber = import('.').Fiber;
 import { assert } from '../util/assert';
 import { increment } from './increment';
 
-const __DEBUG__ = true;
+const __DEBUG__ = process.env.NODE_ENV !== 'production';
 
 export function remove(
   fiber: Fiber,

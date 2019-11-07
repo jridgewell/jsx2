@@ -1,6 +1,6 @@
 type Fiber = import('.').Fiber;
 
-const __DEBUG__ = true;
+const __DEBUG__ = process.env.NODE_ENV !== 'production';
 
 export function mark(current: Fiber, parent: Fiber, previous: null | Fiber): void {
   current.parent = parent;

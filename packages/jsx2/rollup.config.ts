@@ -2,6 +2,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import typescript from 'rollup-plugin-typescript';
+import replace from '@rollup/plugin-replace';
+
 
 const pkg = require('./package.json');
 
@@ -13,10 +15,15 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   plugins: [
+    // Change NODE_ENV to production to eliminate assert checks.
+    replace({ 'process.env.NODE_ENV': "'production'" }),
+
     // Compile TypeScript files
     typescript(),
+
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
+
     // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage

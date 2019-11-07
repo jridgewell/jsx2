@@ -2,7 +2,7 @@ type Fiber = import('.').Fiber;
 
 import { assert } from '../util/assert';
 
-const __DEBUG__ = true;
+const __DEBUG__ = process.env.NODE_ENV !== 'production';
 
 export function verify(fiber: Fiber): void {
   // istanbul ignore next
