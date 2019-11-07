@@ -2,15 +2,12 @@ type Fiber = import('.').Fiber;
 
 import { assert } from '../util/assert';
 
-const __DEBUG__ = process.env.NODE_ENV !== 'production';
-
 export function getNextSibling(fiber: Fiber, container: Node, skipSelf?: boolean): null | Node {
   let current = skipSelf ? nextFiber(fiber, container) : fiber;
   while (current !== null) {
     const { dom } = current;
     if (dom) {
-      // istanbul ignore next
-      if (__DEBUG__) assert(dom.parentNode === container, 'dom must be a child of the container');
+      debug: assert(dom.parentNode === container, 'dom must be a child of the container');
       return dom;
     }
 

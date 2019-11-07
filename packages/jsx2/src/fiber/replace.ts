@@ -7,11 +7,8 @@ import { insert } from './insert';
 import { remove } from './remove';
 import { unmount } from './unmount';
 
-const __DEBUG__ = process.env.NODE_ENV !== 'production';
-
 export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node): Fiber {
-  // istanbul ignore next
-  if (__DEBUG__) {
+  debug: {
     assert(old.parent === parent, 'old must be child of parent');
     assert(fiber.parent === parent, 'fiber must be child of parent');
     assert(old.index === fiber.index, 'replacement fiber must have same index');
@@ -20,8 +17,7 @@ export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node
   unmount(old);
   insert(fiber, container, getNextSibling(old, container));
 
-  // istanbul ignore next
-  if (__DEBUG__) {
+  debug: {
     fiber.next = old;
     increment(old, 1);
   }

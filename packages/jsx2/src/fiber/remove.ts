@@ -3,16 +3,13 @@ type Fiber = import('.').Fiber;
 import { assert } from '../util/assert';
 import { increment } from './increment';
 
-const __DEBUG__ = process.env.NODE_ENV !== 'production';
-
 export function remove(
   fiber: Fiber,
   parent: Fiber,
   previous: null | Fiber,
   container: Node,
 ): null | Fiber {
-  // istanbul ignore next
-  if (__DEBUG__) {
+  debug: {
     assert(fiber.parent === parent, 'fiber must be child of parent');
     if (previous === null) {
       assert(parent.child === fiber, 'parent must point to fiber');
@@ -30,7 +27,7 @@ export function remove(
     parent.child = next;
   }
 
-  if (__DEBUG__ && next) {
+  debug: if (next) {
     increment(next, -1);
   }
 

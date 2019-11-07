@@ -2,7 +2,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import typescript from 'rollup-plugin-typescript';
-import replace from '@rollup/plugin-replace';
+import strip from '@rollup/plugin-strip';
 
 
 const pkg = require('./package.json');
@@ -15,8 +15,8 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   plugins: [
-    // Change NODE_ENV to production to eliminate assert checks.
-    replace({ 'process.env.NODE_ENV': "'production'" }),
+    // Eliminate debug blocks.
+    strip({ functions: [], labels: ['debug'] }),
 
     // Compile TypeScript files
     typescript(),

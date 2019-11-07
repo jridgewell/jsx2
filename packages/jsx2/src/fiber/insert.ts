@@ -2,11 +2,8 @@ type Fiber = import('.').Fiber;
 
 import { assert } from '../util/assert';
 
-const __DEBUG__ = process.env.NODE_ENV !== 'production';
-
 export function insert(fiber: Fiber, container: Node, before: null | Node): void {
-  // istanbul ignore next
-  if (__DEBUG__) {
+  debug: {
     assert(
       before === null || before.parentNode === container,
       'before node must be child of container',
@@ -21,8 +18,7 @@ function insertRange(fiber: Fiber, end: null | Fiber, container: Node, before: n
   do {
     const { dom, child } = current;
     if (dom) {
-      // istanbul ignore next
-      if (__DEBUG__) assert(dom.parentNode === null, 'fiber must not already be mounted');
+      debug: assert(dom.parentNode === null, 'fiber must not already be mounted');
 
       if (child) insertRange(child, null, dom, null);
       container.insertBefore(dom, before);
