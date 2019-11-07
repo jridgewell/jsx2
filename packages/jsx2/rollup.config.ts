@@ -4,7 +4,6 @@ import sourceMaps from 'rollup-plugin-sourcemaps';
 import typescript from 'rollup-plugin-typescript';
 import strip from '@rollup/plugin-strip';
 
-
 const pkg = require('./package.json');
 
 export default {
@@ -15,11 +14,11 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   plugins: [
-    // Eliminate debug blocks.
-    strip({ functions: [], labels: ['debug'] }),
-
     // Compile TypeScript files
     typescript(),
+
+    // Eliminate debug blocks.
+    strip({ include: '**/*.ts', functions: [], labels: ['debug'] }),
 
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
