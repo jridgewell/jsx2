@@ -10,7 +10,7 @@ function verifyRange(fiber: Fiber, end: null | Fiber, parent: null | Fiber): voi
   let current: null | Fiber = fiber;
   let i = 0;
   do {
-    assert(current, 'end is guaranteed to prevent null loop');
+    assert(current !== null, 'end is guaranteed to prevent null loop');
     assert(current.index === i, 'unexpected index');
     assert(current.parent === parent, 'unexpected parent');
 

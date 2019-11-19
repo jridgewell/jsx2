@@ -37,7 +37,7 @@ export function remove(
 function removeRange(fiber: Fiber, end: null | Fiber, container: Node): void {
   let current: null | Fiber = fiber;
   do {
-    debug: assert(current, 'end is guaranteed to prevent null loop');
+    debug: assert(current !== null, 'end is guaranteed to prevent null loop');
     const { dom, child } = current;
     if (dom) {
       container.removeChild(dom);
