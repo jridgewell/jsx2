@@ -1,6 +1,7 @@
 type Fiber = import('.').Fiber;
 
 import { setRef } from '../diff/ref';
+import { assert } from '../util/assert';
 
 export function unmount(fiber: Fiber): void {
   unmountRange(fiber, fiber.next);
@@ -9,10 +10,11 @@ export function unmount(fiber: Fiber): void {
 function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
-    const { ref, child } = current!;
+    debug: assert(current, 'end is guaranteed to prevent null loop');
+    const { ref, child } = current;
     if (ref) setRef(null, ref);
     if (child) unmountRange(child, null);
 
-    current = current!.next;
+    current = current.next;
   } while (current !== end);
 }

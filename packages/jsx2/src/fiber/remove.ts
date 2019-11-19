@@ -37,13 +37,14 @@ export function remove(
 function removeRange(fiber: Fiber, end: null | Fiber, container: Node): void {
   let current: null | Fiber = fiber;
   do {
-    const { dom, child } = current!;
+    debug: assert(current, 'end is guaranteed to prevent null loop');
+    const { dom, child } = current;
     if (dom) {
       container.removeChild(dom);
     } else if (child) {
       removeRange(child, null, container);
     }
 
-    current = current!.next;
+    current = current.next;
   } while (current !== end);
 }

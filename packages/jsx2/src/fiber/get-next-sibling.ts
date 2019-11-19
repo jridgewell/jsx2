@@ -7,7 +7,10 @@ export function getNextSibling(fiber: Fiber, container: Node, skipSelf?: boolean
   while (current !== null) {
     const { dom } = current;
     if (dom) {
-      debug: assert(dom.parentNode === container, 'dom must be a child of the container');
+      debug: assert(
+        dom.parentNode === null || dom.parentNode === container,
+        'dom must be a child of the container, or not a child',
+      );
       return dom;
     }
 
