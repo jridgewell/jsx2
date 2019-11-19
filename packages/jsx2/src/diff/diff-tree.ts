@@ -7,14 +7,18 @@ type ClassComponentVNode = import('../create-element').ClassComponentVNode;
 type RefWork = import('./ref').RefWork;
 
 import { isFunctionComponent } from '../component';
+import { isValidElement } from '../create-element';
 import { getNextSibling } from '../fiber/get-next-sibling';
 import { insert } from '../fiber/insert';
 import { remove } from '../fiber/remove';
+import { reorderAfter } from '../fiber/reorder-after';
 import { replace } from '../fiber/replace';
 import { unmount } from '../fiber/unmount';
 import { verify } from '../fiber/verify';
+import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
+import { equals } from '../util/nullish-equals';
 import { createChild } from './create-tree';
 import { diffProps } from './prop';
 import { deferRef } from './ref';
@@ -122,21 +126,46 @@ function renderArray(
   let current: null | Fiber = old.child;
   let last: null | Fiber = null;
   for (; i < renderable.length && current !== null; i++) {
-    const f = diffChild(current, coerceRenderable(renderable[i]), old, last, container, refs);
+    const r = coerceRenderable(renderable[i]);
+    if (isValidElement(r) && !equals(current.key, r.key)) break;
+    const f = diffChild(current, r, old, last, container, refs);
     last = f;
     current = f.next;
   }
 
+  const keyed = Object.create(null) as Record<string, undefined | Fiber>;
+  for (let c = current; c !== null; c = c.next) {
+    const { key } = c;
+    keyed[key === null ? c.index : key] = c;
+  }
+
+  debug: assert(old.dom === null, 'array fibers never naver have a DOM, so we may safely skip it');
   const before = getNextSibling(last || old, container, true);
   for (; i < renderable.length; i++) {
-    current = createChild(coerceRenderable(renderable[i]), old, last, refs);
-    last = current;
-    insert(current, container, before);
+    const r = coerceRenderable(renderable[i]);
+    if (isValidElement(r)) {
+      const key = r.key === null ? i : r.key;
+      const already = keyed[key];
+
+      if (already) {
+        if (reorderAfter(already, old, last)) {
+          insert(already, container, before);
+        }
+        const f = diffChild(already, r, old, last, container, refs);
+        last = f;
+        continue;
+      }
+    }
+
+    const f = createChild(r, old, last, refs);
+    last = f;
+    insert(f, container, before);
   }
 
   current = last ? last.next : old.child;
   while (current !== null) {
     unmount(current);
+    // TODO: This could lead to a null child, when it should be a NullFiber.
     current = remove(current, old, last, container);
   }
   return old;

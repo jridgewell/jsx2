@@ -17,10 +17,10 @@ export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node
   unmount(old);
   insert(fiber, container, getNextSibling(old, container));
 
-  debug: {
-    fiber.next = old;
-    increment(old, 1);
-  }
+  // Remove will decrement all indexes, but we're replacing. So offset.
+  debug: increment(old, 1, null);
+  // Remove requires that the previous fiber point at the fiber being remvoed.
+  fiber.next = old;
 
   remove(old, parent, fiber, container);
   return fiber;
