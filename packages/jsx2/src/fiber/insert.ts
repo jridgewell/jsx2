@@ -10,9 +10,6 @@ export function insert(fiber: Fiber, container: Node, before: null | Node): void
       'before node must be child of container',
     );
   }
-  if (before !== null) {
-    if (getNextSibling(fiber, container, true) === before) return;
-  }
   insertRange(fiber, fiber.next, container, before);
 }
 
