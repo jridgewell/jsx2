@@ -21,9 +21,10 @@ export function reorderAfter(fiber: Fiber, parent: Fiber, previous: null | Fiber
   const before = getPreviousFiber(fiber, parent);
   const { next } = fiber;
 
-  if (before) before.next = next;
+  debug: assert(before !== null, 'must be a before node due to if-checks above');
+  before.next = next;
   const after = previous ? previous.next : parent.child;
-  debug: assert(after !== null, 'previous must have a next node');
+  debug: assert(after !== null, 'must be an after node');
   increment(after, 1, next);
   fiber.next = after;
 
