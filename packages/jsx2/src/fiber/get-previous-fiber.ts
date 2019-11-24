@@ -8,10 +8,11 @@ export function getPreviousFiber(fiber: Fiber, parent: Fiber): null | Fiber {
   let current = parent.child;
   if (current === fiber) return null;
 
-  while (current !== null) {
+  while (true) {
+    debug: assert(current !== null, 'guaranteed to find fiber in children');
     const { next } = current;
-    if (next === fiber) return current;
+    if (next === fiber) break;
     current = next;
   }
-  debug: assert(false, 'could not find previous fiber');
+  return current;
 }

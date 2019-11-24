@@ -18,7 +18,7 @@ export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node
   insert(fiber, container, getNextSibling(old, container));
 
   // Remove will decrement all indexes, but we're replacing. So offset.
-  debug: increment(old, 1, null);
+  debug: increment(old, 1);
   // Remove requires that the previous fiber point at the fiber being remvoed.
   fiber.next = old;
 

@@ -27,7 +27,7 @@ export function remove(
     parent.child = next;
   }
 
-  debug: if (next) increment(next, -1, null);
+  debug: if (next) increment(next, -1);
 
   return next;
 }

@@ -22,12 +22,10 @@ export function reorderAfter(fiber: Fiber, parent: Fiber, previous: null | Fiber
   const { next } = fiber;
 
   if (before) before.next = next;
-  if (previous) {
-    const after = previous.next;
-    debug: assert(after !== null, 'previous must have a next node');
-    increment(after, 1, next);
-    fiber.next = after;
-  }
+  const after = previous ? previous.next : parent.child;
+  debug: assert(after !== null, 'previous must have a next node');
+  increment(after, 1, next);
+  fiber.next = after;
 
   mark(fiber, parent, previous);
   return true;
