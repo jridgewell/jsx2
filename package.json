@@ -11,6 +11,6 @@
   "author": "Justin Ridgewell <justin@ridgewell.name>",
   "license": "MIT",
   "devDependencies": {
-    "lerna": "3.20.0"
+    "lerna": "3.20.1"
   }
 }
