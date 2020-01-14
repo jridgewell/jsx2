@@ -121,7 +121,6 @@ function renderArray(
   }
   old.data = renderable;
 
-  // TODO: Figure out key.
   let i = 0;
   let current: null | Fiber = old.child;
   let last: null | Fiber = null;
@@ -165,7 +164,6 @@ function renderArray(
   current = last ? last.next : old.child;
   while (current !== null) {
     unmount(current);
-    // TODO: This could lead to a null child, when it should be a NullFiber.
     current = remove(current, old, last, container);
   }
   return old;

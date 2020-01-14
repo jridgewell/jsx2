@@ -38,7 +38,6 @@ export function createChild(
 
   if (isArray(renderable)) {
     let last: null | Fiber = null;
-    // TODO: this could lead to a null child.
     for (let i = 0; i < renderable.length; i++) {
       const child = createChild(coerceRenderable(renderable[i]), f, last, refs);
       mark(child, f, last);
