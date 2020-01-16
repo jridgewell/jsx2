@@ -5,7 +5,7 @@ export interface FunctionComponent {
 }
 
 export class Component {
-  render(props: object): void | Renderable {}
+  render(_props: object): void | Renderable {}
 }
 
 export function isFunctionComponent(value: Function): value is FunctionComponent {

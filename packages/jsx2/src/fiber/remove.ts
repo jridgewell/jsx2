@@ -1,7 +1,6 @@
 type Fiber = import('.').Fiber;
 
 import { assert } from '../util/assert';
-import { increment } from './increment';
 
 export function remove(
   fiber: Fiber,
@@ -26,8 +25,6 @@ export function remove(
   } else {
     parent.child = next;
   }
-
-  debug: if (next) increment(next, -1);
 
   return next;
 }

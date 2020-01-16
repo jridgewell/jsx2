@@ -8,14 +8,14 @@ type RefWork = import('./ref').RefWork;
 
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
+import { clone } from '../fiber/clone';
 import { getNextSibling } from '../fiber/get-next-sibling';
 import { insert } from '../fiber/insert';
+import { mark } from '../fiber/mark';
 import { remove } from '../fiber/remove';
-import { reorderAfter } from '../fiber/reorder-after';
 import { replace } from '../fiber/replace';
 import { unmount } from '../fiber/unmount';
 import { verify } from '../fiber/verify';
-import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { equals } from '../util/nullish-equals';
@@ -138,30 +138,39 @@ function renderArray(
     keyed[key === null ? c.index : key] = c;
   }
 
-  debug: assert(old.dom === null, 'array fibers never naver have a DOM, so we may safely skip it');
-  const before = getNextSibling(last || old, container, true);
+  // If we have a last node, we want to get its next's DOM. If not, we want to
+  // descend into the old fiber to find the next DOM.
+  const before = getNextSibling(last || old, container, !!last);
   for (; i < renderable.length; i++) {
     const r = coerceRenderable(renderable[i]);
+
     if (isValidElement(r)) {
       const key = r.key === null ? i : r.key;
       const already = keyed[key];
 
       if (already) {
-        if (reorderAfter(already, old, last)) {
-          insert(already, container, before);
+        const cloned = clone(already);
+        mark(cloned, old, last);
+
+        if (current === already) {
+          current = current.next;
+        } else {
+          insert(cloned, container, before);
         }
-        const f = diffChild(already, r, old, last, container, refs);
+
+        const f = diffChild(cloned, r, old, last, container, refs);
         last = f;
+        f.next = null;
         continue;
       }
     }
 
     const f = createChild(r, old, last, refs);
-    last = f;
     insert(f, container, before);
+    last = f;
   }
 
-  current = last ? last.next : old.child;
+  if (last) last.next = current;
   while (current !== null) {
     unmount(current);
     current = remove(current, old, last, container);

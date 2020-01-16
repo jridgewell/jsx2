@@ -1,7 +1,6 @@
 type Fiber = import('.').Fiber;
 
 import { assert } from '../util/assert';
-import { getNextSibling } from './get-next-sibling';
 
 export function insert(fiber: Fiber, container: Node, before: null | Node): void {
   debug: {

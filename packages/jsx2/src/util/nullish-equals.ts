@@ -1,4 +1,4 @@
-type Primitive = number | string | boolean;
+// type Primitive = number | string | boolean;
 type Nullish<T> = null | undefined | T;
 
 export function equals<T extends object | Function>(a: Nullish<T>, b: Nullish<T>): boolean;
