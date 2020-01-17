@@ -49,57 +49,43 @@ describe('diffTree', () => {
     }
   }
 
+  function spyOn<T extends {}, M extends jest.FunctionPropertyNames<Required<T>>>(
+    obj: T,
+    method: M,
+    spy: (...args: jest.ArgsType<Required<T>[M]>) => void,
+  ) {
+    const original = (obj[method] as unknown) as (...args: jest.ArgsType<Required<T>[M]>) => any;
+    jest.spyOn(obj, method).mockImplementation((...args) => {
+      spy(...args);
+      return original.apply(obj, args);
+    });
+  }
+
   type Mutations = { added: Node[]; removed: Node[] };
-  function listenForChildMutations(container: Node): () => Mutations {
-    const appendChild = jest.spyOn(container, 'appendChild');
-    const insertBefore = jest.spyOn(container, 'insertBefore');
-    const removeChild = jest.spyOn(container, 'removeChild');
-    const replaceChild = jest.spyOn(container, 'replaceChild');
+  function listenForChildMutations(container: Node): Mutations {
+    const added: Node[] = [];
+    const removed: Node[] = [];
 
-    type Zip =
-      | { name: 'appendChild' | 'removeChild'; call: [Node]; order: number }
-      | { name: 'insertBefore'; call: [Node, Node | null]; order: number }
-      | { name: 'replaceChild'; call: [Node, Node]; order: number };
-    function zipMock(name: Zip['name'], spy: jest.SpyInstance<Node, Zip['call']>): Zip[] {
-      const { calls, invocationCallOrder } = spy.mock;
-      const zips: Zip[] = [];
-      for (let i = 0; i < calls.length; i++) {
-        zips.push({ name, call: calls[i], order: invocationCallOrder[i] } as Zip);
-      }
-      return zips;
-    }
+    jest.spyOn(container, 'appendChild');
 
-    return () => {
-      const added: Node[] = [];
-      const removed: Node[] = [];
+    spyOn(container, 'appendChild', (child: Node) => {
+      if (child.parentNode === container) removed.push(child);
+      added.push(child);
+    });
+    spyOn(container, 'insertBefore', (child: Node) => {
+      if (child.parentNode === container) removed.push(child);
+      added.push(child);
+    });
+    spyOn(container, 'removeChild', (child: Node) => {
+      removed.push(child);
+    });
+    spyOn(container, 'replaceChild', (child: Node, oldChild: Node) => {
+      if (child.parentNode === container) removed.push(child);
+      added.push(child);
+      removed.push(oldChild);
+    });
 
-      const zips = [
-        ...zipMock('appendChild', appendChild),
-        ...zipMock('insertBefore', insertBefore),
-        ...zipMock('removeChild', removeChild),
-        ...zipMock('replaceChild', replaceChild),
-      ];
-      zips.sort((a, b) => a.order - b.order);
-
-      for (const zip of zips) {
-        switch (zip.name) {
-          case 'appendChild':
-            added.push(zip.call[0]);
-            break;
-          case 'insertBefore':
-            added.push(zip.call[0]);
-            break;
-          case 'removeChild':
-            removed.push(zip.call[0]);
-            break;
-          case 'replaceChild':
-            added.push(zip.call[0]);
-            removed.push(zip.call[1]);
-            break;
-        }
-      }
-      return { added, removed };
-    };
+    return { added, removed };
   }
 
   describe('rendered null', () => {
@@ -1399,16 +1385,7 @@ describe('diffTree', () => {
       });
 
       describe('keyed children', () => {
-        // keyed element is first child
-        //   next has dom in array
-        //   array's next has dom
-        //   no next in container
-        // keyed element is second child
-        //   next has dom in array
-        //   array's next has dom
-        //   no next in container
-
-        it('reuses keyed child in same position', () => {
+        it('updates keyed child in same position', () => {
           const container = document.createElement('body');
           const tree = makeOldFiberTree(
             [
@@ -1422,19 +1399,45 @@ describe('diffTree', () => {
             createElement('second', { key: 'second', id: 'after' }),
           ];
           const oldChildren = Array.from(container.childNodes);
-          const getMutations = listenForChildMutations(container);
+          const { added, removed } = listenForChildMutations(container);
 
           diff(tree, renderable, container);
 
           const childNodes = Array.from(container.childNodes);
           expectShallowEqual(childNodes, oldChildren);
 
-          const { added, removed } = getMutations();
           expectShallowEqual(added, []);
           expectShallowEqual(removed, []);
         });
 
-        it('reuses keyed child in earlier position', () => {
+        it('updates keyed child in different position', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { key: 'first', id: 'before' }),
+              createElement('second', { key: 'second', id: 'before' }),
+              createElement('third', { key: 'third', id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [
+            createElement('third', { key: 'third', id: 'after' }),
+            createElement('second', { key: 'second', id: 'after' }),
+            createElement('first', { key: 'first', id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expectShallowEqual(childNodes, [oldChildren[2], oldChildren[1], oldChildren[0]]);
+
+          expectShallowEqual(added, [oldChildren[2], oldChildren[1]]);
+          expectShallowEqual(removed, [oldChildren[2], oldChildren[1]]);
+        });
+
+        it('removes keyed child before reused keyed child', () => {
           const container = document.createElement('body');
           const tree = makeOldFiberTree(
             [
@@ -1445,19 +1448,130 @@ describe('diffTree', () => {
           );
           const renderable = [createElement('second', { key: 'second', id: 'after' })];
           const oldChildren = Array.from(container.childNodes);
-          const getMutations = listenForChildMutations(container);
+          const { added, removed } = listenForChildMutations(container);
 
           diff(tree, renderable, container);
 
           const childNodes = Array.from(container.childNodes);
           expectShallowEqual(childNodes, [oldChildren[1]]);
 
-          const { added, removed } = getMutations();
           expectShallowEqual(added, [oldChildren[1]]);
-          expectShallowEqual(removed, [oldChildren[0]]);
+          expectShallowEqual(removed, [oldChildren[1], oldChildren[0]]);
         });
 
-        it('reuses keyed child in later position', () => {
+        it('removes keyed child before reused non-keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { key: 'first', id: 'before' }),
+              createElement('second', { id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [createElement('second', { id: 'before' })];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(1);
+          expectElement(childNodes[0], 'second');
+
+          expectShallowEqual(added, [childNodes[0]]);
+          expectShallowEqual(removed, oldChildren);
+        });
+
+        it('removes keyed child after reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { key: 'first', id: 'before' }),
+              createElement('second', { key: 'second', id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [createElement('first', { key: 'first', id: 'after' })];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expectShallowEqual(childNodes, [oldChildren[0]]);
+
+          expectShallowEqual(added, []);
+          expectShallowEqual(removed, [oldChildren[1]]);
+        });
+
+        it('removes keyed child after reused non-keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { id: 'before' }),
+              createElement('second', { key: 'second', id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [createElement('first', { id: 'before' })];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(1);
+          expectShallowEqual(childNodes, [oldChildren[0]]);
+
+          expectShallowEqual(added, []);
+          expectShallowEqual(removed, [oldChildren[1]]);
+        });
+
+        it('removes non-keyed child before reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { id: 'before' }),
+              createElement('second', { key: 'second', id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [createElement('second', { key: 'second', id: 'after' })];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expectShallowEqual(childNodes, [oldChildren[1]]);
+
+          expectShallowEqual(added, [oldChildren[1]]);
+          expectShallowEqual(removed, [oldChildren[1], oldChildren[0]]);
+        });
+
+        it('removes non-keyed child after reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { key: 'first', id: 'before' }),
+              createElement('second', { id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [createElement('first', { key: 'first', id: 'after' })];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expectShallowEqual(childNodes, [oldChildren[0]]);
+
+          expectShallowEqual(added, []);
+          expectShallowEqual(removed, [oldChildren[1]]);
+        });
+
+        it('inserts keyed child before reused keyed child', () => {
           const container = document.createElement('body');
           const tree = makeOldFiberTree(
             [createElement('second', { key: 'second', id: 'before' })],
@@ -1468,7 +1582,7 @@ describe('diffTree', () => {
             createElement('second', { key: 'second', id: 'after' }),
           ];
           const oldChildren = Array.from(container.childNodes);
-          const getMutations = listenForChildMutations(container);
+          const { added, removed } = listenForChildMutations(container);
 
           diff(tree, renderable, container);
 
@@ -1477,12 +1591,151 @@ describe('diffTree', () => {
           expectElement(childNodes[0], 'first');
           expect(childNodes[1]).toBe(oldChildren[0]);
 
-          const { added, removed } = getMutations();
           expectShallowEqual(added, [childNodes[0]]);
           expect(removed).toHaveLength(0);
         });
 
-        it('reuses non-keyed child in same position after a keyed child', () => {
+        it('inserts keyed child before reused non-keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree([createElement('second', { id: 'before' })], container);
+          const renderable = [
+            createElement('first', { key: 'first', id: 'after' }),
+            createElement('second', { id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(2);
+          expectElement(childNodes[0], 'first');
+          expectElement(childNodes[1], 'second');
+          expect(childNodes[1]).not.toBe(oldChildren[0]);
+
+          expectShallowEqual(added, childNodes);
+          expectShallowEqual(removed, oldChildren);
+        });
+
+        it('inserts keyed child after reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [createElement('first', { key: 'first', id: 'before' })],
+            container,
+          );
+          const renderable = [
+            createElement('first', { key: 'first', id: 'after' }),
+            createElement('second', { key: 'second', id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(2);
+          expect(childNodes[0]).toBe(oldChildren[0]);
+          expectElement(childNodes[1], 'second');
+
+          expectShallowEqual(added, [childNodes[1]]);
+          expect(removed).toHaveLength(0);
+        });
+
+        it('inserts keyed child after reused non-keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree([createElement('first', { id: 'before' })], container);
+          const renderable = [
+            createElement('first', { id: 'after' }),
+            createElement('second', { key: 'second', id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(2);
+          expect(childNodes[0]).toBe(oldChildren[0]);
+          expectElement(childNodes[1], 'second');
+
+          expectShallowEqual(added, [childNodes[1]]);
+          expect(removed).toHaveLength(0);
+        });
+
+        it('inserts non-keyed child before reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [createElement('second', { key: 'second', id: 'before' })],
+            container,
+          );
+          const renderable = [
+            createElement('first', { id: 'after' }),
+            createElement('second', { key: 'second', id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(2);
+          expectElement(childNodes[0], 'first');
+          expect(childNodes[1]).toBe(oldChildren[0]);
+
+          expectShallowEqual(added, [childNodes[0]]);
+          expect(removed).toHaveLength(0);
+        });
+
+        it('inserts non-keyed child after reused keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [createElement('first', { key: 'first', id: 'before' })],
+            container,
+          );
+          const renderable = [
+            createElement('first', { key: 'first', id: 'after' }),
+            createElement('second', { id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expect(childNodes).toHaveLength(2);
+          expect(childNodes[0]).toBe(oldChildren[0]);
+          expectElement(childNodes[1], 'second');
+
+          expectShallowEqual(added, [childNodes[1]]);
+          expect(removed).toHaveLength(0);
+        });
+
+        it('updates non-keyed child in same position before a keyed child', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(
+            [
+              createElement('first', { id: 'before' }),
+              createElement('second', { key: 'second', id: 'before' }),
+            ],
+            container,
+          );
+          const renderable = [
+            createElement('first', { id: 'after' }),
+            createElement('second', { key: 'second', id: 'after' }),
+          ];
+          const oldChildren = Array.from(container.childNodes);
+          const { added, removed } = listenForChildMutations(container);
+
+          diff(tree, renderable, container);
+
+          const childNodes = Array.from(container.childNodes);
+          expectShallowEqual(childNodes, oldChildren);
+
+          expectShallowEqual(added, []);
+          expectShallowEqual(removed, []);
+        });
+
+        it('updates non-keyed child in same position after a keyed child', () => {
           const container = document.createElement('body');
           const tree = makeOldFiberTree(
             [
@@ -1493,27 +1746,19 @@ describe('diffTree', () => {
           );
           const renderable = [
             createElement('first', { key: 'first', id: 'after' }),
-            createElement('second', { id: 'before' }),
+            createElement('second', { id: 'after' }),
           ];
           const oldChildren = Array.from(container.childNodes);
-          const getMutations = listenForChildMutations(container);
+          const { added, removed } = listenForChildMutations(container);
 
           diff(tree, renderable, container);
 
           const childNodes = Array.from(container.childNodes);
           expectShallowEqual(childNodes, oldChildren);
 
-          const { added, removed } = getMutations();
           expectShallowEqual(added, []);
           expectShallowEqual(removed, []);
         });
-
-        it.todo('removes keyed child before reused keyed child');
-        it.todo('removes keyed child before reused non-keyed child');
-        it.todo('removes keyed child after reused keyed child');
-        it.todo('removes keyed child after reused non-keyed child');
-
-        it.todo('reorders keyed children');
       });
     });
   });
