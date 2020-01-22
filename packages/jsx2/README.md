@@ -1,6 +1,6 @@
 # `jsx2`
 
-> Reimagining JSX, faster performance with less memory
+> Just your normal (JSX) syntax, with faster performance and less memory.
 
 ## Usage
 

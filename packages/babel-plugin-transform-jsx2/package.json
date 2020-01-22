@@ -1,7 +1,7 @@
 {
   "name": "babel-plugin-transform-jsx2",
   "version": "0.0.0",
-  "description": "Reimagining JSX, faster performance with less memory",
+  "description": "Just your normal (JSX) syntax, with faster performance and less memory",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage"
