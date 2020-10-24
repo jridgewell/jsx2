@@ -4,13 +4,11 @@
   "description": "Just your normal (JSX) syntax, with faster performance and less memory",
   "private": true,
   "scripts": {
-    "pretest": "lerna bootstrap",
-    "test-only": "lerna run test",
-    "test": "npm run test-only"
+    "test": "node ./test.js"
   },
   "author": "Justin Ridgewell <justin@ridgewell.name>",
   "license": "MIT",
-  "devDependencies": {
-    "lerna": "3.22.1"
-  }
+  "workspaces": [
+    "./packages/*"
+  ]
 }
