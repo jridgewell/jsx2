@@ -67,7 +67,7 @@ module.exports = function({ types: t, template }, options = {}) {
     const lazyTree = template.statement.ast`
       function ${id}(${json ? null : 'createElement'}) {
         const tree = ${tree};
-        ${id} = () => tree;
+        ${t.cloneNode(id)} = () => tree;
         return tree;
       }
     `;
@@ -75,7 +75,7 @@ module.exports = function({ types: t, template }, options = {}) {
 
     return template.expression.ast`
       ${pragmaTemplate}(
-        ${id}(${json ? null : pragma}),
+        ${t.cloneNode(id)}(${json ? null : pragma}),
         ${t.arrayExpression(expressions)}
       )
     `;
