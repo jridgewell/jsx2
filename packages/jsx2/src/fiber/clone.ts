@@ -1,6 +1,6 @@
 type Fiber = import('.').Fiber;
 
-import { fiber } from '.';
+import { fiber } from './index';
 
 export function clone<T extends Fiber>(current: T): T {
   const clone = fiber(current.data);
