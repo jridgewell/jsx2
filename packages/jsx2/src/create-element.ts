@@ -19,7 +19,7 @@ export interface FunctionComponentVNode extends SharedVNode {
 }
 
 export interface ClassComponentVNode extends SharedVNode {
-  readonly type: new (props: object) => Component;
+  readonly type: new (props: Record<string, unknown>) => Component;
 }
 
 export type VNode = ElementVNode | FunctionComponentVNode | ClassComponentVNode;

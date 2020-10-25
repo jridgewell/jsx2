@@ -26,7 +26,7 @@ describe('getPreviousFiber', () => {
     const current = fiber('current');
     let previous = null;
     for (let i = 0; i < 10; i++) {
-      let f = fiber('' + i);
+      const f = fiber('' + i);
       mark(f, parent, previous);
       previous = f;
     }

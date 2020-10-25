@@ -5,6 +5,7 @@ import { createElement, Component } from '../../src/jsx2';
 
 describe('unmount', () => {
   class C extends Component {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     render() {}
   }
 

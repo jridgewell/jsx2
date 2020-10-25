@@ -7,7 +7,7 @@ import { remove } from './remove';
 import { unmount } from './unmount';
 
 export function replace(old: Fiber, fiber: Fiber, parent: Fiber, container: Node): Fiber {
-  debug: {
+  {
     assert(old.parent === parent, 'old must be child of parent');
     assert(fiber.parent === parent, 'fiber must be child of parent');
     assert(old.index === fiber.index, 'replacement fiber must have same index');

@@ -21,7 +21,7 @@ export type Renderable =
   | VNode
   // | TemplateResult
   | RenderableArray;
-export interface RenderableArray extends ReadonlyArray<Renderable> {}
+export type RenderableArray = ReadonlyArray<Renderable>;
 
 export function render(_renderable: Renderable, container: Container): void {
   const renderable = createElement(Fragment, null, _renderable);

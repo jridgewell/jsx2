@@ -3,7 +3,7 @@ type Fiber = import('.').Fiber;
 import { assert } from '../util/assert';
 
 export function insert(fiber: Fiber, container: Node, before: null | Node): void {
-  debug: {
+  {
     assert(
       before === null || before.parentNode === container,
       'before node must be child of container',
@@ -17,7 +17,7 @@ function insertRange(fiber: Fiber, end: null | Fiber, container: Node, before: n
   do {
     const { dom, child } = current!;
     if (dom) {
-      debug: assert(
+      assert(
         dom.parentNode === null || dom.parentNode === container,
         'fiber must not already be mounted, or be mounted as a direct child of container',
       );

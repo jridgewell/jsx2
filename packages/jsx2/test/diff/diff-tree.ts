@@ -49,6 +49,7 @@ describe('diffTree', () => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   function spyOn<T extends {}, M extends jest.FunctionPropertyNames<Required<T>>>(
     obj: T,
     method: M,

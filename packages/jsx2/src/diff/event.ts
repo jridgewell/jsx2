@@ -35,6 +35,6 @@ export function diffEvent(
 
 function listener(this: ListenerElement, event: Event): void {
   const listener = this._listeners[event.type];
-  debug: assert(listener !== null, `listener ${event.type} was not found`);
+  assert(listener !== null, `listener ${event.type} was not found`);
   listener(event);
 }

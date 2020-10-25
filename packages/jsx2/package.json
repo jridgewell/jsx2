@@ -27,7 +27,7 @@
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:lint": "run-s -n test:lint:*",
     "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
-    "test:lint:ts": "tslint  --project tsconfig.json -t codeFrame '{src,test}/**/*.ts'",
+    "test:lint:ts": "eslint '{src,test}/**/*.ts'",
     "test:only": "jest --coverage",
     "test:watch": "jest --coverage --watch",
     "preversion": "run-s test build",
@@ -38,15 +38,15 @@
     "@rollup/plugin-typescript": "6.0.0",
     "@types/jest": "26.0.15",
     "@types/jsdom": "16.2.4",
+    "@typescript-eslint/eslint-plugin": "4.5.0",
+    "@typescript-eslint/parser": "4.5.0",
+    "eslint": "7.12.0",
     "jest": "26.6.1",
     "jest-config": "26.6.1",
     "npm-run-all": "4.1.5",
     "prettier": "2.1.2",
     "rollup": "2.32.1",
     "ts-jest": "26.4.2",
-    "tslint": "6.1.3",
-    "tslint-config-prettier": "1.18.0",
-    "tslint-config-standard": "9.0.0",
     "typescript": "4.0.3"
   }
 }
