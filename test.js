@@ -10,7 +10,7 @@ for (const package of packages) {
   if (stats.isFile()) continue;
 
   console.log(`Testing ${package}`);
-  const cp = spawnSync('npm', ['test'], { cwd, stdio: 'inherit' });
+  const cp = spawnSync('npm', ['test', '--if-present'], { cwd, stdio: 'inherit' });
   if (cp.status !== 0) {
     status = cp.status;
   }
