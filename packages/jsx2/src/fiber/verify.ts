@@ -3,7 +3,8 @@ import type { Fiber } from '.';
 import { assert } from '../util/assert';
 
 export function verify(fiber: Fiber): void {
-  debug: verifyRange(fiber, fiber.next, fiber.parent);
+  const root = fiber.index == 0 ? fiber : fiber.parent!;
+  debug: verifyRange(root, root.next, root.parent);
 }
 
 function verifyRange(fiber: Fiber, end: null | Fiber, parent: null | Fiber): void {

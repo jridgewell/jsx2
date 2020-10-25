@@ -6,6 +6,7 @@ import type { ElementVNode } from '../create-element';
 import type { FunctionComponentVNode } from '../create-element';
 import type { ClassComponentVNode } from '../create-element';
 import type { RefWork } from './ref';
+import type { EffectState } from '../hooks';
 
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
@@ -24,16 +25,19 @@ import { createChild } from './create-tree';
 import { diffProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
+import { applyLayoutEffects } from './apply-layout-effects';
 
 export function diffTree(
   old: Fiber,
   renderable: CoercedRenderable,
   container: Node,
+  layoutEffects: EffectState[] = [],
 ): void {
   const refs: RefWork[] = [];
-  diffChild(old.child!, renderable, old, null, container, refs);
+  diffChild(old.child!, renderable, old, null, container, refs, layoutEffects);
   verify(old);
   applyRefs(refs);
+  applyLayoutEffects(layoutEffects);
 }
 
 function diffChild(
@@ -43,20 +47,21 @@ function diffChild(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
   const { data } = old;
   if (data === renderable) return old;
 
   if (renderable === null) {
-    return renderNull(old, renderable, parentFiber, previousFiber, container, refs);
+    return renderNull(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
   }
 
   if (typeof renderable === 'string') {
-    return renderText(old, renderable, parentFiber, previousFiber, container, refs);
+    return renderText(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
   }
 
   if (isArray(renderable)) {
-    return renderArray(old, renderable, parentFiber, previousFiber, container, refs);
+    return renderArray(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
   }
 
   const { type } = renderable;
@@ -68,6 +73,7 @@ function diffChild(
       previousFiber,
       container,
       refs,
+      layoutEffects,
     );
   }
 
@@ -78,6 +84,7 @@ function diffChild(
     previousFiber,
     container,
     refs,
+    layoutEffects,
   );
 }
 
@@ -88,8 +95,9 @@ function renderNull(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
-  return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+  return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
 }
 
 function renderText(
@@ -99,10 +107,19 @@ function renderText(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
   const { data } = old;
   if (typeof data !== 'string') {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
   old.data = renderable;
 
@@ -117,10 +134,19 @@ function renderArray(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
   const { data } = old;
   if (!isArray(data)) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
   old.data = renderable;
 
@@ -130,7 +156,7 @@ function renderArray(
   for (; i < renderable.length && current !== null; i++) {
     const r = coerceRenderable(renderable[i]);
     if (isValidElement(r) && !equals(current.key, r.key)) break;
-    const f = diffChild(current, r, old, last, container, refs);
+    const f = diffChild(current, r, old, last, container, refs, layoutEffects);
     last = f;
     current = f.next;
   }
@@ -161,14 +187,14 @@ function renderArray(
           insert(cloned, container, before);
         }
 
-        const f = diffChild(cloned, r, old, last, container, refs);
+        const f = diffChild(cloned, r, old, last, container, refs, layoutEffects);
         last = f;
         f.next = null;
         continue;
       }
     }
 
-    const f = createChild(r, old, last, refs);
+    const f = createChild(r, old, last, refs, layoutEffects);
     insert(f, container, before);
     last = f;
   }
@@ -188,15 +214,32 @@ function renderElement(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
 
   const { type } = renderable;
   if (type !== data.type) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
   old.data = renderable;
 
@@ -204,7 +247,7 @@ function renderElement(
   const { props } = renderable;
   const dom = old.dom!;
   diffProps(dom as HTMLElement, oldProps, props);
-  diffChild(old.child!, coerceRenderable(props.children), old, null, dom, refs);
+  diffChild(old.child!, coerceRenderable(props.children), old, null, dom, refs, layoutEffects);
   deferRef(refs, dom, data.ref, renderable.ref);
   return old;
 }
@@ -216,26 +259,43 @@ function renderComponent(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
   old.data = renderable;
 
   const { type } = renderable;
   if (type !== data.type) {
-    return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs);
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
 
   const { props } = renderable;
   const rendered = coerceRenderable(
     isFunctionComponent(type)
-      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber)
+      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber, layoutEffects)
       : old.component!.render(props),
   );
 
-  diffChild(old.child!, rendered, old, null, container, refs);
+  diffChild(old.child!, rendered, old, null, container, refs, layoutEffects);
   return old;
 }
 
@@ -246,7 +306,8 @@ function replaceFiber(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
+  layoutEffects: EffectState[],
 ): Fiber {
-  const f = createChild(renderable, parentFiber, previousFiber, refs);
+  const f = createChild(renderable, parentFiber, previousFiber, refs, layoutEffects);
   return replace(old, f, parentFiber, container);
 }

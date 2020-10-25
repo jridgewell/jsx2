@@ -1,5 +1,6 @@
 import type { FunctionComponentFiber } from '../fiber';
 import type { FunctionComponentVNode } from '../create-element';
+import type { EffectState } from '../hooks';
 
 import { defer } from '../defer';
 import { getContainer } from '../fiber/get-container';
@@ -22,8 +23,9 @@ function process() {
 
       const renderable = fiber.data as FunctionComponentVNode;
       const { type, props } = renderable;
-      const rendered = coerceRenderable(renderComponentWithHooks(type, props, fiber));
-      diffTree(fiber, rendered, getContainer(fiber.parent!)!);
+      const layoutEffects: EffectState[] = [];
+      const rendered = coerceRenderable(renderComponentWithHooks(type, props, fiber, layoutEffects));
+      diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
     }
   }
 }

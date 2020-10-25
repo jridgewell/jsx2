@@ -1,12 +1,12 @@
-import { createElement, useState, useEffect, templateResult } from '/jsx2/jsx2';
+import { createElement, useState, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
 import logo from './logo.png';
 import './App.css';
 
-function Seconds() {
+function Seconds({ init }) {
   // Create the count state.
   const [count, setCount] = useState(0);
   // Create the counter (+1 every second).
-  useEffect(() => {
+  useLayoutEffect(() => {
     const timer = setInterval(() => {
       console.log('updating');
       setCount((count) => count + 1);
@@ -15,7 +15,7 @@ function Seconds() {
       console.log('cleanup');
       clearInterval(timer);
     };
-  }, []);
+  }, [init]);
 
   return (
     <p>
@@ -24,28 +24,30 @@ function Seconds() {
   );
 }
 
-function Enabled({ enabled, as: Comp }) {
-  console.log(enabled);
-  if (enabled) {
-    return <Comp />;
-  }
-}
-
 function App() {
   const [enabled, toggle] = useState(true);
+  const [num, setNum] = useState(0);
+  const onChangeNum = useCallback((event) => {
+    setNum(event.target.value);
+  });
+  const onChangeUnmount = useCallback(() => {
+    toggle(!enabled);
+  });
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={() => {
-            toggle(!enabled);
-          }}
-        />
-        <Enabled enabled={enabled} as={Seconds} />
+        <div>
+          <input type="number" value={num} onChange={onChangeNum} />
+        </div>
+        <div>
+          <label for="unmount">Unmount? </label>
+          <input id="unmount" type="checkbox" checked={enabled} onChange={onChangeUnmount} />
+        </div>
+        {
+          enabled ? <Seconds init={num}/> : null
+        }
       </header>
     </div>
   );

@@ -15,8 +15,11 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
     if (ref) setRef(null, ref);
     if (stateData) {
       for (let i = 0; i < stateData.length; i++) {
-        const cleanup = stateData[i].cleanup;
-        if (cleanup) cleanup();
+        const state = stateData[i];
+        if (state.effect) {
+          const { cleanup } = state.data;
+          if (cleanup) cleanup();
+        }
       }
     }
     if (child) unmountRange(child, null);

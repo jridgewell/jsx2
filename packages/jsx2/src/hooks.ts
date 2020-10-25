@@ -1,19 +1,22 @@
 import type { FunctionComponentFiber } from './fiber';
 import type { RefObject } from './create-ref';
-import type { RefWork } from './diff/ref';
 
 export type HookState = {
-  cleanup: null | undefined | void | EffectCleanup;
+  effect: false;
   data: unknown;
+} | {
+  effect: true;
+  data: EffectState;
 };
 
 type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
+  layoutEffects: EffectState[];
 };
 
-type EffectCleanup = () => void;
-type Effect = () => null | undefined | void | EffectCleanup;
+type EffectCleanup = null | undefined | void | (() => void);
+type Effect = () => EffectCleanup;
 type Lazy<S> = () => S;
 type NextState<S> = (prevState: S) => S;
 type StateSetter<S> = (nextState: S | NextState<S>) => void;
@@ -21,16 +24,23 @@ type StateState<S> = [S, StateSetter<S>];
 type Reducer<S, A> = (prevState: S, action: A) => S;
 type ReducerState<S, A> = [S, (action: A) => void];
 
+export type EffectState = {
+  deps: unknown[];
+  cleanup: EffectCleanup;
+  effect: Effect;
+};
+
 import { defer } from './defer';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 
 const fiberStack: FiberState[] = [];
 
-export function pushHooksFiber(fiber: FunctionComponentFiber): void {
+export function pushHooksFiber(fiber: FunctionComponentFiber, layoutEffects: EffectState[]): void {
   fiberStack.push({
     index: 0,
     fiber,
+    layoutEffects,
   });
 }
 
@@ -49,10 +59,7 @@ function getHookState(): HookState {
   if (stateData.length > index) {
     return stateData[index];
   }
-  return (stateData[index] = {
-    cleanup: null,
-    data: null,
-  });
+  return (stateData[index] = { effect: false, data: null });
 }
 
 function lazy<S>(f: Lazy<S>): S {
@@ -101,32 +108,29 @@ export function useEffect(effect: Effect, deps: unknown[] = []): void {
   if (shallowArrayEquals(hookState.data as null | unknown[], deps)) {
     return;
   }
+  hookState.effect = true;
   hookState.data = deps;
   // TODO: After paint
   defer(() => {
-    const { cleanup } = hookState;
-    if (cleanup) cleanup();
-    hookState.cleanup = effect();
+    // const { cleanup } = hookState;
+    // if (cleanup) cleanup();
+    // hookState.cleanup = effect();
   });
 }
 
 export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
   const hookState = getHookState();
-  if (shallowArrayEquals(hookState.data as null | unknown[], deps)) {
+  const oldData = hookState.data as EffectState;
+  if (oldData !== null && shallowArrayEquals(oldData.deps, deps)) {
     return;
   }
-  hookState.data = deps;
-  // TODO: This is super hacky. And incorrect. All the cleanups should fire first, then all the effects.
-  // Refs apply, then cleanup, then effects.
-  [].push({
-    current: null,
-    old: null,
-    ref() {
-      const { cleanup } = hookState;
-      if (cleanup) cleanup();
-      hookState.cleanup = effect();
-    },
-  } as never);
+  hookState.effect = true;
+  const data = hookState.data = {
+    deps,
+    effect,
+    cleanup: oldData?.cleanup,
+  };
+  currentFiberState().layoutEffects.push(data);
 }
 
 export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {
