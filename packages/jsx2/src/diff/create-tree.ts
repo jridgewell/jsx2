@@ -11,14 +11,16 @@ import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
-import { deferRef } from './ref';
+import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 
-export function createTree(renderable: CoercedRenderable, container: Node, refs: RefWork[]): Fiber {
+export function createTree(renderable: CoercedRenderable, container: Node): Fiber {
   const root = fiber(null);
+  const refs: RefWork[] = [];
   createChild(renderable, root, null, refs);
   insert(root, container, null);
   verify(root);
+  applyRefs(refs);
   return root;
 }
 
@@ -63,7 +65,7 @@ export function createChild(
   if (isFunctionComponent(type)) {
     f.stateData = [];
     createChild(
-      renderComponentWithHooks(type, props, f as FunctionComponentFiber, refs),
+      renderComponentWithHooks(type, props, f as FunctionComponentFiber),
       f,
       null,
       refs,

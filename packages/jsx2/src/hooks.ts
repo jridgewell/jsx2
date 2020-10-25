@@ -10,7 +10,6 @@ export type HookState = {
 type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
-  refs: RefWork[];
 };
 
 type EffectCleanup = () => void;
@@ -28,11 +27,10 @@ import { shallowArrayEquals } from './util/shallow-array-equals';
 
 const fiberStack: FiberState[] = [];
 
-export function pushHooksFiber(fiber: FunctionComponentFiber, refs: RefWork[]): void {
+export function pushHooksFiber(fiber: FunctionComponentFiber): void {
   fiberStack.push({
     index: 0,
     fiber,
-    refs,
   });
 }
 
@@ -118,10 +116,9 @@ export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
     return;
   }
   hookState.data = deps;
-  const { refs } = currentFiberState();
   // TODO: This is super hacky. And incorrect. All the cleanups should fire first, then all the effects.
   // Refs apply, then cleanup, then effects.
-  refs.push({
+  [].push({
     current: null,
     old: null,
     ref() {
@@ -129,7 +126,7 @@ export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
       if (cleanup) cleanup();
       hookState.cleanup = effect();
     },
-  });
+  } as never);
 }
 
 export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {

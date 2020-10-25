@@ -22,17 +22,18 @@ import { isArray } from '../util/is-array';
 import { equals } from '../util/nullish-equals';
 import { createChild } from './create-tree';
 import { diffProps } from './prop';
-import { deferRef } from './ref';
+import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 
 export function diffTree(
   old: Fiber,
   renderable: CoercedRenderable,
   container: Node,
-  refs: RefWork[],
 ): void {
+  const refs: RefWork[] = [];
   diffChild(old.child!, renderable, old, null, container, refs);
   verify(old);
+  applyRefs(refs);
 }
 
 function diffChild(
@@ -208,7 +209,7 @@ function renderElement(
   return old;
 }
 
-export function renderComponent(
+function renderComponent(
   old: Fiber,
   renderable: FunctionComponentVNode | ClassComponentVNode,
   parentFiber: Fiber,
@@ -230,7 +231,7 @@ export function renderComponent(
   const { props } = renderable;
   const rendered = coerceRenderable(
     isFunctionComponent(type)
-      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber, refs)
+      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber)
       : old.component!.render(props),
   );
 
