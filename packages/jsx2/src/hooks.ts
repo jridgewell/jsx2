@@ -21,14 +21,14 @@ import { shallowArrayEquals } from './util/shallow-array-equals';
 
 const fiberStack: State[] = [];
 
-export function pushHooksFiber(fiber: FunctionComponentFiber) {
+export function pushHooksFiber(fiber: FunctionComponentFiber): void {
   fiberStack.push({
     index: 0,
     fiber,
   });
 }
 
-export function popHooksFiber() {
+export function popHooksFiber(): void {
   fiberStack.pop();
 }
 
@@ -69,7 +69,7 @@ export function useState<S>(initial: S | Lazy<S>): StateState<S> {
 
 type Reducer<S, A> = (prevState: S, action: A) => S;
 type ReducerState<S, A> = [S, (action: A) => void];
-export function useReducer<S, A, I>(reducer: Reducer<S, A>, initial: S): ReducerState<S, A>;
+export function useReducer<S, A>(reducer: Reducer<S, A>, initial: S): ReducerState<S, A>;
 export function useReducer<S, A, I>(
   reducer: Reducer<S, A>,
   initial: I,
@@ -96,7 +96,7 @@ export function useReducer<S, A, I>(
   return (hookState.data = data);
 }
 
-export function useEffect(effect: Effect, deps: unknown[] = []) {
+export function useEffect(effect: Effect, deps: unknown[] = []): void {
   const hookState = getHookState();
   if (shallowArrayEquals(hookState.data as unknown[], deps)) {
     return;
@@ -129,7 +129,7 @@ export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {
   return init;
 }
 
-export function useCallback<T extends Function>(cb: T, deps: unknown[]): T {
+export function useCallback<T>(cb: T, deps: unknown[]): T {
   return useMemo(() => cb, deps);
 }
 
@@ -138,7 +138,8 @@ export function useDebugValue(): void {
 }
 
 // TODO:
-export function useContext() {}
-export function useErrorBoundary() {}
-export function useImperativeHandle() {}
-export function useLayoutEffect() {}
+/* eslint-disable @typescript-eslint/no-empty-function */
+export function useContext(): void {}
+export function useErrorBoundary(): void {}
+export function useImperativeHandle(): void {}
+export function useLayoutEffect(): void {}

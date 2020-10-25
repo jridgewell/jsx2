@@ -35,7 +35,7 @@ function process() {
   }
 }
 
-export function enqueueDiff(fiber: Fiber) {
+export function enqueueDiff(fiber: Fiber): void {
   if (fiber.dirty) return;
   fiber.dirty = true;
   const length = diffs.push(fiber);
