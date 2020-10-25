@@ -1,4 +1,5 @@
 import type { CoercedRenderable } from '../util/coerce-renderable';
+import type { FunctionComponentFiber } from '../fiber';
 import type { Fiber } from '../fiber';
 import type { RefWork } from './ref';
 
@@ -11,6 +12,7 @@ import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { addProps } from './prop';
 import { deferRef } from './ref';
+import { renderComponentWithHooks } from './render-component-with-hooks';
 
 export function createTree(renderable: CoercedRenderable, container: Node, refs: RefWork[]): Fiber {
   const root = fiber(null);
@@ -59,7 +61,8 @@ export function createChild(
   }
 
   if (isFunctionComponent(type)) {
-    createChild(coerceRenderable(type(props)), f, null, refs);
+    f.stateData = [];
+    createChild(renderComponentWithHooks(type, props, f as FunctionComponentFiber), f, null, refs);
     return f;
   }
 

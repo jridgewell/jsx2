@@ -11,8 +11,14 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
     debug: assert(current !== null, 'end is guaranteed to prevent null loop');
-    const { ref, child } = current;
+    const { ref, stateData, child } = current;
     if (ref) setRef(null, ref);
+    if (stateData) {
+      for (let i = 0; i < stateData.length; i++) {
+        const cleanup = stateData[i].cleanup;
+        if (cleanup) cleanup();
+      }
+    }
     if (child) unmountRange(child, null);
 
     current = current.next;

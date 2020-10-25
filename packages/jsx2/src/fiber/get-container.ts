@@ -1,0 +1,10 @@
+type Fiber = import('.').Fiber;
+export function getContainer(fiber: Fiber): Fiber['dom'] {
+  let current: null | Fiber = fiber;
+  do {
+    const { dom } = fiber;
+    if (dom) return dom;
+    current = current.parent;
+  } while (current);
+  return null;
+}

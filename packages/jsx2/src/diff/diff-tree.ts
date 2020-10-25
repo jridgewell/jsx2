@@ -1,4 +1,5 @@
 import type { Fiber } from '../fiber';
+import type { FunctionComponentFiber } from '../fiber';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { RenderableArray } from '../render';
 import type { ElementVNode } from '../create-element';
@@ -22,6 +23,7 @@ import { equals } from '../util/nullish-equals';
 import { createChild } from './create-tree';
 import { diffProps } from './prop';
 import { deferRef } from './ref';
+import { renderComponentWithHooks } from './render-component-with-hooks';
 
 export function diffTree(
   old: Fiber,
@@ -206,7 +208,7 @@ function renderElement(
   return old;
 }
 
-function renderComponent(
+export function renderComponent(
   old: Fiber,
   renderable: FunctionComponentVNode | ClassComponentVNode,
   parentFiber: Fiber,
@@ -227,7 +229,9 @@ function renderComponent(
 
   const { props } = renderable;
   const rendered = coerceRenderable(
-    isFunctionComponent(type) ? type(props) : old.component!.render(props),
+    isFunctionComponent(type)
+      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber)
+      : old.component!.render(props),
   );
 
   diffChild(old.child!, rendered, old, null, container, refs);

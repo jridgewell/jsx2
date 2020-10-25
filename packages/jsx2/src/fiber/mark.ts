@@ -2,6 +2,7 @@ import type { Fiber } from '.';
 
 export function mark(current: Fiber, parent: Fiber, previous: null | Fiber): void {
   current.parent = parent;
+  current.depth = parent.depth + 1;
   if (previous === null) {
     current.index = 0;
     parent.child = current;

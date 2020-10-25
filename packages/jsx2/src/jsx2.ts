@@ -4,3 +4,16 @@ export { createElement } from './create-element';
 export { createRef } from './create-ref';
 export { render } from './render';
 export { templateBlock } from './template-block';
+export {
+  useCallback,
+  useContext,
+  useDebugValue,
+  useEffect,
+  useErrorBoundary,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from './hooks';
