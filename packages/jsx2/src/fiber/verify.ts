@@ -3,7 +3,7 @@ type Fiber = import('.').Fiber;
 import { assert } from '../util/assert';
 
 export function verify(fiber: Fiber): void {
-  verifyRange(fiber, fiber.next, fiber.parent);
+  debug: verifyRange(fiber, fiber.next, fiber.parent);
 }
 
 function verifyRange(fiber: Fiber, end: null | Fiber, parent: null | Fiber): void {

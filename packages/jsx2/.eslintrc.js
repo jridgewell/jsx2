@@ -18,6 +18,7 @@ module.exports = {
       },
     ],
     'no-constant-condition': 'off',
+    'no-unused-labels': 'off',
   },
   overrides: [
     {

@@ -3,13 +3,13 @@ type Fiber = import('.').Fiber;
 import { assert } from '../util/assert';
 
 export function getPreviousFiber(fiber: Fiber, parent: Fiber): null | Fiber {
-  assert(fiber.parent === parent, 'fiber must be child of parent');
+  debug: assert(fiber.parent === parent, 'fiber must be child of parent');
 
   let current = parent.child;
   if (current === fiber) return null;
 
   while (true) {
-    assert(current !== null, 'guaranteed to find fiber in children');
+    debug: assert(current !== null, 'guaranteed to find fiber in children');
     const { next } = current;
     if (next === fiber) break;
     current = next;

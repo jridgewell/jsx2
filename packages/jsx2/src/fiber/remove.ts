@@ -8,7 +8,7 @@ export function remove(
   previous: null | Fiber,
   container: Node,
 ): null | Fiber {
-  {
+  debug: {
     assert(fiber.parent === parent, 'fiber must be child of parent');
     if (previous === null) {
       assert(parent.child === fiber, 'parent must point to fiber');
@@ -32,7 +32,7 @@ export function remove(
 function removeRange(fiber: Fiber, end: null | Fiber, container: Node): void {
   let current: null | Fiber = fiber;
   do {
-    assert(current !== null, 'end is guaranteed to prevent null loop');
+    debug: assert(current !== null, 'end is guaranteed to prevent null loop');
     const { dom, child } = current;
     if (dom) {
       container.removeChild(dom);

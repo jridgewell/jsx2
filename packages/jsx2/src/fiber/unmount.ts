@@ -10,7 +10,7 @@ export function unmount(fiber: Fiber): void {
 function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
-    assert(current !== null, 'end is guaranteed to prevent null loop');
+    debug: assert(current !== null, 'end is guaranteed to prevent null loop');
     const { ref, child } = current;
     if (ref) setRef(null, ref);
     if (child) unmountRange(child, null);
