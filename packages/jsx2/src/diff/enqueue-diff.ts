@@ -20,6 +20,8 @@ function process() {
     for (let i = 0; i < scheduled.length; i++) {
       const fiber = scheduled[i];
       if (!fiber.dirty) continue;
+      fiber.dirty = false;
+
       const parent = fiber.parent!;
       const refs: RefWork[] = [];
       renderComponent(

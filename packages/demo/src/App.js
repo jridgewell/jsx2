@@ -1,4 +1,4 @@
-import { createElement, useState, useEffect, useRef, templateResult } from '/jsx2/jsx2';
+import { createElement, useState, useEffect, templateResult } from '/jsx2/jsx2';
 import logo from './logo.png';
 import './App.css';
 

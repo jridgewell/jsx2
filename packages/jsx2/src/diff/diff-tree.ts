@@ -230,7 +230,7 @@ export function renderComponent(
   const { props } = renderable;
   const rendered = coerceRenderable(
     isFunctionComponent(type)
-      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber)
+      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber, refs)
       : old.component!.render(props),
   );
 
