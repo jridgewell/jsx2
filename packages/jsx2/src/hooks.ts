@@ -1,5 +1,5 @@
-type FunctionComponentFiber = import('./fiber').FunctionComponentFiber;
-type RefObject = import('./create-ref').RefObject;
+import type { FunctionComponentFiber } from './fiber';
+import type { RefObject } from './create-ref';
 
 export type HookState = {
   cleanup: null | undefined | void | EffectCleanup;
@@ -19,7 +19,7 @@ import { defer } from './defer';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 
-let fiberStack: State[] = [];
+const fiberStack: State[] = [];
 
 export function pushHooksFiber(fiber: FunctionComponentFiber) {
   fiberStack.push({
@@ -81,7 +81,7 @@ export function useReducer<S, A, I>(
   init?: (initial: I) => S,
 ): ReducerState<S, A> {
   const hookState = getHookState();
-  let data = hookState.data as null | [S, (action: A) => void]
+  let data = hookState.data as null | [S, (action: A) => void];
   if (data) {
     return data;
   }

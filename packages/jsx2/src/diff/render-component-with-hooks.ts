@@ -1,7 +1,7 @@
-type FunctionComponent = import('../component').FunctionComponent;
-type VNode = import('../create-element').VNode;
-type FunctionComponentFiber = import('../fiber').FunctionComponentFiber;
-type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
+import type { FunctionComponent } from '../component';
+import type { VNode } from '../create-element';
+import type { FunctionComponentFiber } from '../fiber';
+import type { CoercedRenderable } from '../util/coerce-renderable';
 
 import { popHooksFiber, pushHooksFiber } from '../hooks';
 import { coerceRenderable } from '../util/coerce-renderable';

@@ -1,7 +1,7 @@
-type Fiber = import('../fiber').Fiber;
-type RefWork = import('./ref').RefWork;
-type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
-type ClassComponentVNode = import('../create-element').ClassComponentVNode;
+import type { Fiber } from '../fiber';
+import type { RefWork } from './ref';
+import type { FunctionComponentVNode } from '../create-element';
+import type { ClassComponentVNode } from '../create-element';
 
 import { defer } from '../defer';
 import { getContainer } from '../fiber/get-container';

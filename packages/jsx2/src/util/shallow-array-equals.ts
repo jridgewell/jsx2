@@ -1,4 +1,6 @@
-export function shallowArrayEquals(a: null | undefined | unknown[], b: null | undefined | unknown[]): boolean {
+type Nullish<T> = null | undefined | T;
+
+export function shallowArrayEquals(a: Nullish<unknown[]>, b: Nullish<unknown[]>): boolean {
   if (a == null || b == null) return false;
   if (a === b) return true;
   if (a.length !== b.length) return false;
