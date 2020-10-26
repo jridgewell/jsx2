@@ -1,3 +1,5 @@
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult`{"type":"div","key":"","ref":null,"props":[${s},{"after":true,"children":"text"}]}`;
+  return _templateResult`{"type":"div","key":"","ref":null,"props":[${s},{"after":true,"children":"text"}]}`;
 }

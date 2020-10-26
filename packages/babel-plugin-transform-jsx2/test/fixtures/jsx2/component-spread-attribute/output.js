@@ -1,10 +1,14 @@
+var _templateResult = require("jsx2").templateResult;
+
+var _createElement = require("jsx2").createElement;
+
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement), [jsx2.createElement(Component, { ...s
+  return _templateResult(_template(), [_createElement(Component, { ...s
   })]);
 }
 
-function _template(createElement) {
-  const tree = createElement("div", null, 0);
+function _template() {
+  const tree = _createElement("div", null, 0);
 
   _template = () => tree;
 

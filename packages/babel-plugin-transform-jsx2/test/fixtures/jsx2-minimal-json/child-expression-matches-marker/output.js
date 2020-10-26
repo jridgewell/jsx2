@@ -1,5 +1,7 @@
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult(_template(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, expression]);
+  return _templateResult(_template(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, expression]);
 }
 
 function _template() {

@@ -1,5 +1,7 @@
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult(_template(), [first_children, second_key, third_ref, fourth_static_child]);
+  return _templateResult(_template(), [first_children, second_key, third_ref, fourth_static_child]);
 }
 
 function _template() {

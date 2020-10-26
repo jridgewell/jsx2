@@ -1,3 +1,5 @@
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult`{"type":"div","key":"","ref":null,"props":{"children":${cond ? jsx2.templateResult`{"type":"t","key":"","ref":null,"props":null}` : jsx2.templateResult`{"type":"f","key":"","ref":null,"props":null}`}}}`;
+  return _templateResult`{"type":"div","key":"","ref":null,"props":{"children":${cond ? _templateResult`{"type":"t","key":"","ref":null,"props":null}` : _templateResult`{"type":"f","key":"","ref":null,"props":null}`}}}`;
 }

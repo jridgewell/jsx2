@@ -1,5 +1,7 @@
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult(_template(), [cond ? t : f]);
+  return _templateResult(_template(), [cond ? t : f]);
 }
 
 function _template() {

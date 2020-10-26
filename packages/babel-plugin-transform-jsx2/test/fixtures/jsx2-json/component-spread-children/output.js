@@ -1,3 +1,5 @@
+var _createElement = require("jsx2").createElement;
+
 function test() {
-  return jsx2.createElement(Component, null, [...x]);
+  return _createElement(Component, null, [...x]);
 }
