@@ -44,9 +44,7 @@ export function diffTree(
 export function rediffComponent(fiber: FunctionComponentFiber): void {
   const { type, props } = fiber.data;
   const layoutEffects: EffectState[] = [];
-  const rendered = coerceRenderable(
-    renderComponentWithHooks(type, props, fiber, layoutEffects),
-  );
+  const rendered = coerceRenderable(renderComponentWithHooks(type, props, fiber, layoutEffects));
   diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
 }
 

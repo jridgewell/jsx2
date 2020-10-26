@@ -2,14 +2,12 @@ import type { Renderable } from '../../src/render';
 import type { RenderableArray } from '../../src/render';
 import type { FunctionComponentVNode } from '../../src/create-element';
 import type { ClassComponentVNode } from '../../src/create-element';
-import type { RefWork } from '../../src/diff/ref';
 import type { Fiber } from '../../src/fiber';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 import type { ElementVNode } from '../../src/create-element';
 
 import { createElement, Component, Fragment } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
-import { applyRefs } from '../../src/diff/ref';
 import { diffTree } from '../../src/diff/diff-tree';
 
 describe('diffTree', () => {
@@ -30,16 +28,11 @@ describe('diffTree', () => {
   }
 
   function makeTree(renderable: Renderable, container: Node) {
-    const refs: RefWork[] = [];
-    const tree = createTree(data(renderable), container, refs);
-    applyRefs(refs);
-    return tree;
+    return createTree(data(renderable), container);
   }
 
   function diff(old: Fiber, renderable: CoercedRenderable, container: Node) {
-    const refs: RefWork[] = [];
-    diffTree(old, data(renderable), container, refs);
-    applyRefs(refs);
+    diffTree(old, data(renderable), container);
   }
 
   function expectShallowEqual<T, U>(actual: T[], expected: U[]) {

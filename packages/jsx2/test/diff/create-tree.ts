@@ -1,10 +1,8 @@
 import type { Renderable } from '../../src/render';
 import type { FunctionComponentVNode } from '../../src/create-element';
-import type { RefWork } from '../../src/diff/ref';
 
 import { createElement, Component, Fragment } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
-import { applyRefs } from '../../src/diff/ref';
 
 describe('createTree', () => {
   function expectTextNode(node: Node, text: string) {
@@ -24,9 +22,7 @@ describe('createTree', () => {
   }
 
   function create(renderable: Renderable, container: Node) {
-    const refs: RefWork[] = [];
-    createTree(data(renderable), container, refs);
-    applyRefs(refs);
+    createTree(data(renderable), container);
   }
 
   describe('rendering null', () => {
