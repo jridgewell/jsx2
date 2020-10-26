@@ -1,9 +1,13 @@
+var _templateResult = require("jsx2").templateResult;
+
+var _createElement = require("jsx2").createElement;
+
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement), [cond ? jsx2.templateResult(_template2(jsx2.createElement), []) : jsx2.templateResult(_template3(jsx2.createElement), [])]);
+  return _templateResult(_template(), [cond ? _templateResult(_template2(), []) : _templateResult(_template3(), [])]);
 }
 
-function _template(createElement) {
-  const tree = createElement("div", {
+function _template() {
+  const tree = _createElement("div", {
     attr: 0
   });
 
@@ -12,16 +16,16 @@ function _template(createElement) {
   return tree;
 }
 
-function _template2(createElement) {
-  const tree = createElement("t", null);
+function _template2() {
+  const tree = _createElement("t", null);
 
   _template2 = () => tree;
 
   return tree;
 }
 
-function _template3(createElement) {
-  const tree = createElement("f", null);
+function _template3() {
+  const tree = _createElement("f", null);
 
   _template3 = () => tree;
 

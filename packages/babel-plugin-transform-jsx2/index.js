@@ -1,15 +1,15 @@
 const jsx = require('@babel/plugin-syntax-jsx');
+const { addNamed } = require('@babel/helper-module-imports');
 
-module.exports = function({ types: t, template }, options = {}) {
+module.exports = function ({ types: t, template }, options = {}) {
   const {
     json = true,
     minimalJson = false,
     taggedTemplate = true,
 
-    pragma = 'jsx2.createElement',
-    pragmaFrag = 'jsx2.Fragment',
-    pragmaTemplate = 'jsx2.templateResult',
+    importSource = 'jsx2',
   } = options;
+  const importMap = new WeakMap();
 
   if (minimalJson && !json) {
     throw new Error('"minimalJson" option requires "json" to be true');
@@ -29,12 +29,24 @@ module.exports = function({ types: t, template }, options = {}) {
     },
   };
 
+  function getImport(path, name) {
+    const program = path.findParent((p) => p.isProgram());
+    let map = importMap.get(program);
+    if (map === undefined) {
+      map = { __proto__: null };
+      importMap.set(program, map);
+    }
+    const imported = map[name];
+    if (imported) return t.cloneNode(imported);
+    return (map[name] = addNamed(program, name, importSource));
+  }
+
   function buildTemplate(path) {
     if (isComponent(path)) {
       return buildElement(path);
     }
 
-    const program = path.findParent(p => p.isProgram());
+    const program = path.findParent((p) => p.isProgram());
 
     const expressions = [];
     let fragIndex;
@@ -46,8 +58,11 @@ module.exports = function({ types: t, template }, options = {}) {
       },
 
       fragMarker() {
+        if (!json) {
+          return getImport(path, 'Fragment');
+        }
         if (fragIndex === undefined) {
-          fragIndex = this.expressionMarker(template.expression.ast(pragmaFrag));
+          fragIndex = this.expressionMarker(getImport(path, 'Fragment'));
         }
         return t.cloneNode(fragIndex);
       },
@@ -56,7 +71,7 @@ module.exports = function({ types: t, template }, options = {}) {
     if (json) {
       const cooked = stringify(tree);
       if (taggedTemplate) {
-        return buildTaggedTemplate(cooked, expressions);
+        return buildTaggedTemplate(path, cooked, expressions);
       }
 
       const stringified = t.templateLiteral([buildTemplateElement(cooked)], []);
@@ -65,7 +80,7 @@ module.exports = function({ types: t, template }, options = {}) {
 
     const id = path.scope.generateUidIdentifier('template');
     const lazyTree = template.statement.ast`
-      function ${id}(${json ? null : 'createElement'}) {
+      function ${id}() {
         const tree = ${tree};
         ${t.cloneNode(id)} = () => tree;
         return tree;
@@ -74,8 +89,8 @@ module.exports = function({ types: t, template }, options = {}) {
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      ${pragmaTemplate}(
-        ${t.cloneNode(id)}(${json ? null : pragma}),
+      ${getImport(path, 'templateResult')}(
+        ${t.cloneNode(id)}(),
         ${t.arrayExpression(expressions)}
       )
     `;
@@ -92,7 +107,7 @@ module.exports = function({ types: t, template }, options = {}) {
     const { props, key, ref, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),
       path.get('children'),
-      state
+      state,
     );
 
     if (state && json) {
@@ -105,7 +120,7 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return template.expression.ast`
-      ${state ? 'createElement' : pragma}(
+      ${getImport(path, 'createElement')}(
         ${type},
         ${props},
         ${children}
@@ -148,7 +163,7 @@ module.exports = function({ types: t, template }, options = {}) {
       }
 
       objProps.push(
-        t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, state))
+        t.objectProperty(convertJSXName(name, false), extractAttributeValue(value, state)),
       );
     }
 
@@ -196,7 +211,7 @@ module.exports = function({ types: t, template }, options = {}) {
       } else if (state) {
         props = t.arrayExpression(objs);
       } else {
-        props = t.objectExpression(flatMap(objs, o => o.properties));
+        props = t.objectExpression(flatMap(objs, (o) => o.properties));
       }
     }
 
@@ -250,7 +265,7 @@ module.exports = function({ types: t, template }, options = {}) {
     if (name.isJSXMemberExpression()) {
       return t.memberExpression(
         convertJSXName(name.get('object'), true),
-        convertJSXName(name.get('property'), false)
+        convertJSXName(name.get('property'), false),
       );
     }
 
@@ -345,7 +360,7 @@ module.exports = function({ types: t, template }, options = {}) {
     throw new Error(`Can't handle type "${type}"`);
   }
 
-  function buildTaggedTemplate(json, expressions) {
+  function buildTaggedTemplate(path, json, expressions) {
     const regex = /((?:[^"\d]+(?:"(?:[^"\\]*|\\[^])+")?)+)(\d+|$)/g;
     const elements = [];
     const orderedExpressions = [];
@@ -361,8 +376,8 @@ module.exports = function({ types: t, template }, options = {}) {
     }
 
     return t.taggedTemplateExpression(
-      template.expression.ast(pragmaTemplate),
-      t.templateLiteral(elements, orderedExpressions)
+      getImport(path, 'templateResult'),
+      t.templateLiteral(elements, orderedExpressions),
     );
   }
 

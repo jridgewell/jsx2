@@ -1,5 +1,9 @@
+var _createElement = require("jsx2").createElement;
+
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult`{"type":"div","key":"","ref":null,"props":{"children":${jsx2.createElement(Component, {
+  return _templateResult`{"type":"div","key":"","ref":null,"props":{"children":${_createElement(Component, {
     before: true,
     ...s,
     after: true

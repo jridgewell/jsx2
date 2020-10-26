@@ -1,3 +1,7 @@
+var _templateResult = require("jsx2").templateResult;
+
+var _Fragment = require("jsx2").Fragment;
+
 function test() {
-  return jsx2.templateResult`{"type":${jsx2.Fragment},"key":"","ref":null,"props":{"children":${x}}}`;
+  return _templateResult`{"type":${_Fragment},"key":"","ref":null,"props":{"children":${x}}}`;
 }

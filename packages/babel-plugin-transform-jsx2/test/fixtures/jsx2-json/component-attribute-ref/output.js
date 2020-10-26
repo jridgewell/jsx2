@@ -1,6 +1,10 @@
+var _createElement = require("jsx2").createElement;
+
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
   const ref = {};
-  return jsx2.templateResult(_template(), [jsx2.createElement(Component, {
+  return _templateResult(_template(), [_createElement(Component, {
     ref: ref
   })]);
 }

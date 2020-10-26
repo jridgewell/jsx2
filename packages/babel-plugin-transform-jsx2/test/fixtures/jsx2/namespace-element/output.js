@@ -1,9 +1,13 @@
+var _templateResult = require("jsx2").templateResult;
+
+var _createElement = require("jsx2").createElement;
+
 function test() {
-  return jsx2.templateResult(_template(jsx2.createElement), []);
+  return _templateResult(_template(), []);
 }
 
-function _template(createElement) {
-  const tree = createElement("xml:foo", null);
+function _template() {
+  const tree = _createElement("xml:foo", null);
 
   _template = () => tree;
 

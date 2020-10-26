@@ -1,8 +1,12 @@
+var _createElement = require("jsx2").createElement;
+
+var _templateResult = require("jsx2").templateResult;
+
 function test() {
-  return jsx2.templateResult(_template(), [jsx2.createElement(Component, {
+  return _templateResult(_template(), [_createElement(Component, {
     id: foo,
     bar: bar
-  }, true && jsx2.templateResult(_template2(), []))]);
+  }, true && _templateResult(_template2(), []))]);
 }
 
 function _template() {

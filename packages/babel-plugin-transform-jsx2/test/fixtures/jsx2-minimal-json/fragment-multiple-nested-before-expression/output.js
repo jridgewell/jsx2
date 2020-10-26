@@ -1,5 +1,9 @@
+var _templateResult = require("jsx2").templateResult;
+
+var _Fragment = require("jsx2").Fragment;
+
 function test() {
-  return jsx2.templateResult(_template(), [jsx2.Fragment, id]);
+  return _templateResult(_template(), [_Fragment, id]);
 }
 
 function _template() {
