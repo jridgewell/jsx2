@@ -18,6 +18,7 @@ import { remove } from '../fiber/remove';
 import { replace } from '../fiber/replace';
 import { unmount } from '../fiber/unmount';
 import { verify } from '../fiber/verify';
+import { getContainer } from '../fiber/get-container';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { equals } from '../util/nullish-equals';
@@ -38,6 +39,15 @@ export function diffTree(
   verify(old);
   applyRefs(refs);
   applyEffects(layoutEffects);
+}
+
+export function rediffComponent(fiber: FunctionComponentFiber): void {
+  const { type, props } = fiber.data;
+  const layoutEffects: EffectState[] = [];
+  const rendered = coerceRenderable(
+    renderComponentWithHooks(type, props, fiber, layoutEffects),
+  );
+  diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
 }
 
 function diffChild(

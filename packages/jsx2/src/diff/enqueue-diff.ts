@@ -1,11 +1,6 @@
 import type { FunctionComponentFiber } from '../fiber';
-import type { FunctionComponentVNode } from '../create-element';
-import type { EffectState } from '../hooks';
 
-import { getContainer } from '../fiber/get-container';
-import { diffTree } from './diff-tree';
-import { coerceRenderable } from '../util/coerce-renderable';
-import { renderComponentWithHooks } from './render-component-with-hooks';
+import { rediffComponent } from './diff-tree';
 
 const nextTick = Promise.prototype.then.bind(Promise.resolve());
 
@@ -21,14 +16,7 @@ function process() {
       const fiber = scheduled[i];
       if (!fiber.dirty) continue;
       fiber.dirty = false;
-
-      const renderable = fiber.data as FunctionComponentVNode;
-      const { type, props } = renderable;
-      const layoutEffects: EffectState[] = [];
-      const rendered = coerceRenderable(
-        renderComponentWithHooks(type, props, fiber, layoutEffects),
-      );
-      diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
+      rediffComponent(fiber);
     }
   }
 }
