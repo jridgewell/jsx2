@@ -13,10 +13,21 @@ export function renderComponentWithHooks(
   fiber: FunctionComponentFiber,
   layoutEffects: EffectState[],
 ): CoercedRenderable {
-  pushHooksFiber(fiber, layoutEffects);
-  try {
-    return coerceRenderable(type(props));
-  } finally {
+  const { length } = layoutEffects;
+  let i = 0;
+  let rendered;
+  fiber.current = true;
+  for (; i < 25; i++) {
+    pushHooksFiber(fiber, layoutEffects);
+    rendered = type(props);
     popHooksFiber();
+
+    if (!fiber.dirty) break;
+
+    fiber.dirty = false;
+    layoutEffects.length = length;
   }
+  fiber.current = false;
+
+  return coerceRenderable(rendered);
 }

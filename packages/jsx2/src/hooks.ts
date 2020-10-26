@@ -21,10 +21,9 @@ type EffectCleanup = null | undefined | void | (() => void);
 type Effect = () => EffectCleanup;
 type Lazy<S> = () => S;
 type NextState<S> = (prevState: S) => S;
-type StateSetter<S> = (nextState: S | NextState<S>) => void;
-type StateState<S> = [S, StateSetter<S>];
+type StateState<S> = readonly [S, (nextState: S | NextState<S>) => void];
 type Reducer<S, A> = (prevState: S, action: A) => S;
-type ReducerState<S, A> = [S, (action: A) => void];
+type ReducerState<S, A> = readonly [S, (action: A) => void];
 
 export type EffectState = {
   deps: unknown[];
@@ -90,7 +89,7 @@ export function useReducer<S, A, I>(
   init?: (initial: I) => S,
 ): ReducerState<S, A> {
   const hookState = getHookState();
-  let data = hookState.data as null | ReducerState<S, A>;
+  const data = hookState.data as null | ReducerState<S, A>;
   if (data) {
     return data;
   }
@@ -98,11 +97,13 @@ export function useReducer<S, A, I>(
   const { fiber } = currentFiberState();
   const initialState = init ? init(initial as I) : (initial as S);
   const dispatch = (action: A) => {
-    data![0] = reducer(data![0], action);
+    const old = (hookState.data as ReducerState<S, A>)[0];
+    const value = reducer(old, action)
+    if (value === old) return;
+    hookState.data = [value, dispatch];
     enqueueDiff(fiber);
   };
-  data = [initialState, dispatch] as ReducerState<S, A>;
-  return (hookState.data = data);
+  return (hookState.data = [initialState, dispatch] as const);
 }
 
 export function useEffect(effect: Effect, deps: unknown[] = []): void {

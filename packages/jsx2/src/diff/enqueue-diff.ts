@@ -35,6 +35,7 @@ function process() {
 export function enqueueDiff(fiber: FunctionComponentFiber): void {
   if (fiber.dirty) return;
   fiber.dirty = true;
+  if (fiber.current) return;
   const length = diffs.push(fiber);
   if (length === 1) defer(process);
 }

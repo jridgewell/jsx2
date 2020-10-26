@@ -24,7 +24,7 @@ function Seconds({ init }) {
   );
 }
 
-function App() {
+export function App() {
   const [enabled, toggle] = useState(true);
   const [num, setNum] = useState(0);
   const onChangeNum = useCallback((event) => {
@@ -53,4 +53,21 @@ function App() {
   );
 }
 
-export default App;
+export function SyncSetState() {
+  console.log('App');
+  const [s, set] = useState(0);
+  useLayoutEffect(() => {
+	  console.log('useEffect');
+	}, [s]);
+
+  set(s + 1);
+  console.log('app2');
+  return (
+	  <div ref={() => {
+      console.log(document.querySelector('#root').outerHTML)
+    }}>
+      {s}
+  	</div>
+  );
+
+}

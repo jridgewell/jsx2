@@ -13,6 +13,7 @@ export interface SharedFiber {
   index: number;
   depth: number;
   dirty: boolean;
+  current: boolean;
 }
 
 export interface NullFiber extends SharedFiber {
@@ -97,6 +98,7 @@ export function fiber<T extends Fiber['data']>(
     index: 0,
     depth: 0,
     dirty: false,
+    current: false,
     key: null,
     dom: null,
     stateData: null,
