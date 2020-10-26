@@ -1,5 +1,5 @@
 import { createElement, render } from '/jsx2/jsx2';
-import { App, SyncSetState } from './App.js';
+import { Raf } from './App.js';
 import './index.css';
 
-render(<App />, document.getElementById('root'));
+render(<Raf />, document.getElementById('root'));

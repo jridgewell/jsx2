@@ -1,4 +1,4 @@
-import { createElement, useState, useEffect, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
+import { createElement, useMemo, useState, useEffect, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
 import logo from './logo.png';
 import './App.css';
 
@@ -22,6 +22,29 @@ function Seconds({ init }) {
       Page has been open for <code>{count}</code> seconds.
     </p>
   );
+}
+
+function average(bucket) {
+  let total = 0;
+  for (let i = 0; i < bucket.length; i++) {
+    total += bucket[i];
+  }
+  return total / bucket.length;
+}
+export function Raf() {
+  const bucket = useMemo(() => [], []);
+  const [avg, set] = useState(0);
+  const [_, increment] = useState(0);
+  const start = performance.now();
+  useEffect(() => {
+    bucket.push(performance.now() - start);
+    const avg = average(bucket).toFixed(2);
+    console.log(avg);
+    set(avg);
+    increment(i => i + 1);
+  });
+
+  return <time>{avg}</time>
 }
 
 export function App() {

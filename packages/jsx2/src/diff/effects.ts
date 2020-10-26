@@ -11,15 +11,15 @@ function process(): void {
 const raf = (() => {
   if (typeof requestAnimationFrame === 'undefined') {
     return (): void => {
-      setTimeout(process, 32);
+      setTimeout(process, 17);
     };
   }
   function singleRaf(): void {
-    requestAnimationFrame(process);
+    setTimeout(process);
   }
   return (): void => {
     requestAnimationFrame(singleRaf);
-  }
+  };
 })();
 
 export function scheduleEffect(effect: EffectState): void {
@@ -28,7 +28,7 @@ export function scheduleEffect(effect: EffectState): void {
 }
 
 export function purgeInactiveEffects(): void {
-  queuedEffects = queuedEffects.filter(e => e.active);
+  queuedEffects = queuedEffects.filter((e) => e.active);
 }
 
 export function applyEffects(effects: EffectState[]): void {

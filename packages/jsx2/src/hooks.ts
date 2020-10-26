@@ -26,7 +26,7 @@ type Reducer<S, A> = (prevState: S, action: A) => S;
 type ReducerState<S, A> = readonly [S, (action: A) => void];
 
 export type EffectState = {
-  deps: unknown[];
+  deps: undefined | unknown[];
   cleanup: EffectCleanup;
   effect: Effect;
   active: boolean;
@@ -99,7 +99,7 @@ export function useReducer<S, A, I>(
   const initialState = init ? init(initial as I) : (initial as S);
   const dispatch = (action: A) => {
     const old = (hookState.data as ReducerState<S, A>)[0];
-    const value = reducer(old, action)
+    const value = reducer(old, action);
     if (value === old) return;
     hookState.data = [value, dispatch];
     enqueueDiff(fiber);
@@ -107,7 +107,7 @@ export function useReducer<S, A, I>(
   return (hookState.data = [initialState, dispatch] as const);
 }
 
-export function useEffect(effect: Effect, deps: unknown[] = []): void {
+export function useEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
   const oldData = hookState.data as EffectState;
   if (oldData !== null) {
@@ -126,7 +126,7 @@ export function useEffect(effect: Effect, deps: unknown[] = []): void {
   scheduleEffect(data);
 }
 
-export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
+export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
   const oldData = hookState.data as EffectState;
   if (oldData !== null && shallowArrayEquals(oldData.deps, deps)) {
