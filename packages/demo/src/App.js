@@ -1,4 +1,4 @@
-import { createElement, useMemo, useState, useEffect, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
+import { createElement, useMemo, useState, useEffect, useLayoutEffect, useCallback } from '/jsx2/jsx2';
 import logo from './logo.png';
 import './App.css';
 
