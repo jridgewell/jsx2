@@ -38,7 +38,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     }
     const imported = map[name];
     if (imported) return t.cloneNode(imported);
-    return (map[name] = addNamed(path, name, importSource));
+    return (map[name] = addNamed(program, name, importSource));
   }
 
   function buildTemplate(path) {
