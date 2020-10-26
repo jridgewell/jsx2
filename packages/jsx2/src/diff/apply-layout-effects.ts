@@ -1,8 +1,8 @@
-import type {EffectState} from '../hooks';
+import type { EffectState } from '../hooks';
 
 export function applyLayoutEffects(layoutEffects: EffectState[]): void {
   for (let i = 0; i < layoutEffects.length; i++) {
-    const {cleanup} = layoutEffects[i];
+    const { cleanup } = layoutEffects[i];
     if (cleanup) cleanup();
   }
   for (let i = 0; i < layoutEffects.length; i++) {

@@ -1,13 +1,15 @@
 import type { FunctionComponentFiber } from './fiber';
 import type { RefObject } from './create-ref';
 
-export type HookState = {
-  effect: false;
-  data: unknown;
-} | {
-  effect: true;
-  data: EffectState;
-};
+export type HookState =
+  | {
+      effect: false;
+      data: unknown;
+    }
+  | {
+      effect: true;
+      data: EffectState;
+    };
 
 type FiberState = {
   index: number;
@@ -125,11 +127,11 @@ export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
     return;
   }
   hookState.effect = true;
-  const data = hookState.data = {
+  const data = (hookState.data = {
     deps,
     effect,
     cleanup: oldData?.cleanup,
-  };
+  });
   currentFiberState().layoutEffects.push(data);
 }
 

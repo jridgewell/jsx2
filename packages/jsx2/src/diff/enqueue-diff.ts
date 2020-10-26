@@ -24,7 +24,9 @@ function process() {
       const renderable = fiber.data as FunctionComponentVNode;
       const { type, props } = renderable;
       const layoutEffects: EffectState[] = [];
-      const rendered = coerceRenderable(renderComponentWithHooks(type, props, fiber, layoutEffects));
+      const rendered = coerceRenderable(
+        renderComponentWithHooks(type, props, fiber, layoutEffects),
+      );
       diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
     }
   }

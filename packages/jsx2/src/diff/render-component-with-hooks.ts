@@ -11,7 +11,7 @@ export function renderComponentWithHooks(
   type: FunctionComponent,
   props: VNode['props'],
   fiber: FunctionComponentFiber,
-  layoutEffects: EffectState[]
+  layoutEffects: EffectState[],
 ): CoercedRenderable {
   pushHooksFiber(fiber, layoutEffects);
   try {
