@@ -1,10 +1,10 @@
 var _createElement = require("jsx2").createElement;
 
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 function test() {
   return _createElement(Component, {
-    attr: _templateResult(_template(), [x])
+    attr: _templateBlock(_template(), [x])
   });
 }
 

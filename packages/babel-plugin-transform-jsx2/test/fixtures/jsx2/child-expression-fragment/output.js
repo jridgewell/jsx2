@@ -1,11 +1,11 @@
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 var _createElement = require("jsx2").createElement;
 
 var _Fragment = require("jsx2").Fragment;
 
 function test() {
-  return _templateResult(_template(), []);
+  return _templateBlock(_template(), []);
 }
 
 function _template() {

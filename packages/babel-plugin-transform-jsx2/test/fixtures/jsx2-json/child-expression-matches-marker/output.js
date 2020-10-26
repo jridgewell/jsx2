@@ -1,7 +1,7 @@
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 function test() {
-  return _templateResult(_template(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, expression]);
+  return _templateBlock(_template(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, expression]);
 }
 
 function _template() {

@@ -1,14 +1,14 @@
-type TemplateResult = import('../src/template-result').TemplateResult;
+type TemplateBlock = import('../src/template-block').TemplateBlock;
 
-import { templateResult } from '../src/jsx2';
+import { templateBlock } from '../src/jsx2';
 
-describe('templateResult', () => {
-  function div(): TemplateResult {
-    return templateResult`{"type": "div"}`;
+describe('templateBlock', () => {
+  function div(): TemplateBlock {
+    return templateBlock`{"type": "div"}`;
   }
 
-  function interpolations(): TemplateResult {
-    return templateResult`{
+  function interpolations(): TemplateBlock {
+    return templateBlock`{
       "type": ${'type'},
       "key": ${'key'},
       "ref": ${'ref'}
@@ -57,7 +57,7 @@ describe('templateResult', () => {
   });
 
   it('excludes overridden properties', () => {
-    const result = templateResult`{"type":${'a'},"type":${'b'}}`;
+    const result = templateBlock`{"type":${'a'},"type":${'b'}}`;
 
     expect(result.tree).toEqual({ type: 1 });
     expect(result.expressions).toEqual(['a', 'b']);

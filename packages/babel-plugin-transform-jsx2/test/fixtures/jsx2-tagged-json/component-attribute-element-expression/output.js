@@ -1,9 +1,9 @@
 var _createElement = require("jsx2").createElement;
 
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 function test() {
   return _createElement(Component, {
-    attr: _templateResult`{"type":"inner","key":"","ref":null,"props":{"children":${x}}}`
+    attr: _templateBlock`{"type":"inner","key":"","ref":null,"props":{"children":${x}}}`
   });
 }

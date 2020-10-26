@@ -89,7 +89,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     program.pushContainer('body', lazyTree);
 
     return template.expression.ast`
-      ${getImport(path, 'templateResult')}(
+      ${getImport(path, 'templateBlock')}(
         ${t.cloneNode(id)}(),
         ${t.arrayExpression(expressions)}
       )
@@ -376,7 +376,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     }
 
     return t.taggedTemplateExpression(
-      getImport(path, 'templateResult'),
+      getImport(path, 'templateBlock'),
       t.templateLiteral(elements, orderedExpressions),
     );
   }

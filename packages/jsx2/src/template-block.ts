@@ -13,7 +13,7 @@ export interface StaticNode {
   readonly props?: null | Marker | Props | readonly (Marker | Props)[];
 }
 
-export interface TemplateResult {
+export interface TemplateBlock {
   readonly tree: StaticNode;
   readonly expressions: unknown[];
   readonly constructor: undefined;
@@ -38,10 +38,10 @@ function getTree(strings: TemplateStringsArray): StaticNode {
   return tree;
 }
 
-export function templateResult(
+export function templateBlock(
   strings: TemplateStringsArray,
   ...expressions: unknown[]
-): TemplateResult {
+): TemplateBlock {
   return {
     tree: getTree(strings),
     expressions,

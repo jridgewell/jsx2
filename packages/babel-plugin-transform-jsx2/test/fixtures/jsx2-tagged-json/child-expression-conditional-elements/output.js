@@ -1,5 +1,5 @@
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 function test() {
-  return _templateResult`{"type":"div","key":"","ref":null,"props":{"children":${cond ? _templateResult`{"type":"t","key":"","ref":null,"props":null}` : _templateResult`{"type":"f","key":"","ref":null,"props":null}`}}}`;
+  return _templateBlock`{"type":"div","key":"","ref":null,"props":{"children":${cond ? _templateBlock`{"type":"t","key":"","ref":null,"props":null}` : _templateBlock`{"type":"f","key":"","ref":null,"props":null}`}}}`;
 }

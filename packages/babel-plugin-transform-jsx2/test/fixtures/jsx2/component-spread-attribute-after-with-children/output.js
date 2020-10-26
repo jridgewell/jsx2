@@ -1,9 +1,9 @@
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 var _createElement = require("jsx2").createElement;
 
 function test() {
-  return _templateResult(_template(), [_createElement(Component, { ...s,
+  return _templateBlock(_template(), [_createElement(Component, { ...s,
     after: true
   }, "text")]);
 }

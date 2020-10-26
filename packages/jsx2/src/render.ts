@@ -19,7 +19,7 @@ export type Renderable =
   | null
   | undefined
   | VNode
-  // | TemplateResult
+  // | TemplateBlock
   | RenderableArray;
 export type RenderableArray = ReadonlyArray<Renderable>;
 

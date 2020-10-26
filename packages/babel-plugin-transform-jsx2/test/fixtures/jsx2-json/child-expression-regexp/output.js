@@ -1,7 +1,7 @@
-var _templateResult = require("jsx2").templateResult;
+var _templateBlock = require("jsx2").templateBlock;
 
 function test() {
-  return _templateResult(_template(), [/foo/g]);
+  return _templateBlock(_template(), [/foo/g]);
 }
 
 function _template() {
