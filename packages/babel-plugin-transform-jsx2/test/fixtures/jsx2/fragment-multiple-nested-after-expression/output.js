@@ -5,13 +5,13 @@ var _createElement = require("jsx2").createElement;
 var _Fragment = require("jsx2").Fragment;
 
 function test() {
-  return _templateResult(_template(), [id, _Fragment]);
+  return _templateResult(_template(), [id]);
 }
 
 function _template() {
   const tree = _createElement("div", {
     id: 0
-  }, _createElement(1, null), _createElement(1, null), _createElement(1, null));
+  }, _createElement(_Fragment, null), _createElement(_Fragment, null), _createElement(_Fragment, null));
 
   _template = () => tree;
 

@@ -58,6 +58,9 @@ module.exports = function ({ types: t, template }, options = {}) {
       },
 
       fragMarker() {
+        if (!json) {
+          return getImport(path, 'Fragment');
+        }
         if (fragIndex === undefined) {
           fragIndex = this.expressionMarker(getImport(path, 'Fragment'));
         }
