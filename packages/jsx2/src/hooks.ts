@@ -29,11 +29,12 @@ export type EffectState = {
   deps: unknown[];
   cleanup: EffectCleanup;
   effect: Effect;
+  active: boolean;
 };
 
-import { defer } from './defer';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
+import { scheduleEffect } from './diff/effects';
 
 const fiberStack: FiberState[] = [];
 
@@ -108,17 +109,21 @@ export function useReducer<S, A, I>(
 
 export function useEffect(effect: Effect, deps: unknown[] = []): void {
   const hookState = getHookState();
-  if (shallowArrayEquals(hookState.data as null | unknown[], deps)) {
-    return;
+  const oldData = hookState.data as EffectState;
+  if (oldData !== null) {
+    if (shallowArrayEquals(oldData.deps, deps)) {
+      return;
+    }
+    oldData.active = false;
   }
   hookState.effect = true;
-  hookState.data = deps;
-  // TODO: After paint
-  defer(() => {
-    // const { cleanup } = hookState;
-    // if (cleanup) cleanup();
-    // hookState.cleanup = effect();
+  const data = (hookState.data = {
+    deps,
+    effect,
+    cleanup: oldData?.cleanup,
+    active: true,
   });
+  scheduleEffect(data);
 }
 
 export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
@@ -132,6 +137,7 @@ export function useLayoutEffect(effect: Effect, deps: unknown[] = []): void {
     deps,
     effect,
     cleanup: oldData?.cleanup,
+    active: true,
   });
   currentFiberState().layoutEffects.push(data);
 }

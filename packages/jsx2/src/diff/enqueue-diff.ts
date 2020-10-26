@@ -2,11 +2,12 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { FunctionComponentVNode } from '../create-element';
 import type { EffectState } from '../hooks';
 
-import { defer } from '../defer';
 import { getContainer } from '../fiber/get-container';
 import { diffTree } from './diff-tree';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { renderComponentWithHooks } from './render-component-with-hooks';
+
+const nextTick = Promise.prototype.then.bind(Promise.resolve());
 
 let diffs: FunctionComponentFiber[] = [];
 
@@ -37,5 +38,5 @@ export function enqueueDiff(fiber: FunctionComponentFiber): void {
   fiber.dirty = true;
   if (fiber.current) return;
   const length = diffs.push(fiber);
-  if (length === 1) defer(process);
+  if (length === 1) nextTick(process);
 }

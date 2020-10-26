@@ -25,7 +25,7 @@ import { createChild } from './create-tree';
 import { diffProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
-import { applyLayoutEffects } from './apply-layout-effects';
+import { applyEffects } from './effects';
 
 export function diffTree(
   old: Fiber,
@@ -37,7 +37,7 @@ export function diffTree(
   diffChild(old.child!, renderable, old, null, container, refs, layoutEffects);
   verify(old);
   applyRefs(refs);
-  applyLayoutEffects(layoutEffects);
+  applyEffects(layoutEffects);
 }
 
 function diffChild(

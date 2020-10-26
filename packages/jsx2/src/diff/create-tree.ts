@@ -14,7 +14,7 @@ import { isArray } from '../util/is-array';
 import { addProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
-import { applyLayoutEffects } from './apply-layout-effects';
+import { applyEffects } from './effects';
 
 export function createTree(renderable: CoercedRenderable, container: Node): Fiber {
   const root = fiber(null);
@@ -24,7 +24,7 @@ export function createTree(renderable: CoercedRenderable, container: Node): Fibe
   insert(root, container, null);
   verify(root);
   applyRefs(refs);
-  applyLayoutEffects(layoutEffects);
+  applyEffects(layoutEffects);
   return root;
 }
 

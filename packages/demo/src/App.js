@@ -1,4 +1,4 @@
-import { createElement, useState, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
+import { createElement, useState, useEffect, useLayoutEffect, useCallback, templateResult } from '/jsx2/jsx2';
 import logo from './logo.png';
 import './App.css';
 
@@ -6,7 +6,7 @@ function Seconds({ init }) {
   // Create the count state.
   const [count, setCount] = useState(0);
   // Create the counter (+1 every second).
-  useLayoutEffect(() => {
+  useEffect(() => {
     const timer = setInterval(() => {
       console.log('updating');
       setCount((count) => count + 1);

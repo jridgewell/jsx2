@@ -6,6 +6,7 @@ import type { EffectState } from '../hooks';
 
 import { popHooksFiber, pushHooksFiber } from '../hooks';
 import { coerceRenderable } from '../util/coerce-renderable';
+import { purgeInactiveEffects } from './effects';
 
 export function renderComponentWithHooks(
   type: FunctionComponent,
@@ -26,6 +27,7 @@ export function renderComponentWithHooks(
 
     fiber.dirty = false;
     layoutEffects.length = length;
+    purgeInactiveEffects();
   }
   fiber.current = false;
 
