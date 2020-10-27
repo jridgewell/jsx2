@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-strip": "2.0.0",
-    "@rollup/plugin-typescript": "6.0.0",
+    "@rollup/plugin-typescript": "6.1.0",
     "@types/jest": "26.0.15",
     "@types/jsdom": "16.2.4",
     "@typescript-eslint/eslint-plugin": "4.6.0",
