@@ -3,11 +3,15 @@ import type { Fiber } from '.';
 import { assert } from '../util/assert';
 
 export function verify(fiber: Fiber): void {
-  const root = fiber.index == 0 ? fiber : fiber.parent!;
-  debug: verifyRange(root, root.next, root.parent);
+  debug: verifyRange(fiber, fiber.next, fiber.parent, false);
 }
 
-function verifyRange(fiber: Fiber, end: null | Fiber, parent: null | Fiber): void {
+function verifyRange(
+  fiber: Fiber,
+  end: null | Fiber,
+  parent: null | Fiber,
+  checkSiblings = true,
+): void {
   let current: null | Fiber = fiber;
   let i = 0;
   do {
@@ -20,5 +24,5 @@ function verifyRange(fiber: Fiber, end: null | Fiber, parent: null | Fiber): voi
 
     i++;
     current = current.next;
-  } while (current !== end);
+  } while (checkSiblings && current !== end);
 }
