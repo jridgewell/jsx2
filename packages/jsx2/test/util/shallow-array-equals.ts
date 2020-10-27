@@ -15,7 +15,7 @@ describe('shallowArrayEquals', () => {
   });
 
   it('compares objects by identity', () => {
-    expect(shallowArrayEquals([{key: true}], [{key: true}])).toBe(false);
+    expect(shallowArrayEquals([{ key: true }], [{ key: true }])).toBe(false);
   });
 
   it('returns false for un-equal array lengths', () => {
