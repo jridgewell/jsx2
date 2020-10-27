@@ -23,7 +23,7 @@
     "lint:prettier": "npm run test:lint:prettier -- --write",
     "lint:ts": "npm run test:lint:ts -- --fix",
     "prebuild": "rm -rf dist",
-    "test": "run-s -n test:lint 'test:only --no-cache'",
+    "test": "run-s -n test:lint 'test:only -- --no-cache'",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:lint": "run-s -n test:lint:*",
     "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
