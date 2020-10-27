@@ -1,6 +1,6 @@
-type Renderable = import('../../src/render').Renderable;
-type FunctionComponentVNode = import('../../src/create-element').FunctionComponentVNode;
-type RefWork = import('../../src/diff/ref').RefWork;
+import type { Renderable } from '../../src/render';
+import type { FunctionComponentVNode } from '../../src/create-element';
+import type { RefWork } from '../../src/diff/ref';
 
 import { createElement, Component, Fragment } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';

@@ -1,4 +1,4 @@
-type Fiber = import('.').Fiber;
+import type { Fiber } from '.';
 
 export function mark(current: Fiber, parent: Fiber, previous: null | Fiber): void {
   current.parent = parent;

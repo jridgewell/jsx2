@@ -1,4 +1,4 @@
-type Fiber = import('.').Fiber;
+import type { Fiber } from '.';
 
 import { assert } from '../util/assert';
 import { getNextSibling } from './get-next-sibling';

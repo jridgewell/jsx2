@@ -1,6 +1,6 @@
-type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
-type Fiber = import('../fiber').Fiber;
-type RefWork = import('./ref').RefWork;
+import type { CoercedRenderable } from '../util/coerce-renderable';
+import type { Fiber } from '../fiber';
+import type { RefWork } from './ref';
 
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';

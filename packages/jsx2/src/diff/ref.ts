@@ -1,4 +1,4 @@
-type Ref = import('../create-ref').Ref;
+import type { Ref } from '../create-ref';
 
 export interface RefWork {
   current: unknown;

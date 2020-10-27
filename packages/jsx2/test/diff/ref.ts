@@ -1,4 +1,4 @@
-type RefWork = import('../../src/diff/ref').RefWork;
+import type { RefWork } from '../../src/diff/ref';
 
 import { applyRefs, deferRef } from '../../src/diff/ref';
 import { createRef } from '../../src/jsx2';

@@ -1,7 +1,7 @@
-type Ref = import('./create-ref').Ref;
-type FunctionComponent = import('./component').FunctionComponent;
-type Component = import('./component').Component;
-type Renderable = import('./render').Renderable;
+import type { Ref } from './create-ref';
+import type { FunctionComponent } from './component';
+import type { Component } from './component';
+import type { Renderable } from './render';
 
 export interface SharedVNode {
   readonly key: string | number | null;

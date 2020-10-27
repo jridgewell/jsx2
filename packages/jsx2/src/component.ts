@@ -1,4 +1,4 @@
-type Renderable = import('./render').Renderable;
+import type { Renderable } from './render';
 type Props = Record<string, unknown>;
 
 export interface FunctionComponent {

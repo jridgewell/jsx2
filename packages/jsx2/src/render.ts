@@ -1,6 +1,6 @@
-type VNode = import('./create-element').VNode;
-type Fiber = import('./fiber').Fiber;
-type RefWork = import('./diff/ref').RefWork;
+import type { VNode } from './create-element';
+import type { Fiber } from './fiber';
+import type { RefWork } from './diff/ref';
 
 import { createElement } from './create-element';
 import { createTree } from './diff/create-tree';

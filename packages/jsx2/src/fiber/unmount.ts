@@ -1,4 +1,4 @@
-type Fiber = import('.').Fiber;
+import type { Fiber } from '.';
 
 import { setRef } from '../diff/ref';
 import { assert } from '../util/assert';

@@ -1,4 +1,4 @@
-type Renderable = import('../render').Renderable;
+import type { Renderable } from '../render';
 
 import { isValidElement } from '../create-element';
 import { isArray } from './is-array';

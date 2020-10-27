@@ -1,6 +1,6 @@
-type StyleTypes = import('./style').StyleTypes;
-type ListenerTypes = import('./event').ListenerTypes;
-type VNode = import('../create-element').VNode;
+import type { StyleTypes } from './style';
+import type { ListenerTypes } from './event';
+import type { VNode } from '../create-element';
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';

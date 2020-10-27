@@ -1,10 +1,10 @@
-type Fiber = import('../fiber').Fiber;
-type CoercedRenderable = import('../util/coerce-renderable').CoercedRenderable;
-type RenderableArray = import('../render').RenderableArray;
-type ElementVNode = import('../create-element').ElementVNode;
-type FunctionComponentVNode = import('../create-element').FunctionComponentVNode;
-type ClassComponentVNode = import('../create-element').ClassComponentVNode;
-type RefWork = import('./ref').RefWork;
+import type { Fiber } from '../fiber';
+import type { CoercedRenderable } from '../util/coerce-renderable';
+import type { RenderableArray } from '../render';
+import type { ElementVNode } from '../create-element';
+import type { FunctionComponentVNode } from '../create-element';
+import type { ClassComponentVNode } from '../create-element';
+import type { RefWork } from './ref';
 
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';

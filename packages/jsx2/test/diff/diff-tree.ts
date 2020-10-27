@@ -1,11 +1,11 @@
-type Renderable = import('../../src/render').Renderable;
-type RenderableArray = import('../../src/render').RenderableArray;
-type FunctionComponentVNode = import('../../src/create-element').FunctionComponentVNode;
-type ClassComponentVNode = import('../../src/create-element').ClassComponentVNode;
-type RefWork = import('../../src/diff/ref').RefWork;
-type Fiber = import('../../src/fiber').Fiber;
-type CoercedRenderable = import('../../src/util/coerce-renderable').CoercedRenderable;
-type ElementVNode = import('../../src/create-element').ElementVNode;
+import type { Renderable } from '../../src/render';
+import type { RenderableArray } from '../../src/render';
+import type { FunctionComponentVNode } from '../../src/create-element';
+import type { ClassComponentVNode } from '../../src/create-element';
+import type { RefWork } from '../../src/diff/ref';
+import type { Fiber } from '../../src/fiber';
+import type { CoercedRenderable } from '../../src/util/coerce-renderable';
+import type { ElementVNode } from '../../src/create-element';
 
 import { createElement, Component, Fragment } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';

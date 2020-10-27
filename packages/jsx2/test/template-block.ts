@@ -1,4 +1,4 @@
-type TemplateBlock = import('../src/template-block').TemplateBlock;
+import type { TemplateBlock } from '../src/template-block';
 
 import { templateBlock } from '../src/jsx2';
 

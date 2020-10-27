@@ -1,4 +1,4 @@
-type Fiber = import('.').Fiber;
+import type { Fiber } from '.';
 
 import { fiber } from './index';
 
