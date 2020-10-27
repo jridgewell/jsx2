@@ -1,4 +1,5 @@
 import type { Fiber } from '.';
+import { cleanupEffects } from '../diff/effects';
 
 import { setRef } from '../diff/ref';
 import { assert } from '../util/assert';
@@ -13,15 +14,7 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
     debug: assert(current !== null, 'end is guaranteed to prevent null loop');
     const { ref, stateData, child } = current;
     if (ref) setRef(null, ref);
-    if (stateData) {
-      for (let i = 0; i < stateData.length; i++) {
-        const state = stateData[i];
-        if (state.effect) {
-          const { cleanup } = state.data;
-          if (cleanup) cleanup();
-        }
-      }
-    }
+    if (stateData) cleanupEffects(stateData);
     if (child) unmountRange(child, null);
 
     current = current.next;

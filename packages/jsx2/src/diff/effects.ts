@@ -1,4 +1,4 @@
-import type { EffectState } from '../hooks';
+import type { EffectState, HookState } from '../hooks';
 
 let queuedEffects: EffectState[] = [];
 
@@ -27,18 +27,26 @@ export function scheduleEffect(effect: EffectState): void {
   if (length === 1) raf();
 }
 
-export function purgeInactiveEffects(): void {
-  queuedEffects = queuedEffects.filter((e) => e.active);
+export function cleanupEffects(stateData: HookState[]): void {
+  for (let i = 0; i < stateData.length; i++) {
+    const state = stateData[i];
+    if (!state.effect) continue;
+
+    const { data } = state;
+    const { cleanup } = data;
+    data.active = false;
+    if (cleanup != null) cleanup();
+  }
 }
 
 export function applyEffects(effects: EffectState[]): void {
   for (let i = 0; i < effects.length; i++) {
-    const { cleanup } = effects[i];
-    if (cleanup) cleanup();
+    const { active, cleanup } = effects[i];
+    if (active && cleanup != null) cleanup();
   }
   for (let i = 0; i < effects.length; i++) {
     const item = effects[i];
-    const { effect } = item;
-    item.cleanup = effect();
+    const { active, effect } = item;
+    if (active) item.cleanup = effect();
   }
 }
