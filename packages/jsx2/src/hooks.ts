@@ -1,4 +1,3 @@
-import type { FunctionComponentFiber } from './fiber';
 import type { RefObject } from './create-ref';
 
 export type HookState =
@@ -10,12 +9,6 @@ export type HookState =
       effect: true;
       data: EffectState;
     };
-
-type FiberState = {
-  index: number;
-  fiber: FunctionComponentFiber;
-  layoutEffects: EffectState[];
-};
 
 type EffectCleanup = null | undefined | void | (() => void);
 type Effect = () => EffectCleanup;
@@ -35,24 +28,7 @@ export type EffectState = {
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 import { scheduleEffect } from './diff/effects';
-
-const fiberStack: FiberState[] = [];
-
-export function pushHooksFiber(fiber: FunctionComponentFiber, layoutEffects: EffectState[]): void {
-  fiberStack.push({
-    index: 0,
-    fiber,
-    layoutEffects,
-  });
-}
-
-export function popHooksFiber(): void {
-  fiberStack.pop();
-}
-
-function currentFiberState(): FiberState {
-  return fiberStack[fiberStack.length - 1];
-}
+import { currentFiberState } from './diff/render-component-with-hooks';
 
 function getHookState(): HookState {
   const current = currentFiberState();

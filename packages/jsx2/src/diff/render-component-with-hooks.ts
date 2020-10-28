@@ -4,8 +4,31 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { EffectState } from '../hooks';
 
-import { popHooksFiber, pushHooksFiber } from '../hooks';
+type FiberState = {
+  index: number;
+  fiber: FunctionComponentFiber;
+  layoutEffects: EffectState[];
+};
+
 import { coerceRenderable } from '../util/coerce-renderable';
+
+const fiberStack: FiberState[] = [];
+
+export function pushHooksFiber(fiber: FunctionComponentFiber, layoutEffects: EffectState[]): void {
+  fiberStack.push({
+    index: 0,
+    fiber,
+    layoutEffects,
+  });
+}
+
+export function popHooksFiber(): void {
+  fiberStack.pop();
+}
+
+export function currentFiberState(): FiberState {
+  return fiberStack[fiberStack.length - 1];
+}
 
 export function renderComponentWithHooks(
   type: FunctionComponent,
