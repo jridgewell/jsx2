@@ -8,23 +8,28 @@ function process(): void {
   applyEffects(queue);
 }
 
-const raf = (() => {
+function setTimeoutRaf(_process: () => void) {
+  setTimeout(process, 17);
+}
+function singleRaf() {
+  setTimeout(process, 0);
+}
+function doubleRaf(_process: () => void) {
+  requestAnimationFrame(singleRaf);
+}
+export function getRaf(): (process: () => void) => void {
   if (typeof requestAnimationFrame === 'undefined') {
-    return (): void => {
-      setTimeout(process, 17);
-    };
+    return setTimeoutRaf;
   }
-  function singleRaf(): void {
-    setTimeout(process);
-  }
-  return (): void => {
-    requestAnimationFrame(singleRaf);
-  };
-})();
+  return doubleRaf;
+}
 
-export function scheduleEffect(effect: EffectState): void {
+export function scheduleEffect(
+  effect: EffectState,
+  scheduler: (process: () => void) => void,
+): void {
   const length = queuedEffects.push(effect);
-  if (length === 1) raf();
+  if (length === 1) scheduler(process);
 }
 
 export function cleanupEffects(stateData: HookState[]): void {

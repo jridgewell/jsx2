@@ -1,17 +1,18 @@
 import type { RefObject } from './create-ref';
 
+export type EffectHookState = {
+  effect: true;
+  data: EffectState;
+};
 export type HookState =
   | {
       effect: false;
       data: unknown;
     }
-  | {
-      effect: true;
-      data: EffectState;
-    };
+  | EffectHookState;
 
-type EffectCleanup = null | undefined | void | (() => void);
-type Effect = () => EffectCleanup;
+export type EffectCleanup = null | undefined | void | (() => void);
+export type Effect = () => EffectCleanup;
 type Lazy<S> = () => S;
 type NextState<S> = (prevState: S) => S;
 type StateState<S> = readonly [S, (nextState: S | NextState<S>) => void];
@@ -27,7 +28,7 @@ export type EffectState = {
 
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
-import { scheduleEffect } from './diff/effects';
+import { getRaf, scheduleEffect } from './diff/effects';
 import { currentFiberState } from './diff/render-component-with-hooks';
 
 function getHookState(): HookState {
@@ -99,7 +100,7 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     cleanup: oldData?.cleanup,
     active: true,
   });
-  scheduleEffect(data);
+  scheduleEffect(data, getRaf());
 }
 
 export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
