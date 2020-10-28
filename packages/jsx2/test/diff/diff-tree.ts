@@ -1754,3 +1754,64 @@ describe('diffTree', () => {
     });
   });
 });
+
+describe('rediffComponent', () => {
+  it('invokes component with the same props', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    const props = {};
+    const tree = makeTree(createElement(C, props), container);
+    const component = tree.child as FunctionComponentFiber;
+    C.mockReset();
+
+    rediffComponent(component);
+
+    expect(C).toHaveBeenCalledTimes(1);
+    expect(C).toHaveBeenCalledWith(props);
+  });
+
+  it('updates render', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    C.mockReturnValue('before');
+    const tree = makeTree(createElement(C), container);
+    const component = tree.child as FunctionComponentFiber;
+    const old = container.firstChild!;
+
+    C.mockReturnValue('test');
+    rediffComponent(component);
+
+    expect(container.firstChild).toBe(old);
+    expect(container.lastChild).toBe(old);
+    expectTextNode(old, 'test');
+  });
+
+  it('applies layoutEffects from rerender', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    C.mockReturnValue('before');
+    const tree = makeTree(createElement(C), container);
+    const component = tree.child as FunctionComponentFiber;
+    const effect = jest.fn();
+
+    C.mockImplementation(() => {
+      useLayoutEffect(effect);
+    });
+    rediffComponent(component);
+
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+
+  it('diffs the component in isolation', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    const D = jest.fn();
+    const tree = makeTree([createElement(C), createElement(D)], container);
+    const cComponent = tree.child!.child as FunctionComponentFiber;
+    D.mockReset();
+
+    rediffComponent(cComponent);
+
+    expect(D).not.toHaveBeenCalled();
+  });
+});
