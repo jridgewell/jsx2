@@ -1,4 +1,4 @@
-import type { Fiber } from '../fiber';
+import type { Fiber, DiffableFiber, RootFiber } from '../fiber';
 import type { FunctionComponentFiber } from '../fiber';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { RenderableArray } from '../render';
@@ -29,7 +29,7 @@ import { renderComponentWithHooks } from './render-component-with-hooks';
 import { applyEffects } from './effects';
 
 export function diffTree(
-  old: Fiber,
+  old: RootFiber | FunctionComponentFiber,
   renderable: CoercedRenderable,
   container: Node,
   layoutEffects: EffectState[] = [],
@@ -49,7 +49,7 @@ export function rediffComponent(fiber: FunctionComponentFiber): void {
 }
 
 function diffChild(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -97,7 +97,7 @@ function diffChild(
 }
 
 function renderNull(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: null,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -109,7 +109,7 @@ function renderNull(
 }
 
 function renderText(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: string,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -136,7 +136,7 @@ function renderText(
 }
 
 function renderArray(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: RenderableArray,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -169,7 +169,7 @@ function renderArray(
     current = f.next;
   }
 
-  const keyed = Object.create(null) as Record<string, undefined | Fiber>;
+  const keyed = Object.create(null) as Record<string, undefined | DiffableFiber>;
   for (let c = current; c !== null; c = c.next) {
     const { key } = c;
     keyed[key === null ? c.index : key] = c;
@@ -216,7 +216,7 @@ function renderArray(
 }
 
 function renderElement(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: ElementVNode,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -261,7 +261,7 @@ function renderElement(
 }
 
 function renderComponent(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: FunctionComponentVNode | ClassComponentVNode,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
@@ -308,7 +308,7 @@ function renderComponent(
 }
 
 function replaceFiber(
-  old: Fiber,
+  old: DiffableFiber,
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,

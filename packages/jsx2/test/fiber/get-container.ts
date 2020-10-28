@@ -41,7 +41,6 @@ describe('getContainer', () => {
         mark(parent, grandparent, null);
         mark(current, parent, null);
 
-        debugger;
         expect(getContainer(current)).toBe(parent.dom);
       });
 

@@ -2,37 +2,34 @@ import type { Renderable } from '../../src/render';
 import type { RenderableArray } from '../../src/render';
 import type { FunctionComponentVNode } from '../../src/create-element';
 import type { ClassComponentVNode } from '../../src/create-element';
-import type { Fiber } from '../../src/fiber';
-import type { CoercedRenderable } from '../../src/util/coerce-renderable';
+import type { FunctionComponentFiber, RootFiber } from '../../src/fiber';
+import { CoercedRenderable, coerceRenderable } from '../../src/util/coerce-renderable';
 import type { ElementVNode } from '../../src/create-element';
 
-import { createElement, Component, Fragment } from '../../src/jsx2';
+import { createElement, Component } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
-import { diffTree } from '../../src/diff/diff-tree';
+import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
+import { useLayoutEffect } from '../../src/hooks';
+
+function makeTree(renderable: Renderable, container: Node) {
+  return createTree(coerceRenderable(renderable), container);
+}
+
+function expectTextNode(node: Node, text: string) {
+  expect(node).toBeTruthy();
+  expect(node.nodeType).toBe(Node.TEXT_NODE);
+  expect(node.textContent).toBe(text);
+}
 
 describe('diffTree', () => {
-  function expectTextNode(node: Node, text: string) {
-    expect(node).toBeTruthy();
-    expect(node.nodeType).toBe(Node.TEXT_NODE);
-    expect(node.textContent).toBe(text);
-  }
-
   function expectElement(node: Node, tag: string): asserts node is Element {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.ELEMENT_NODE);
     expect((node as Element).localName).toBe(tag);
   }
 
-  function data(renderable: Renderable): FunctionComponentVNode {
-    return createElement(Fragment, null, renderable);
-  }
-
-  function makeTree(renderable: Renderable, container: Node) {
-    return createTree(data(renderable), container);
-  }
-
-  function diff(old: Fiber, renderable: CoercedRenderable, container: Node) {
-    diffTree(old, data(renderable), container);
+  function diff(old: RootFiber, renderable: CoercedRenderable, container: Node) {
+    diffTree(old, coerceRenderable(renderable), container);
   }
 
   function expectShallowEqual<T, U>(actual: T[], expected: U[]) {

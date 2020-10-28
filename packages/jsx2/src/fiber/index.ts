@@ -8,12 +8,21 @@ import type { HookState } from '../hooks';
 
 export interface SharedFiber {
   parent: null | Fiber;
-  child: null | Fiber;
-  next: null | Fiber;
+  child: null | DiffableFiber;
+  next: null | DiffableFiber;
   index: number;
   depth: number;
   dirty: boolean;
   current: boolean;
+}
+
+export interface RootFiber extends SharedFiber {
+  data: Node;
+  key: null;
+  dom: Node;
+  stateData: null;
+  component: null;
+  ref: null;
 }
 
 export interface NullFiber extends SharedFiber {
@@ -71,6 +80,7 @@ export interface ArrayFiber extends SharedFiber {
 }
 
 export type Fiber =
+  | RootFiber
   | NullFiber
   | TextFiber
   | ElementFiber
@@ -78,9 +88,13 @@ export type Fiber =
   | ClassComponentFiber
   | ArrayFiber;
 
+export type DiffableFiber = Exclude<Fiber, RootFiber>;
+
 export function fiber<T extends Fiber['data']>(
   data: T,
-): T extends NullFiber['data']
+): T extends RootFiber['data']
+  ? RootFiber
+  : T extends NullFiber['data']
   ? NullFiber
   : T extends TextFiber['data']
   ? TextFiber
