@@ -3,7 +3,7 @@ import type { RefObject } from './create-ref';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 import { scheduleEffect } from './diff/effects';
-import { currentFiberState } from './diff/render-component-with-hooks';
+import { getCurrentFiberState } from './diff/render-component-with-hooks';
 
 export type EffectHookState = {
   effect: true;
@@ -32,7 +32,7 @@ export type EffectState = {
 };
 
 function getHookState(): HookState {
-  const current = currentFiberState();
+  const current = getCurrentFiberState();
   const { stateData } = current.fiber;
   const index = current.index++;
   if (stateData.length > index) {
@@ -72,7 +72,7 @@ export function useReducer<S, A, I>(
     return data;
   }
 
-  const { fiber } = currentFiberState();
+  const { fiber } = getCurrentFiberState();
   const initialState = init ? init(initial as I) : (initial as S);
   const dispatch = (action: A) => {
     const old = (hookState.data as ReducerState<S, A>)[0];
@@ -116,7 +116,7 @@ export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
     cleanup: oldData?.cleanup,
     active: true,
   });
-  currentFiberState().layoutEffects.push(data);
+  getCurrentFiberState().layoutEffects.push(data);
 }
 
 export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {

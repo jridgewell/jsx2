@@ -4,6 +4,7 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
+import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
 type FiberState = {
@@ -12,10 +13,11 @@ type FiberState = {
   layoutEffects: EffectState[];
 };
 
-const fiberStack: FiberState[] = [];
+let currentFiber: null | FiberState = null;
 
-export function currentFiberState(): FiberState {
-  return fiberStack[fiberStack.length - 1];
+export function getCurrentFiberState(): FiberState {
+  debug: assert(currentFiber !== null, 'current fiber is not assigned');
+  return currentFiber;
 }
 
 export function renderComponentWithHooks(
@@ -26,12 +28,13 @@ export function renderComponentWithHooks(
 ): CoercedRenderable {
   const { length } = layoutEffects;
   let rendered;
-  const fiberState = {
+
+  debug: assert(currentFiber === null, 'current fiber already assigned');
+  currentFiber = {
     index: 0,
     fiber,
     layoutEffects,
   };
-  fiberStack.push(fiberState);
   fiber.current = true;
 
   for (let renderCount = 0; renderCount < 25; renderCount++) {
@@ -41,10 +44,11 @@ export function renderComponentWithHooks(
 
     fiber.dirty = false;
     layoutEffects.length = length;
-    fiberState.index = 0;
+    currentFiber.index = 0;
   }
+
   fiber.current = false;
-  fiberStack.pop();
+  currentFiber = null;
 
   return coerceRenderable(rendered);
 }
