@@ -1,5 +1,10 @@
 import type { RefObject } from './create-ref';
 
+import { enqueueDiff } from './diff/enqueue-diff';
+import { shallowArrayEquals } from './util/shallow-array-equals';
+import { scheduleEffect } from './diff/effects';
+import { currentFiberState } from './diff/render-component-with-hooks';
+
 export type EffectHookState = {
   effect: true;
   data: EffectState;
@@ -25,11 +30,6 @@ export type EffectState = {
   effect: Effect;
   active: boolean;
 };
-
-import { enqueueDiff } from './diff/enqueue-diff';
-import { shallowArrayEquals } from './util/shallow-array-equals';
-import { scheduleEffect } from './diff/effects';
-import { currentFiberState } from './diff/render-component-with-hooks';
 
 function getHookState(): HookState {
   const current = currentFiberState();

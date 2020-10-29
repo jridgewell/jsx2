@@ -4,13 +4,13 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
+import { coerceRenderable } from '../util/coerce-renderable';
+
 type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
   layoutEffects: EffectState[];
 };
-
-import { coerceRenderable } from '../util/coerce-renderable';
 
 const fiberStack: FiberState[] = [];
 
