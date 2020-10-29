@@ -22,8 +22,8 @@ const targetSize = 25;
 
 function Dot({ x, y, size, text }) {
   const [hover, setHover] = useState(false);
-  const enter = useCallback(() => setHover(true));
-  const leave = useCallback(() => setHover(false));
+  const enter = useCallback(() => setHover(true), []);
+  const leave = useCallback(() => setHover(false), []);
   const s = size * 1.3;
   const style = {
     ...dotStyle,
