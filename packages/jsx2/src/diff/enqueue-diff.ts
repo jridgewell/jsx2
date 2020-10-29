@@ -2,7 +2,15 @@ import type { FunctionComponentFiber } from '../fiber';
 
 import { rediffComponent } from './diff-tree';
 
-const nextTick = Promise.prototype.then.bind(Promise.resolve());
+let resolved: Promise<void>;
+
+function nextTick(process: () => void): void {
+  (resolved ||= Promise.resolve()).then(process);
+}
+
+function getNextTick(): (process: () => void) => void {
+  return nextTick;
+}
 
 let diffs: FunctionComponentFiber[] = [];
 
@@ -21,10 +29,10 @@ function process() {
   }
 }
 
-export function enqueueDiff(fiber: FunctionComponentFiber): void {
+export function enqueueDiff(fiber: FunctionComponentFiber, scheduler = getNextTick()): void {
   if (fiber.dirty) return;
   fiber.dirty = true;
   if (fiber.current) return;
   const length = diffs.push(fiber);
-  if (length === 1) nextTick(process);
+  if (length === 1) scheduler(process);
 }

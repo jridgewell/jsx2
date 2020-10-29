@@ -2,14 +2,15 @@ import type { Renderable } from '../../src/render';
 import type { RenderableArray } from '../../src/render';
 import type { FunctionComponentVNode } from '../../src/create-element';
 import type { ClassComponentVNode } from '../../src/create-element';
-import type { FunctionComponentFiber, RootFiber } from '../../src/fiber';
-import { CoercedRenderable, coerceRenderable } from '../../src/util/coerce-renderable';
+import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
+import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 import type { ElementVNode } from '../../src/create-element';
 
 import { createElement, Component } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { useLayoutEffect } from '../../src/hooks';
+import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 function makeTree(renderable: Renderable, container: Node) {
   return createTree(coerceRenderable(renderable), container);
@@ -1756,12 +1757,20 @@ describe('diffTree', () => {
 });
 
 describe('rediffComponent', () => {
+  function expectFunctionComponentFiber(fiber: null | Fiber): FunctionComponentFiber {
+    expect(fiber).not.toBeNull();
+    const { data } = fiber!;
+    expect(typeof data).toBe('object');
+    expect(typeof (data as any).type).toBe('function');
+    return fiber as FunctionComponentFiber;
+  }
+
   it('invokes component with the same props', () => {
     const container = document.createElement('body');
     const C = jest.fn();
     const props = {};
     const tree = makeTree(createElement(C, props), container);
-    const component = tree.child as FunctionComponentFiber;
+    const component = expectFunctionComponentFiber(tree.child);
     C.mockReset();
 
     rediffComponent(component);
@@ -1775,7 +1784,7 @@ describe('rediffComponent', () => {
     const C = jest.fn();
     C.mockReturnValue('before');
     const tree = makeTree(createElement(C), container);
-    const component = tree.child as FunctionComponentFiber;
+    const component = expectFunctionComponentFiber(tree.child);
     const old = container.firstChild!;
 
     C.mockReturnValue('test');
@@ -1791,7 +1800,7 @@ describe('rediffComponent', () => {
     const C = jest.fn();
     C.mockReturnValue('before');
     const tree = makeTree(createElement(C), container);
-    const component = tree.child as FunctionComponentFiber;
+    const component = expectFunctionComponentFiber(tree.child);
     const effect = jest.fn();
 
     C.mockImplementation(() => {
@@ -1807,7 +1816,7 @@ describe('rediffComponent', () => {
     const C = jest.fn();
     const D = jest.fn();
     const tree = makeTree([createElement(C), createElement(D)], container);
-    const cComponent = tree.child!.child as FunctionComponentFiber;
+    const cComponent = expectFunctionComponentFiber(tree.child!.child);
     D.mockReset();
 
     rediffComponent(cComponent);

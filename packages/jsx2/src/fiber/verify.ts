@@ -3,17 +3,18 @@ import type { Fiber } from '.';
 import { assert } from '../util/assert';
 
 export function verify(fiber: Fiber): void {
-  debug: verifyRange(fiber, fiber.next, fiber.parent, false);
+  debug: verifyRange(fiber, fiber.next, fiber.parent, fiber.index, false);
 }
 
 function verifyRange(
   fiber: Fiber,
   end: null | Fiber,
   parent: null | Fiber,
+  index = 0,
   checkSiblings = true,
 ): void {
   let current: null | Fiber = fiber;
-  let i = 0;
+  let i = index;
   do {
     assert(current !== null, 'end is guaranteed to prevent null loop');
     assert(current.index === i, 'unexpected index');
