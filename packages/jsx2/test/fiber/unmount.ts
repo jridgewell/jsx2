@@ -1,8 +1,8 @@
 import type { Fiber } from '../../src/fiber';
 import { fiber } from '../../src/fiber';
+import { createElement, Component } from '../../src/jsx2';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
-import { createElement, Component } from '../../src/jsx2';
 
 describe('unmount', () => {
   class C extends Component {

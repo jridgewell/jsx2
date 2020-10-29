@@ -1,8 +1,8 @@
 import type { FunctionComponent } from '../component';
 import type { VNode } from '../create-element';
 import type { FunctionComponentFiber } from '../fiber';
-import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { EffectState } from '../hooks';
+import type { CoercedRenderable } from '../util/coerce-renderable';
 
 type FiberState = {
   index: number;

@@ -1,5 +1,9 @@
 import type { Renderable, RenderableArray } from '../../src/render';
-import type { FunctionComponentVNode, ClassComponentVNode, ElementVNode } from '../../src/create-element';
+import type {
+  FunctionComponentVNode,
+  ClassComponentVNode,
+  ElementVNode,
+} from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 

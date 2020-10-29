@@ -1,8 +1,12 @@
-import type { CoercedRenderable } from '../util/coerce-renderable';
-import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { RefWork } from './ref';
+import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { EffectState } from '../hooks';
+import type { CoercedRenderable } from '../util/coerce-renderable';
 
+import { addProps } from './prop';
+import { applyRefs, deferRef } from './ref';
+import { renderComponentWithHooks } from './render-component-with-hooks';
+import { applyEffects } from './effects';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
 import { insert } from '../fiber/insert';
@@ -10,10 +14,6 @@ import { mark } from '../fiber/mark';
 import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
-import { addProps } from './prop';
-import { applyRefs, deferRef } from './ref';
-import { renderComponentWithHooks } from './render-component-with-hooks';
-import { applyEffects } from './effects';
 
 export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
   const root = fiber(container);

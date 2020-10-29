@@ -1,10 +1,10 @@
 import type { DiffableFiber, Fiber } from '.';
 
-import { assert } from '../util/assert';
 import { getNextSibling } from './get-next-sibling';
 import { insert } from './insert';
 import { remove } from './remove';
 import { unmount } from './unmount';
+import { assert } from '../util/assert';
 
 export function replace(old: DiffableFiber, fiber: Fiber, parent: Fiber, container: Node): Fiber {
   debug: {

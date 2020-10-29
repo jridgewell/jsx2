@@ -1,7 +1,7 @@
 import { fiber } from '../../src/fiber';
+import { createElement } from '../../src/jsx2';
 import { mark } from '../../src/fiber/mark';
 import { getContainer } from '../../src/fiber/get-container';
-import { createElement } from '../../src/jsx2';
 
 describe('getContainer', () => {
   function makeElementFiber(tag: string) {

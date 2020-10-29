@@ -1,10 +1,15 @@
+import type { RefWork } from './ref';
 import type { Fiber, DiffableFiber, RootFiber, FunctionComponentFiber } from '../fiber';
-import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { RenderableArray } from '../render';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
-import type { RefWork } from './ref';
 import type { EffectState } from '../hooks';
+import type { CoercedRenderable } from '../util/coerce-renderable';
 
+import { createChild } from './create-tree';
+import { diffProps } from './prop';
+import { applyRefs, deferRef } from './ref';
+import { renderComponentWithHooks } from './render-component-with-hooks';
+import { applyEffects } from './effects';
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
 import { clone } from '../fiber/clone';
@@ -19,11 +24,6 @@ import { getContainer } from '../fiber/get-container';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { equals } from '../util/nullish-equals';
-import { createChild } from './create-tree';
-import { diffProps } from './prop';
-import { applyRefs, deferRef } from './ref';
-import { renderComponentWithHooks } from './render-component-with-hooks';
-import { applyEffects } from './effects';
 
 export function diffTree(
   old: RootFiber | FunctionComponentFiber,
