@@ -1,15 +1,11 @@
-import type { Renderable } from '../../src/render';
-import type { RenderableArray } from '../../src/render';
-import type { FunctionComponentVNode } from '../../src/create-element';
-import type { ClassComponentVNode } from '../../src/create-element';
+import type { Renderable, RenderableArray } from '../../src/render';
+import type { FunctionComponentVNode, ClassComponentVNode, ElementVNode } from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
-import type { ElementVNode } from '../../src/create-element';
 
-import { createElement, Component } from '../../src/jsx2';
+import { createElement, useLayoutEffect, Component } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
-import { useLayoutEffect } from '../../src/hooks';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 function makeTree(renderable: Renderable, container: Node) {

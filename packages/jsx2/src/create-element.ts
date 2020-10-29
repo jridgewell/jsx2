@@ -1,6 +1,5 @@
 import type { Ref } from './create-ref';
-import type { FunctionComponent } from './component';
-import type { Component } from './component';
+import type { FunctionComponent, Component } from './component';
 import type { Renderable } from './render';
 
 export interface SharedVNode {

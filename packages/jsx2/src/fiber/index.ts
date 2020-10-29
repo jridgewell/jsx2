@@ -1,7 +1,5 @@
 import type { Component } from '../component';
-import type { ElementVNode } from '../create-element';
-import type { FunctionComponentVNode } from '../create-element';
-import type { ClassComponentVNode } from '../create-element';
+import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
 import type { RenderableArray } from '../render';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';

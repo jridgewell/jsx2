@@ -1,6 +1,5 @@
 import type { CoercedRenderable } from '../util/coerce-renderable';
-import type { DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
-import type { Fiber } from '../fiber';
+import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { RefWork } from './ref';
 import type { EffectState } from '../hooks';
 
