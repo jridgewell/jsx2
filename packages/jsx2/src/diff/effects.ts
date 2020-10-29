@@ -26,7 +26,7 @@ export function getRaf(): (process: () => void) => void {
 
 export function scheduleEffect(
   effect: EffectState,
-  scheduler: (process: () => void) => void,
+  scheduler = getRaf(),
 ): void {
   const length = queuedEffects.push(effect);
   if (length === 1) scheduler(process);

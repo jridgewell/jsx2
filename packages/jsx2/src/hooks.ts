@@ -28,7 +28,7 @@ export type EffectState = {
 
 import { enqueueDiff } from './diff/enqueue-diff';
 import { shallowArrayEquals } from './util/shallow-array-equals';
-import { getRaf, scheduleEffect } from './diff/effects';
+import { scheduleEffect } from './diff/effects';
 import { currentFiberState } from './diff/render-component-with-hooks';
 
 function getHookState(): HookState {
@@ -100,7 +100,7 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     cleanup: oldData?.cleanup,
     active: true,
   });
-  scheduleEffect(data, getRaf());
+  scheduleEffect(data);
 }
 
 export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
