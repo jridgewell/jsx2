@@ -14,18 +14,6 @@ type FiberState = {
 
 const fiberStack: FiberState[] = [];
 
-export function pushHooksFiber(fiber: FunctionComponentFiber, layoutEffects: EffectState[]): void {
-  fiberStack.push({
-    index: 0,
-    fiber,
-    layoutEffects,
-  });
-}
-
-export function popHooksFiber(): void {
-  fiberStack.pop();
-}
-
 export function currentFiberState(): FiberState {
   return fiberStack[fiberStack.length - 1];
 }
@@ -37,20 +25,26 @@ export function renderComponentWithHooks(
   layoutEffects: EffectState[],
 ): CoercedRenderable {
   const { length } = layoutEffects;
-  let i = 0;
   let rendered;
+  const fiberState = {
+    index: 0,
+    fiber,
+    layoutEffects,
+  };
+  fiberStack.push(fiberState);
   fiber.current = true;
-  for (; i < 25; i++) {
-    pushHooksFiber(fiber, layoutEffects);
+
+  for (let renderCount = 0; renderCount < 25; renderCount++) {
     rendered = type(props);
-    popHooksFiber();
 
     if (!fiber.dirty) break;
 
     fiber.dirty = false;
     layoutEffects.length = length;
+    fiberState.index = 0;
   }
   fiber.current = false;
+  fiberStack.pop();
 
   return coerceRenderable(rendered);
 }
