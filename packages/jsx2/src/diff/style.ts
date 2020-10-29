@@ -1,6 +1,10 @@
 type StyleObject = Record<string, unknown>;
 export type StyleTypes = string | null | undefined | StyleObject;
 
+const empty = {
+  __proto__: null,
+};
+
 export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: StyleTypes): void {
   const { style } = el;
   if (typeof newValue === 'string') {
@@ -10,16 +14,18 @@ export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: Style
 
   if (typeof oldValue === 'string') {
     style.cssText = '';
-  } else if (oldValue && newValue) {
-    for (const s in oldValue) {
-      if (!(s in newValue)) setStyle(style, s, '');
-    }
-  } else if (oldValue) {
-    for (const s in oldValue) setStyle(style, s, '');
+    oldValue = empty;
+  } else if (!oldValue) {
+    oldValue = empty;
   }
 
-  if (newValue) {
-    for (const s in newValue) setStyle(style, s, newValue[s]);
+  if (!newValue) newValue = empty;
+
+  for (const s in oldValue) {
+    if (!(s in newValue)) setStyle(style, s, '');
+  }
+  for (const s in newValue) {
+    if (newValue[s] !== oldValue[s]) setStyle(style, s, newValue[s]);
   }
 }
 

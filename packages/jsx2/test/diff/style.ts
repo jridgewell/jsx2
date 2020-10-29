@@ -213,6 +213,7 @@ describe('diffStyle', () => {
         const old = { background: 'black' };
         const value = { background: 'black', opacity: 0 };
 
+        diffStyle(el, null, old);
         diffStyle(el, old, value);
 
         expect(el.style.background).toBe('black');
