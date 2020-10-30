@@ -7,7 +7,7 @@ import type { CoercedRenderable } from '../util/coerce-renderable';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
-type FiberState = {
+export type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
   layoutEffects: EffectState[];
