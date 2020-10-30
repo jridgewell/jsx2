@@ -9,7 +9,6 @@ export {
   useContext,
   useDebugValue,
   useEffect,
-  useErrorBoundary,
   useImperativeHandle,
   useLayoutEffect,
   useMemo,

@@ -1,4 +1,4 @@
-import type { RefObject } from './create-ref';
+import type { Ref, RefObject } from './create-ref';
 import type { Context } from './context';
 import type { Fiber } from './fiber';
 
@@ -7,6 +7,7 @@ import { enqueueDiff } from './diff/enqueue-diff';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 import { getAncestorFiber } from './fiber/get-ancestor-fiber';
+import { setRef } from './diff/ref';
 
 export type EffectHookState = {
   effect: true;
@@ -159,7 +160,6 @@ export function useContext<T>(ctx: Context<T>): T {
   return ctx._defaultValue;
 }
 
-// TODO:
-/* eslint-disable @typescript-eslint/no-empty-function */
-export function useErrorBoundary(): void {}
-export function useImperativeHandle(): void {}
+export function useImperativeHandle<R>(ref: Ref, createHandle: () => R, deps?: unknown[]): void {
+  return useLayoutEffect(() => setRef(createHandle(), ref), deps);
+}
