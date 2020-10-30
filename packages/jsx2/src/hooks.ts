@@ -146,16 +146,27 @@ export function useDebugValue(): void {
   // purposefully noop.
 }
 
+function next<T>(_prevState: T, nextState: T): T {
+  return nextState;
+}
 export function useContext<T>(ctx: Context<T>): T {
-  const { fiber } = getCurrentFiberState();
-  let current: null | Fiber = fiber;
-  while ((current = current.parent || getAncestorFiber(current)) !== null) {
-    const { contexts } = current;
-    if (contexts === null) continue;
-    if (!contexts.has(ctx as Context<unknown>)) continue;
-    return contexts.get(ctx as Context<unknown>) as T;
+  const { 0: value, 1: set } = useReducer(next, ctx, (ctx: Context<T>) => {
+    const { fiber } = getCurrentFiberState();
+    let current: null | Fiber = fiber;
+    while ((current = current.parent || getAncestorFiber(current)) !== null) {
+      const { contexts } = current;
+      if (contexts === null) continue;
+      const holder = contexts.get(ctx);
+      if (!holder) continue;
+      holder.listeners.push(setter);
+      return holder.value;
+    }
+    return ctx._defaultValue;
+  });
+  function setter(value: T) {
+    set(value);
   }
-  return ctx._defaultValue;
+  return value;
 }
 
 export function useImperativeHandle<R>(ref: Ref, createHandle: () => R, deps?: unknown[]): void {

@@ -4,10 +4,15 @@ import { useContext } from './hooks';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
 
 export interface Context<T> {
-  _defaultValue: T,
+  _defaultValue: T;
   Consumer: ContextConsumer<T>;
   Provider: ContextProvider<T>;
 }
+
+export type ContextHolder<T> = {
+  value: T;
+  listeners: ((value: T) => void)[];
+};
 
 type ConsumerProps<T> = {
   children: (context: T) => Renderable;
@@ -15,7 +20,7 @@ type ConsumerProps<T> = {
 export type ContextConsumer<T> = (props: ConsumerProps<T>) => Renderable;
 
 type ProviderProps<T> = {
-  value: T,
+  value: T;
   children: Renderable;
 };
 export type ContextProvider<T> = (props: ProviderProps<T>) => Renderable;
@@ -27,10 +32,21 @@ export function createContext<T>(defaultValue: T): Context<T> {
       return props.children(useContext(ctx));
     },
     Provider(props: ProviderProps<T>): Renderable {
+      const { value, children } = props;
       const { fiber } = getCurrentFiberState();
       const contexts = (fiber.contexts ||= new WeakMap());
-      contexts.set(ctx as Context<unknown>, props.value);
-      return props.children;
+      let holder = contexts.get(ctx);
+      if (holder === undefined) {
+        holder = {
+          value,
+          listeners: [],
+        };
+        contexts.set(ctx, holder);
+      } else {
+        holder.value = value;
+        holder.listeners.forEach((s) => s(value));
+      }
+      return children;
     },
   };
   return ctx;

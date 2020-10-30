@@ -1,5 +1,5 @@
 import type { Component } from '../component';
-import type { Context } from '../context';
+import type { Context, ContextHolder } from '../context';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
@@ -61,7 +61,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   dom: null;
   stateData: HookState[];
   component: null;
-  contexts: null | WeakMap<Context<unknown>, unknown>;
+  contexts: null | WeakMap<Context<any>, ContextHolder<any>>;
   ref: null;
 }
 
