@@ -1,8 +1,8 @@
 import type { Component } from '../component';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
-import type { RenderableArray } from '../render';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
+import type { RenderableArray } from '../render';
 
 export interface SharedFiber {
   parent: null | Fiber;

@@ -1,9 +1,9 @@
 import type { RefObject } from './create-ref';
 
-import { enqueueDiff } from './diff/enqueue-diff';
-import { shallowArrayEquals } from './util/shallow-array-equals';
 import { scheduleEffect } from './diff/effects';
+import { enqueueDiff } from './diff/enqueue-diff';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
+import { shallowArrayEquals } from './util/shallow-array-equals';
 
 export type EffectHookState = {
   effect: true;

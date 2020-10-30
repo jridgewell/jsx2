@@ -1,9 +1,9 @@
-import type { Renderable } from '../../src/render';
 import type { Fiber, FunctionComponentFiber } from '../../src/fiber';
+import type { Renderable } from '../../src/render';
 
 import { createElement } from '../../src/jsx2';
-import { enqueueDiff } from '../../src/diff/enqueue-diff';
 import { createTree } from '../../src/diff/create-tree';
+import { enqueueDiff } from '../../src/diff/enqueue-diff';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('enqueueDiff', () => {

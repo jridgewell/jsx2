@@ -1,7 +1,7 @@
 import { fiber } from '../../src/fiber';
 import { createElement } from '../../src/jsx2';
-import { mark } from '../../src/fiber/mark';
 import { insert } from '../../src/fiber/insert';
+import { mark } from '../../src/fiber/mark';
 import { replace } from '../../src/fiber/replace';
 
 describe('replace', () => {

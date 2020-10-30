@@ -3,10 +3,10 @@ import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '..
 import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
+import { applyEffects } from './effects';
 import { addProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
-import { applyEffects } from './effects';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
 import { insert } from '../fiber/insert';

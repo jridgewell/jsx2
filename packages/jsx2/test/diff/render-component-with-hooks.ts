@@ -1,12 +1,12 @@
 import type { EffectState } from '../../src/hooks';
 import type { FiberState } from '../../src/diff/render-component-with-hooks';
 
+import { fiber } from '../../src/fiber';
+import { createElement } from '../../src/jsx2';
 import {
   getCurrentFiberState,
   renderComponentWithHooks,
 } from '../../src/diff/render-component-with-hooks';
-import { fiber } from '../../src/fiber';
-import { createElement } from '../../src/jsx2';
 
 describe('getCurrentFiberState', () => {
   it('returns currently rendering fiber', () => {
