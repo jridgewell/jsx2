@@ -149,14 +149,12 @@ export function useDebugValue(): void {
 export function useContext<T>(ctx: Context<T>): T {
   const { fiber } = getCurrentFiberState();
   let current: null | Fiber = fiber;
-  do {
+  while ((current = current.parent || getAncestorFiber(current)) !== null) {
     const { contexts } = current;
     if (contexts === null) continue;
-    if (contexts.has(ctx as Context<unknown>)) {
-      return contexts.get(ctx as Context<unknown>) as T;
-    }
-    current = current.parent || getAncestorFiber(current);
-  } while (current !== null);
+    if (!contexts.has(ctx as Context<unknown>)) continue;
+    return contexts.get(ctx as Context<unknown>) as T;
+  }
   return ctx._defaultValue;
 }
 
