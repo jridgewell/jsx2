@@ -1,5 +1,5 @@
 import type { Ref, RefObject } from './create-ref';
-import type { Context } from './context';
+import type { Context, ContextHolder } from './context';
 import type { Fiber } from './fiber';
 
 import { scheduleEffect } from './diff/effects';
@@ -148,34 +148,28 @@ export function useDebugValue(): void {
 
 export function useContext<T>(ctx: Context<T>): T {
   const hookState = getHookState();
-  const data = hookState.data as null | StateState<T>;
+  const data = hookState.data as null | ContextHolder<T>;
   if (data) {
-    return data[0];
+    return data.value;
   }
 
   const { fiber } = getCurrentFiberState();
-  const set = (value: T): void => {
-    const old = (hookState.data as StateState<T>)[0];
-    if (value === old) return;
-    hookState.data = [value, set];
-    enqueueDiff(fiber);
-  };
+  let holder: ContextHolder<T> = { value: ctx._defaultValue, consumers: [] };
   let current: null | Fiber = fiber;
-  let value = ctx._defaultValue;
   while ((current = current.parent || getAncestorFiber(current)) !== null) {
     const { contexts } = current;
     if (contexts === null) continue;
-    const holder = contexts.get(ctx);
-    if (!holder) continue;
-    const { listeners, value: v } = holder;
-    value = v;
-    listeners.push(set);
-    const contextListeners = (fiber.contextListeners ||= []);
-    contextListeners.push({ listeners, set });
+    const h = contexts.get(ctx);
+    if (h === undefined) continue;
+
+    const consumedContexts = (fiber.consumedContexts ||= []);
+    holder = h;
+    consumedContexts.push(holder);
+    holder.consumers.push(fiber);
     break;
   }
-  hookState.data = [value, set];
-  return value;
+  hookState.data = holder;
+  return holder.value;
 }
 
 export function useImperativeHandle<R>(ref: Ref, createHandle: () => R, deps?: unknown[]): void {

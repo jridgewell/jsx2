@@ -1,5 +1,5 @@
 import type { Component } from '../component';
-import type { Context, ContextHolder, ReverseContextHolder } from '../context';
+import type { Context, ContextHolder } from '../context';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
@@ -22,7 +22,7 @@ export interface RootFiber extends SharedFiber {
   stateData: null;
   component: null;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null;
 }
 
@@ -33,7 +33,7 @@ export interface NullFiber extends SharedFiber {
   stateData: null;
   component: null;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null;
 }
 
@@ -44,7 +44,7 @@ export interface TextFiber extends SharedFiber {
   stateData: null;
   component: null;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null;
 }
 
@@ -55,7 +55,7 @@ export interface ElementFiber extends SharedFiber {
   stateData: null;
   component: null;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null | Ref;
 }
 
@@ -66,7 +66,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   stateData: HookState[];
   component: null;
   contexts: null | WeakMap<Context<any>, ContextHolder<any>>;
-  contextListeners: null | ReverseContextHolder<any>[];
+  consumedContexts: null | ContextHolder<any>[];
   ref: null;
 }
 
@@ -77,7 +77,7 @@ export interface ClassComponentFiber extends SharedFiber {
   stateData: null;
   component: null | Component;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null | Ref;
 }
 
@@ -88,7 +88,7 @@ export interface ArrayFiber extends SharedFiber {
   stateData: null;
   component: null;
   contexts: null;
-  contextListeners: null;
+  consumedContexts: null;
   ref: null;
 }
 
@@ -131,7 +131,7 @@ export function fiber<T extends Fiber['data']>(
     stateData: null,
     component: null,
     contexts: null,
-    contextListeners: null,
+    consumedContexts: null,
     parent: null,
     child: null,
     next: null,
