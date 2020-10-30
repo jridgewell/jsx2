@@ -1,12 +1,12 @@
 import type { VNode } from './create-element';
-import type { RootFiber } from './fiber';
+import type { Fiber } from './fiber';
 
 import { createTree } from './diff/create-tree';
 import { diffTree } from './diff/diff-tree';
 import { coerceRenderable } from './util/coerce-renderable';
 
 export type Container = (Element | Document | ShadowRoot | DocumentFragment) & {
-  _fiber?: RootFiber;
+  _fiber?: Fiber;
 };
 
 export type Renderable =
@@ -23,7 +23,7 @@ export type RenderableArray = ReadonlyArray<Renderable>;
 export function render(_renderable: Renderable, container: Container): void {
   const renderable = coerceRenderable(_renderable);
   const old = container._fiber;
-  if (old) {
+  if (old && old.data === container) {
     diffTree(old, renderable, container);
   } else {
     container.textContent = '';

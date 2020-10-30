@@ -1,6 +1,7 @@
 import type { RefWork } from './ref';
 import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { EffectState } from '../hooks';
+import type { Container } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
 import { applyEffects } from './effects';
@@ -59,6 +60,7 @@ export function createChild(
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
+    (el as Container)._fiber = f;
     f.dom = el;
     f.ref = ref;
     addProps(el, props);

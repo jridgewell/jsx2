@@ -1,9 +1,12 @@
 import type { RefObject } from './create-ref';
+import type { Context } from './context';
+import type { Fiber } from './fiber';
 
 import { scheduleEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
 import { shallowArrayEquals } from './util/shallow-array-equals';
+import { getAncestorFiber } from './fiber/get-ancestor-fiber';
 
 export type EffectHookState = {
   effect: true;
@@ -142,8 +145,21 @@ export function useDebugValue(): void {
   // purposefully noop.
 }
 
+export function useContext<T>(ctx: Context<T>): T {
+  const { fiber } = getCurrentFiberState();
+  let current: null | Fiber = fiber;
+  do {
+    const { contexts } = current;
+    if (contexts === null) continue;
+    if (contexts.has(ctx as Context<unknown>)) {
+      return contexts.get(ctx as Context<unknown>) as T;
+    }
+    current = current.parent || getAncestorFiber(current);
+  } while (current !== null);
+  return ctx._defaultValue;
+}
+
 // TODO:
 /* eslint-disable @typescript-eslint/no-empty-function */
-export function useContext(): void {}
 export function useErrorBoundary(): void {}
 export function useImperativeHandle(): void {}
