@@ -9,9 +9,15 @@ export interface Context<T> {
   Provider: ContextProvider<T>;
 }
 
+type Listener<T> = (value: T) => void;
 export type ContextHolder<T> = {
   value: T;
-  listeners: ((value: T) => void)[];
+  listeners: Listener<T>[];
+};
+
+export type ReverseContextHolder<T> = {
+  listeners: Listener<T>[];
+  set: Listener<T>;
 };
 
 type ConsumerProps<T> = {

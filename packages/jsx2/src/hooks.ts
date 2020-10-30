@@ -146,26 +146,35 @@ export function useDebugValue(): void {
   // purposefully noop.
 }
 
-function next<T>(_prevState: T, nextState: T): T {
-  return nextState;
-}
 export function useContext<T>(ctx: Context<T>): T {
-  const { 0: value, 1: set } = useReducer(next, ctx, (ctx: Context<T>) => {
-    const { fiber } = getCurrentFiberState();
-    let current: null | Fiber = fiber;
-    while ((current = current.parent || getAncestorFiber(current)) !== null) {
-      const { contexts } = current;
-      if (contexts === null) continue;
-      const holder = contexts.get(ctx);
-      if (!holder) continue;
-      holder.listeners.push(setter);
-      return holder.value;
-    }
-    return ctx._defaultValue;
-  });
-  function setter(value: T) {
-    set(value);
+  const hookState = getHookState();
+  const data = hookState.data as null | StateState<T>;
+  if (data) {
+    return data[0];
   }
+
+  const { fiber } = getCurrentFiberState();
+  const set = (value: T): void => {
+    const old = (hookState.data as StateState<T>)[0];
+    if (value === old) return;
+    hookState.data = [value, set];
+    enqueueDiff(fiber);
+  };
+  let current: null | Fiber = fiber;
+  let value = ctx._defaultValue;
+  while ((current = current.parent || getAncestorFiber(current)) !== null) {
+    const { contexts } = current;
+    if (contexts === null) continue;
+    const holder = contexts.get(ctx);
+    if (!holder) continue;
+    const { listeners, value: v } = holder;
+    value = v;
+    listeners.push(set);
+    const contextListeners = (fiber.contextListeners ||= []);
+    contextListeners.push({ listeners, set });
+    break;
+  }
+  hookState.data = [value, set];
   return value;
 }
 
