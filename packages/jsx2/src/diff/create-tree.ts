@@ -18,6 +18,7 @@ import { isArray } from '../util/is-array';
 
 export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
   const root = fiber(container);
+  root.dom = container;
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
   createChild(renderable, root, null, refs, layoutEffects);
@@ -25,7 +26,6 @@ export function createTree(renderable: CoercedRenderable, container: Node): Root
   verify(root);
   applyRefs(refs);
   applyEffects(layoutEffects);
-  root.dom = container;
   return root;
 }
 
