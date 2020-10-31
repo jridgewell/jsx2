@@ -20,8 +20,8 @@ export type RenderableArray = ReadonlyArray<Renderable>;
 
 export function render(_renderable: Renderable, container: Container): void {
   const renderable = coerceRenderable(_renderable);
-  const old = container._fiber;
-  if (old && old.data === container) {
+  const old = getFromNode(container);
+  if (old) {
     diffTree(old, renderable, container);
   } else {
     container.textContent = '';

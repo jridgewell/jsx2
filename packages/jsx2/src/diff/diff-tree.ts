@@ -1,6 +1,6 @@
 import type { RefWork } from './ref';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
-import type { Fiber, DiffableFiber, RootFiber, FunctionComponentFiber } from '../fiber';
+import type { Fiber, DiffableFiber, FunctionComponentFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { RenderableArray } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
@@ -26,7 +26,7 @@ import { isArray } from '../util/is-array';
 import { equals } from '../util/nullish-equals';
 
 export function diffTree(
-  old: RootFiber | FunctionComponentFiber,
+  old: Fiber,
   renderable: CoercedRenderable,
   container: Node,
   layoutEffects: EffectState[] = [],
