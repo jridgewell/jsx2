@@ -23,7 +23,6 @@ function process() {
     for (let i = 0; i < scheduled.length; i++) {
       const fiber = scheduled[i];
       if (!fiber.dirty) continue;
-      fiber.dirty = false;
       rediffComponent(fiber);
     }
   }

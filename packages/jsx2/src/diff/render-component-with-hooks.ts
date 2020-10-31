@@ -38,11 +38,12 @@ export function renderComponentWithHooks(
   fiber.current = true;
 
   for (let renderCount = 0; renderCount < 25; renderCount++) {
+    // The component may have been dirtied by a component change
+    fiber.dirty = false;
     rendered = type(props);
 
     if (!fiber.dirty) break;
 
-    fiber.dirty = false;
     layoutEffects.length = length;
     currentFiber.index = 0;
   }
