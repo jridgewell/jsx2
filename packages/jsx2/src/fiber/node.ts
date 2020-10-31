@@ -1,4 +1,4 @@
-import { Fiber } from './index';
+import type { Fiber } from './index';
 
 export type NodeWithFiber = Node & {
   _fiber?: Fiber;

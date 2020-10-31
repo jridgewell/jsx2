@@ -1,4 +1,5 @@
 import type { Effect, EffectHookState, EffectCleanup, HookState } from '../../src/hooks';
+
 import { scheduleEffect, cleanupEffects, applyEffects } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {

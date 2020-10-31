@@ -1,4 +1,5 @@
 import type { Fiber } from '../../src/fiber';
+
 import { fiber } from '../../src/fiber';
 import { createElement, Component } from '../../src/jsx2';
 import { mark } from '../../src/fiber/mark';
