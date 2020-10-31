@@ -96,4 +96,6 @@ describe('render', () => {
     expect(ref2).toHaveBeenCalledTimes(1);
     expect(lastEl).toBe(null);
   });
+
+  it.todo('overrides already rendered tree with a root tree')
 });
