@@ -1,9 +1,9 @@
 import type { Renderable } from '../src/render';
 
 import { createContext } from '../src/context';
+import { act, createElement, useState } from '../src/jsx2';
 import { createTree } from '../src/diff/create-tree';
 import { coerceRenderable } from '../src/util/coerce-renderable';
-import { act, createElement, useState } from '../src/jsx2';
 
 describe('createContext', () => {
   function makeTree(renderable: Renderable, container: Node) {

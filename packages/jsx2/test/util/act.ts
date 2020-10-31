@@ -10,7 +10,7 @@ describe('act', () => {
     describe('reentrancy', () => {
       it.todo('does not process mutations after inner sync cb');
       it.todo('does not process mutations after inner async cb');
-    })
+    });
   });
 
   describe('with sync callback', () => {
@@ -20,6 +20,6 @@ describe('act', () => {
     describe('reentrancy', () => {
       it.todo('does not process mutations after inner sync cb');
       it.todo('does not process mutations after inner async cb');
-    })
+    });
   });
 });

@@ -41,7 +41,7 @@ const nilProps: { key: null; ref: null; children?: null } = {
 export function createElement<T extends VNode['type']>(
   type: T,
   props?: null | undefined | (T extends ElementVNode['type'] ? Props : ComponentProps),
-  ...children: (T extends ElementVNode['type'] ? Renderable[] : ComponentChildren)
+  ...children: T extends ElementVNode['type'] ? Renderable[] : ComponentChildren
 ): T extends ElementVNode['type']
   ? ElementVNode
   : T extends FunctionComponentVNode['type']

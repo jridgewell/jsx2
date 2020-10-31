@@ -1,6 +1,6 @@
+import { fiber } from '../../src/fiber';
 import { render, createElement } from '../../src/jsx2';
 import { getFromNode, setOnNode } from '../../src/fiber/node';
-import { fiber } from '../../src/fiber';
 
 describe('getFromNode', () => {
   it('returns fiber for rendered element', () => {

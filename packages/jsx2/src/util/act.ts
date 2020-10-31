@@ -1,8 +1,8 @@
+import { process as processEffects, skipScheduling as skipEffectScheduling } from '../diff/effects';
 import {
   process as processDiffs,
   skipScheduling as skipDiffScheduling,
 } from '../diff/enqueue-diff';
-import { process as processEffects, skipScheduling as skipEffectScheduling } from '../diff/effects';
 
 let callDepth = 0;
 

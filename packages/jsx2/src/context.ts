@@ -2,8 +2,8 @@ import type { FunctionComponentFiber } from './fiber';
 import type { Renderable } from './render';
 
 import { useContext } from './hooks';
-import { getCurrentFiberState } from './diff/render-component-with-hooks';
 import { enqueueDiff } from './diff/enqueue-diff';
+import { getCurrentFiberState } from './diff/render-component-with-hooks';
 
 export interface Context<T> {
   _defaultValue: T;

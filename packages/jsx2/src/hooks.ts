@@ -1,13 +1,13 @@
-import type { Ref, RefObject } from './create-ref';
 import type { Context, ContextHolder } from './context';
+import type { Ref, RefObject } from './create-ref';
 import type { Fiber } from './fiber';
 
 import { scheduleEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
-import { getCurrentFiberState } from './diff/render-component-with-hooks';
-import { shallowArrayEquals } from './util/shallow-array-equals';
-import { getAncestorFiber } from './fiber/get-ancestor-fiber';
 import { setRef } from './diff/ref';
+import { getCurrentFiberState } from './diff/render-component-with-hooks';
+import { getAncestorFiber } from './fiber/get-ancestor-fiber';
+import { shallowArrayEquals } from './util/shallow-array-equals';
 
 export type EffectHookState = {
   effect: true;

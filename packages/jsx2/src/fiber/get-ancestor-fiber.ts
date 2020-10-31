@@ -1,7 +1,7 @@
 import type { Fiber } from './index';
 
-import { assert } from '../util/assert';
 import { getFromNode } from './node';
+import { assert } from '../util/assert';
 
 export function getAncestorFiber(fiber: Fiber): Fiber | null {
   debug: assert(fiber.dom === fiber.data, 'trying to get ancestor of non-root fiber');

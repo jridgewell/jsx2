@@ -2,8 +2,8 @@ import type { ElementFiber, Fiber } from '../../src/fiber';
 import type { Renderable } from '../../src/render';
 
 import { createElement } from '../../src/jsx2';
-import { getAncestorFiber } from '../../src/fiber/get-ancestor-fiber';
 import { createTree } from '../../src/diff/create-tree';
+import { getAncestorFiber } from '../../src/fiber/get-ancestor-fiber';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('getAncestorFiber', () => {
