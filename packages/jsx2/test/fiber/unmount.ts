@@ -1,4 +1,5 @@
-import type { Fiber } from '../../src/fiber';
+import type { ContextHolder } from '../../src/context';
+import type { FunctionComponentFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';
 import { createElement, Component } from '../../src/jsx2';
@@ -11,8 +12,12 @@ describe('unmount', () => {
     render() {}
   }
 
-  function makeComponentFiber() {
+  function makeClassComponentFiber() {
     return fiber(createElement(C, null));
+  }
+
+  function makeFunctionComponentFiber() {
+    return fiber(createElement(() => {}, null));
   }
 
   function makeElementFiber(tag: string) {
@@ -138,7 +143,7 @@ describe('unmount', () => {
         describe('without children', () => {
           it('unmounts ref', () => {
             const parent = fiber('parent');
-            const current = makeComponentFiber();
+            const current = makeClassComponentFiber();
             const next = makeElementFiber('next');
             current.ref = jest.fn();
             next.ref = jest.fn();
@@ -156,7 +161,7 @@ describe('unmount', () => {
         describe('with child', () => {
           it("unmounts child's ref", () => {
             const parent = fiber('parent');
-            const current = makeComponentFiber();
+            const current = makeClassComponentFiber();
             const child = makeElementFiber('child');
             const next = makeElementFiber('next');
             current.ref = jest.fn();
@@ -223,7 +228,7 @@ describe('unmount', () => {
   });
 
   describe('pending useEffects', () => {
-    function addEffect(fiber: Fiber): jest.Mock {
+    function addEffect(fiber: FunctionComponentFiber): jest.Mock {
       const cleanup = jest.fn();
       fiber.stateData = [
         {
@@ -240,161 +245,166 @@ describe('unmount', () => {
     }
 
     describe('fiber without useEffect', () => {
-      describe('fiber without dom', () => {
-        describe('without children', () => {
-          it('does nothing', () => {
-            const parent = fiber('parent');
-            const current = fiber('current');
-            const next = makeElementFiber('next');
-            const nextCleanup = addEffect(next);
-            mark(current, parent, null);
-            mark(next, parent, current);
+      describe('without children', () => {
+        it('does nothing', () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const nextCleanup = addEffect(next);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-            unmount(current);
+          unmount(current);
 
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
-        });
-
-        describe('with child', () => {
-          it("cleans child's effect", () => {
-            const parent = fiber('parent');
-            const current = fiber('current');
-            const child = makeElementFiber('child');
-            const next = makeElementFiber('next');
-            const childCleanup = addEffect(child);
-            const nextCleanup = addEffect(next);
-            mark(child, current, null);
-            mark(current, parent, null);
-            mark(next, parent, current);
-
-            unmount(current);
-
-            expect(childCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
+          expect(nextCleanup).not.toHaveBeenCalled();
         });
       });
 
-      describe('fiber with dom', () => {
-        describe('without children', () => {
-          it('does nothing', () => {
-            const parent = fiber('parent');
-            const current = makeElementFiber('current');
-            const next = makeElementFiber('next');
-            const nextCleanup = addEffect(next);
-            mark(current, parent, null);
-            mark(next, parent, current);
+      describe('with child', () => {
+        it("cleans child's effect", () => {
+          const parent = fiber('parent');
+          const current = fiber('current');
+          const child = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const childCleanup = addEffect(child);
+          const nextCleanup = addEffect(next);
+          mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-            unmount(current);
+          unmount(current);
 
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
-        });
-
-        describe('with child', () => {
-          it("cleans child's effect", () => {
-            const parent = fiber('parent');
-            const current = makeElementFiber('current');
-            const child = makeElementFiber('child');
-            const next = makeElementFiber('next');
-            const childCleanup = addEffect(child);
-            const nextCleanup = addEffect(next);
-            mark(child, current, null);
-            mark(current, parent, null);
-            mark(next, parent, current);
-
-            unmount(current);
-
-            expect(childCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
+          expect(childCleanup).toHaveBeenCalledTimes(1);
+          expect(nextCleanup).not.toHaveBeenCalled();
         });
       });
     });
 
     describe('fiber with useEffect', () => {
-      describe('fiber without dom', () => {
-        describe('without children', () => {
-          it('cleans effect', () => {
-            const parent = fiber('parent');
-            const current = makeComponentFiber();
-            const next = makeElementFiber('next');
-            const currentCleanup = addEffect(current);
-            const nextCleanup = addEffect(next);
-            mark(current, parent, null);
-            mark(next, parent, current);
+      describe('without children', () => {
+        it('cleans effect', () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const currentCleanup = addEffect(current);
+          const nextCleanup = addEffect(next);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-            unmount(current);
+          unmount(current);
 
-            expect(currentCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
-        });
-
-        describe('with child', () => {
-          it("cleans child's effect", () => {
-            const parent = fiber('parent');
-            const current = makeComponentFiber();
-            const child = makeElementFiber('child');
-            const next = makeElementFiber('next');
-            const currentCleanup = addEffect(current);
-            const childCleanup = addEffect(child);
-            const nextCleanup = addEffect(next);
-            mark(child, current, null);
-            mark(current, parent, null);
-            mark(next, parent, current);
-
-            unmount(current);
-
-            expect(currentCleanup).toHaveBeenCalledTimes(1);
-            expect(childCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
+          expect(currentCleanup).toHaveBeenCalledTimes(1);
+          expect(nextCleanup).not.toHaveBeenCalled();
         });
       });
 
-      describe('fiber with dom', () => {
-        describe('without children', () => {
-          it('cleans effect', () => {
-            const parent = fiber('parent');
-            const current = makeElementFiber('current');
-            const next = makeElementFiber('next');
-            const currentCleanup = addEffect(current);
-            const nextCleanup = addEffect(next);
-            mark(current, parent, null);
-            mark(next, parent, current);
+      describe('with child', () => {
+        it("cleans child's effect", () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const child = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const currentCleanup = addEffect(current);
+          const childCleanup = addEffect(child);
+          const nextCleanup = addEffect(next);
+          mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
 
-            unmount(current);
+          unmount(current);
 
-            expect(currentCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
-        });
-
-        describe('with child', () => {
-          it("cleans child's effect", () => {
-            const parent = fiber('parent');
-            const current = makeElementFiber('current');
-            const child = makeElementFiber('child');
-            const next = makeElementFiber('next');
-            const currentCleanup = addEffect(current);
-            const childCleanup = addEffect(child);
-            const nextCleanup = addEffect(next);
-            mark(child, current, null);
-            mark(current, parent, null);
-            mark(next, parent, current);
-
-            unmount(current);
-
-            expect(currentCleanup).toHaveBeenCalledTimes(1);
-            expect(childCleanup).toHaveBeenCalledTimes(1);
-            expect(nextCleanup).not.toHaveBeenCalled();
-          });
+          expect(currentCleanup).toHaveBeenCalledTimes(1);
+          expect(childCleanup).toHaveBeenCalledTimes(1);
+          expect(nextCleanup).not.toHaveBeenCalled();
         });
       });
     });
   });
 
-  xdescribe('consumed contexts', () => {});
+  describe('consumed contexts', () => {
+    function makeContextHolder(fiber: FunctionComponentFiber): ContextHolder<null> {
+      const holder = {
+        value: null,
+        consumers: [fiber],
+      };
+      fiber.consumedContexts = [holder];
+      return holder;
+    }
+
+    describe('fiber without consumed context', () => {
+      describe('without children', () => {
+        it('does nothing', () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const nextHolder = makeContextHolder(next);
+          mark(current, parent, null);
+          mark(next, parent, current);
+
+          unmount(current);
+
+          expect(nextHolder.consumers).toContain(next);
+        });
+      });
+
+      describe('with child', () => {
+        it("removes child from context's consumers", () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const child = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const childHolder = makeContextHolder(child);
+          const nextHolder = makeContextHolder(next);
+          mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
+
+          unmount(current);
+
+          expect(childHolder.consumers).not.toContain(child);
+          expect(nextHolder.consumers).toContain(next);
+        });
+      });
+    });
+
+    describe('fiber with consumed context', () => {
+      describe('without children', () => {
+        it("removes fiber from context's consumers", () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const currentHolder = makeContextHolder(current);
+          const nextHolder = makeContextHolder(next);
+          mark(current, parent, null);
+          mark(next, parent, current);
+
+          unmount(current);
+
+          expect(currentHolder.consumers).not.toContain(current);
+          expect(nextHolder.consumers).toContain(next);
+        });
+      });
+
+      describe('with child', () => {
+        it("cleans child's effect", () => {
+          const parent = fiber('parent');
+          const current = makeFunctionComponentFiber();
+          const child = makeFunctionComponentFiber();
+          const next = makeFunctionComponentFiber();
+          const currentHolder = makeContextHolder(current);
+          const childHolder = makeContextHolder(child);
+          const nextHolder = makeContextHolder(next);
+          mark(child, current, null);
+          mark(current, parent, null);
+          mark(next, parent, current);
+
+          unmount(current);
+
+          expect(currentHolder.consumers).not.toContain(current);
+          expect(childHolder.consumers).not.toContain(child);
+          expect(nextHolder.consumers).toContain(next);
+        });
+      });
+    });
+  });
 });
