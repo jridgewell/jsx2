@@ -162,6 +162,7 @@ describe('enqueueDiff', () => {
     const First = jest.fn(() => {});
     const tree = makeTree(createElement(First), container);
     const first = expectFunctionComponentFiber(tree.child);
+    First.mockClear();
 
     enqueueDiff(first, scheduler);
     first.mounted = false;
