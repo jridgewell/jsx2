@@ -1,4 +1,4 @@
-import type { FunctionComponent, Component } from './component';
+import type { FunctionComponent, Component, ComponentProps, ComponentChildren } from './component';
 import type { Ref } from './create-ref';
 import type { Renderable } from './render';
 
@@ -40,8 +40,8 @@ const nilProps: { key: null; ref: null; children?: null } = {
 
 export function createElement<T extends VNode['type']>(
   type: T,
-  props?: null | undefined | Props,
-  ...children: Renderable[]
+  props?: null | undefined | (T extends ElementVNode['type'] ? Props : ComponentProps),
+  ...children: (T extends ElementVNode['type'] ? Renderable[] : ComponentChildren)
 ): T extends ElementVNode['type']
   ? ElementVNode
   : T extends FunctionComponentVNode['type']
@@ -49,7 +49,7 @@ export function createElement<T extends VNode['type']>(
   : T extends ClassComponentVNode['type']
   ? ClassComponentVNode
   : never {
-  const { key = null, ref = null, ..._props } = props || nilProps;
+  const { key = null, ref = null, ..._props } = (props || nilProps) as Props;
   if (children.length > 0) {
     _props.children = children.length === 1 ? children[0] : children;
   }
