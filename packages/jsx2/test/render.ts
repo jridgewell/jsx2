@@ -97,5 +97,22 @@ describe('render', () => {
     expect(lastEl).toBe(null);
   });
 
-  it.todo('overrides already rendered tree with a root tree')
+  it('allows rendering over an already rendered tree', () => {
+    const el = createElement('div', null, createElement('span', null, 'test', 'ing'));
+    const container = document.createElement('body');
+    const mo = new MutationObserver(() => {});
+    mo.observe(container, { childList: true, subtree: true });
+
+    render(el, container);
+    // Clear the original render, we know it's happening
+    mo.takeRecords();
+
+    const span = container.querySelector('span')!;
+    render(['after', 'ing'], span);
+    expect(mo.takeRecords()).toHaveLength(0);
+
+    render(createElement('div', null, createElement('span', null, 'after', 'after')), container);
+    const records = mo.takeRecords();
+    expect(records).toHaveLength(0);
+  });
 });
