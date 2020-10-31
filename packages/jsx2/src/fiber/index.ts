@@ -21,7 +21,7 @@ export interface RootFiber extends SharedFiber {
   dom: Node;
   stateData: null;
   component: null;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null;
 }
@@ -32,7 +32,7 @@ export interface NullFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null;
 }
@@ -43,7 +43,7 @@ export interface TextFiber extends SharedFiber {
   dom: null | Text;
   stateData: null;
   component: null;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null;
 }
@@ -54,7 +54,7 @@ export interface ElementFiber extends SharedFiber {
   dom: null | Element;
   stateData: null;
   component: null;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null | Ref;
 }
@@ -65,7 +65,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   dom: null;
   stateData: HookState[];
   component: null;
-  contexts: null | WeakMap<Context<any>, ContextHolder<any>>;
+  providedContexts: null | WeakMap<Context<any>, ContextHolder<any>>;
   consumedContexts: null | ContextHolder<any>[];
   ref: null;
 }
@@ -76,7 +76,7 @@ export interface ClassComponentFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null | Component;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null | Ref;
 }
@@ -87,7 +87,7 @@ export interface ArrayFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null;
-  contexts: null;
+  providedContexts: null;
   consumedContexts: null;
   ref: null;
 }
@@ -130,7 +130,7 @@ export function fiber<T extends Fiber['data']>(
     dom: null,
     stateData: null,
     component: null,
-    contexts: null,
+    providedContexts: null,
     consumedContexts: null,
     parent: null,
     child: null,

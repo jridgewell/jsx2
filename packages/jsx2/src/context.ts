@@ -35,10 +35,10 @@ export function createContext<T>(defaultValue: T): Context<T> {
   function Provider(props: ProviderProps<T>): Renderable {
     const { value, children } = props;
     const { fiber } = getCurrentFiberState();
-    const contexts = (fiber.contexts ||= new WeakMap());
-    const holder = contexts.get(ctx) as undefined | ContextHolder<T>;
+    const providedContexts = (fiber.providedContexts ||= new WeakMap());
+    const holder = providedContexts.get(ctx) as undefined | ContextHolder<T>;
     if (holder === undefined) {
-      contexts.set(ctx, { value, consumers: [] });
+      providedContexts.set(ctx, { value, consumers: [] });
       return children;
     }
 
