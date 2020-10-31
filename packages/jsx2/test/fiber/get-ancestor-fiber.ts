@@ -1,72 +1,71 @@
-import { render, createElement } from '../../src/jsx2';
+import type { ElementFiber, Fiber } from '../../src/fiber';
+import type { Renderable } from '../../src/render';
+
+import { createElement } from '../../src/jsx2';
 import { getAncestorFiber } from '../../src/fiber/get-ancestor-fiber';
-import { getFromNode } from '../../src/fiber/node';
+import { createTree } from '../../src/diff/create-tree';
+import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('getAncestorFiber', () => {
+  function makeTree(renderable: Renderable, container: Node) {
+    return createTree(coerceRenderable(renderable), container);
+  }
+
+  function expectElementFiber(fiber: Fiber, tag: string): ElementFiber {
+    expect(fiber).toBeTruthy();
+    expect(fiber.data).toHaveProperty('type', tag);
+    return fiber as ElementFiber;
+  }
+
   it('finds nearest parentNode with a fiber', () => {
     const body = document.createElement('body');
-    const parentTree = createElement('ul', null, createElement('li'));
-    render(parentTree, body);
+    const parentTree = makeTree(createElement('ul', null, createElement('li')), body);
 
     const li = body.querySelector('li')!;
     const childRoot = li.appendChild(document.createElement('span'));
-    const childTree = 'test';
-    render(childTree, childRoot);
+    const childTree = makeTree('test', childRoot);
 
-    const fiber = getFromNode(childRoot);
-    expect(getAncestorFiber(fiber!)).toBe(getFromNode(li));
+    expect(getAncestorFiber(childTree)).toBe(expectElementFiber(parentTree.child!, 'ul').child);
   });
 
   it('find nearest parentNode with a fiber through nodes', () => {
     const body = document.createElement('body');
-    const parentTree = createElement('ul', null, createElement('li'));
-    render(parentTree, body);
+    const parentTree = makeTree(createElement('ul', null, createElement('li')), body);
 
     const li = body.querySelector('li')!;
     const nested = li.appendChild(document.createElement('nested'));
     const childRoot = nested.appendChild(document.createElement('span'));
-    const childTree = 'test';
-    render(childTree, childRoot);
+    const childTree = makeTree('test', childRoot);
 
-    const fiber = getFromNode(childRoot);
-    expect(getAncestorFiber(fiber!)).toBe(getFromNode(li));
+    expect(getAncestorFiber(childTree)).toBe(expectElementFiber(parentTree.child!, 'ul').child);
   });
 
   it('finds nearest from inside shadow dom', () => {
     const body = document.createElement('body');
-    const parentTree = createElement('div', null, createElement('span'));
-    render(parentTree, body);
+    const parentTree = makeTree(createElement('div', null, createElement('span')), body);
 
     const span = body.querySelector('span')!;
     const childRoot = span.attachShadow({ mode: 'open' });
-    const childTree = 'test';
-    render(childTree, childRoot);
+    const childTree = makeTree('test', childRoot);
 
-    const fiber = getFromNode(childRoot);
-    expect(getAncestorFiber(fiber!)).toBe(getFromNode(span));
+    expect(getAncestorFiber(childTree)).toBe(expectElementFiber(parentTree.child!, 'div').child);
   });
 
   it('finds nearest inside sloted node', () => {
     const body = document.createElement('body');
     const parentRoot = body.attachShadow({ mode: 'open' });
-    const parentTree = createElement('div', null, createElement('slot'));
-    render(parentTree, parentRoot);
+    const parentTree = makeTree(createElement('div', null, createElement('slot')), parentRoot);
 
-    const slot = parentRoot.querySelector('slot')!;
     const childRoot = body.appendChild(document.createElement('div'));
-    const childTree = createElement('span');
-    render(childTree, childRoot);
+    const childTree = makeTree(createElement('span'), childRoot);
 
-    const fiber = getFromNode(body.firstChild!);
-    expect(getAncestorFiber(fiber!)).toBe(getFromNode(slot));
+    expect(getAncestorFiber(childTree)).toBe(expectElementFiber(parentTree.child!, 'div').child);
   });
 
   it('returns null if no ancestor fiber', () => {
     const body = document.createElement('body');
-    const parentTree = createElement('div');
-    render(parentTree, body);
+    const tree = makeTree(createElement('div'), body);
 
-    const fiber = getFromNode(body);
-    expect(getAncestorFiber(fiber!)).toBe(null);
+    expect(getAncestorFiber(tree)).toBe(null);
   });
 });
