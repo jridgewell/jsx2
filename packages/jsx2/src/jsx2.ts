@@ -16,3 +16,4 @@ export {
   useRef,
   useState,
 } from './hooks';
+export { act } from './util/act';

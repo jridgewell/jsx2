@@ -3,18 +3,19 @@ import type { FunctionComponentFiber } from '../fiber';
 import { rediffComponent } from './diff-tree';
 
 let resolved: Promise<void>;
-
-function nextTick(process: () => void): void {
-  (resolved ||= Promise.resolve()).then(process);
-}
-
-function getNextTick(): (process: () => void) => void {
-  return nextTick;
-}
-
 let diffs: FunctionComponentFiber[] = [];
+let scheduling = true;
 
-function process() {
+export function enqueueDiff(fiber: FunctionComponentFiber, scheduler = getNextTick()): void {
+  if (fiber.dirty || !fiber.mounted) return;
+  fiber.dirty = true;
+  if (fiber.current) return;
+  const length = diffs.push(fiber);
+  if (length === 1 && scheduling) scheduler(process);
+}
+
+export function process(): boolean {
+  if (diffs.length === 0) return false;
   while (diffs.length > 0) {
     // Process top-down, so that we can skip rendering a child component twice
     // if a parent rerenders.
@@ -26,12 +27,19 @@ function process() {
       rediffComponent(fiber);
     }
   }
+  return true;
 }
 
-export function enqueueDiff(fiber: FunctionComponentFiber, scheduler = getNextTick()): void {
-  if (fiber.dirty || !fiber.mounted) return;
-  fiber.dirty = true;
-  if (fiber.current) return;
-  const length = diffs.push(fiber);
-  if (length === 1) scheduler(process);
+export function skipScheduling(skip: boolean): void {
+  scheduling = !skip;
+}
+
+// istanbul ignore next
+function nextTick(process: () => void): void {
+  (resolved ||= Promise.resolve()).then(process);
+}
+
+// istanbul ignore next
+function getNextTick(): (process: () => void) => void {
+  return nextTick;
 }

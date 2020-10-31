@@ -1,32 +1,11 @@
 import type { EffectState, HookState } from '../hooks';
 
 let queuedEffects: EffectState[] = [];
-
-function process(): void {
-  const queue = queuedEffects;
-  queuedEffects = [];
-  applyEffects(queue);
-}
-
-function setTimeoutRaf(_process: () => void) {
-  setTimeout(process, 17);
-}
-function singleRaf() {
-  setTimeout(process, 0);
-}
-function doubleRaf(_process: () => void) {
-  requestAnimationFrame(singleRaf);
-}
-export function getRaf(): (process: () => void) => void {
-  if (typeof requestAnimationFrame === 'undefined') {
-    return setTimeoutRaf;
-  }
-  return doubleRaf;
-}
+let scheduling = true;
 
 export function scheduleEffect(effect: EffectState, scheduler = getRaf()): void {
   const length = queuedEffects.push(effect);
-  if (length === 1) scheduler(process);
+  if (length === 1 && scheduling) scheduler(process);
 }
 
 export function cleanupEffects(stateData: HookState[]): void {
@@ -51,4 +30,36 @@ export function applyEffects(effects: EffectState[]): void {
     const { active, effect } = item;
     if (active) item.cleanup = effect();
   }
+}
+
+export function process(): boolean {
+  if (queuedEffects.length === 0) return false;
+  const queue = queuedEffects;
+  queuedEffects = [];
+  applyEffects(queue);
+  return true;
+}
+
+export function skipScheduling(skip: boolean): void {
+  scheduling = !skip;
+}
+
+function getRaf(): (process: () => void) => void {
+  if (typeof requestAnimationFrame === 'undefined') {
+    return setTimeoutRaf;
+  }
+  return doubleRaf;
+}
+
+// istanbul ignore next
+function setTimeoutRaf(_process: () => void) {
+  setTimeout(process, 17);
+}
+// istanbul ignore next
+function singleRaf() {
+  setTimeout(process, 0);
+}
+// istanbul ignore next
+function doubleRaf(_process: () => void) {
+  requestAnimationFrame(singleRaf);
 }
