@@ -21,6 +21,41 @@ describe('unmount', () => {
     return f;
   }
 
+  describe('unmounted', () => {
+    describe('without children', () => {
+      it('sets fiber to unmounted', () => {
+        const parent = fiber('parent');
+        const current = fiber('current');
+        const next = makeElementFiber('next');
+        mark(current, parent, null);
+        mark(next, parent, current);
+
+        unmount(current);
+
+        expect(current.mounted).toBe(false);
+        expect(next.mounted).toBe(true);
+      });
+    });
+
+    describe('with child', () => {
+      it('sets child to unmounted', () => {
+        const parent = fiber('parent');
+        const current = fiber('current');
+        const child = makeElementFiber('child');
+        const next = makeElementFiber('next');
+        mark(child, current, null);
+        mark(current, parent, null);
+        mark(next, parent, current);
+
+        unmount(current);
+
+        expect(child.mounted).toBe(false);
+        expect(current.mounted).toBe(false);
+        expect(next.mounted).toBe(true);
+      });
+    });
+  });
+
   describe('refs', () => {
     describe('fiber without ref', () => {
       describe('fiber without dom', () => {
