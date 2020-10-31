@@ -1,10 +1,12 @@
 import { Fiber } from './index';
-import { Container } from '../render';
+import { assert } from '../util/assert';
+import { getFromNode } from './node';
 
 export function getAncestorFiber(fiber: Fiber): Fiber | null {
+  debug: assert(fiber.dom === fiber.data, 'trying to get ancestor of non-root fiber');
   let current: null | Node = getParent(fiber.dom!);
   while (current !== null) {
-    const fiber = (current as Container)._fiber;
+    const fiber = getFromNode(current);
     if (fiber) return fiber;
     current = getParent(current);
   }

@@ -1,7 +1,6 @@
 import type { RefWork } from './ref';
 import type { Fiber, DiffableFiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { EffectState } from '../hooks';
-import type { Container } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
 import { applyEffects } from './effects';
@@ -12,6 +11,7 @@ import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
 import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
+import { setOnNode } from '../fiber/node';
 import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
@@ -60,7 +60,7 @@ export function createChild(
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
     const el = document.createElement(type);
-    (el as Container)._fiber = f;
+    setOnNode(el, f);
     f.dom = el;
     f.ref = ref;
     addProps(el, props);
