@@ -385,7 +385,7 @@ describe('diffTree', () => {
           const ref = oldRef;
           const tree = makeOldFiberTree(createElement('div', { ref: oldRef }), container);
           const renderable = createElement('div', { ref });
-          ref.mockReset();
+          ref.mockClear();
 
           diff(tree, renderable, container);
 
@@ -420,7 +420,7 @@ describe('diffTree', () => {
           const ref = oldRef;
           const tree = makeOldFiberTree(createElement('div', { ref: oldRef }), container);
           const renderable = createElement('before', { ref });
-          ref.mockReset();
+          ref.mockClear();
 
           diff(tree, renderable, container);
 
@@ -1771,7 +1771,7 @@ describe('rediffComponent', () => {
     const props = {};
     const tree = makeTree(createElement(C, props), container);
     const component = expectFunctionComponentFiber(tree.child);
-    C.mockReset();
+    C.mockClear();
 
     rediffComponent(component);
 
@@ -1817,7 +1817,7 @@ describe('rediffComponent', () => {
     const D = jest.fn();
     const tree = makeTree([createElement(C), createElement(D)], container);
     const cComponent = expectFunctionComponentFiber(tree.child!.child);
-    D.mockReset();
+    D.mockClear();
 
     rediffComponent(cComponent);
 

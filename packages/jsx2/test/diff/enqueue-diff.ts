@@ -128,8 +128,8 @@ describe('enqueueDiff', () => {
     const tree = makeTree(createElement(Parent), container);
     const parent = expectFunctionComponentFiber(tree.child);
     const child = expectFunctionComponentFiber(parent.child);
-    Parent.mockReset();
-    Child.mockReset();
+    Parent.mockClear();
+    Child.mockClear();
 
     enqueueDiff(child, scheduler);
     enqueueDiff(parent, scheduler);
@@ -149,8 +149,8 @@ describe('enqueueDiff', () => {
     const tree = makeTree([createElement(First), createElement(Second)], container);
     const first = expectFunctionComponentFiber(tree.child!.child);
     const second = expectFunctionComponentFiber(first.next);
-    First.mockReset();
-    Second.mockReset();
+    First.mockClear();
+    Second.mockClear();
     First.mockImplementationOnce(() => {
       enqueueDiff(second, scheduler);
     });
@@ -169,7 +169,7 @@ describe('enqueueDiff', () => {
     const First = jest.fn(() => {});
     const tree = makeTree(createElement(First), container);
     const first = expectFunctionComponentFiber(tree.child);
-    First.mockReset();
+    First.mockClear();
     First.mockImplementationOnce(() => {
       enqueueDiff(first, scheduler);
     });
