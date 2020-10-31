@@ -136,9 +136,9 @@ describe('enqueueDiff', () => {
 
     process();
 
-    expectCalledBefore(Parent, Child);
     expect(Parent).toHaveBeenCalledTimes(1);
     expect(Child).toHaveBeenCalledTimes(1);
+    expectCalledBefore(Parent, Child);
   });
 
   it('processes components reentrantly', () => {
