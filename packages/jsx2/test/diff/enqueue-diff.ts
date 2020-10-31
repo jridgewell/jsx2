@@ -88,6 +88,21 @@ describe('enqueueDiff', () => {
     expect(scheduler).not.toHaveBeenCalled();
   });
 
+  it('does not schedule fiber if unmounted', () => {
+    const container = document.createElement('body');
+    const scheduler = jest.fn(defaultScheduler);
+    const tree = makeTree(
+      createElement(() => {}),
+      container,
+    );
+    const component = expectFunctionComponentFiber(tree.child);
+
+    component.mounted = false;
+    enqueueDiff(component, scheduler);
+
+    expect(scheduler).not.toHaveBeenCalled();
+  });
+
   it('does not schedule fiber if current', () => {
     const container = document.createElement('body');
     const scheduler = jest.fn(defaultScheduler);
@@ -139,6 +154,21 @@ describe('enqueueDiff', () => {
     expect(Parent).toHaveBeenCalledTimes(1);
     expect(Child).toHaveBeenCalledTimes(1);
     expectCalledBefore(Parent, Child);
+  });
+
+  it('skips reprocessing component if it becomes unmounted', () => {
+    const container = document.createElement('body');
+    const scheduler = jest.fn(defaultScheduler);
+    const First = jest.fn(() => {});
+    const tree = makeTree(createElement(First), container);
+    const first = expectFunctionComponentFiber(tree.child);
+
+    enqueueDiff(first, scheduler);
+    first.mounted = false;
+
+    process();
+
+    expect(First).not.toHaveBeenCalled();
   });
 
   it('processes components reentrantly', () => {

@@ -22,14 +22,14 @@ function process() {
     diffs = [];
     for (let i = 0; i < scheduled.length; i++) {
       const fiber = scheduled[i];
-      if (!fiber.dirty) continue;
+      if (!fiber.dirty || !fiber.mounted) continue;
       rediffComponent(fiber);
     }
   }
 }
 
 export function enqueueDiff(fiber: FunctionComponentFiber, scheduler = getNextTick()): void {
-  if (fiber.dirty) return;
+  if (fiber.dirty || !fiber.mounted) return;
   fiber.dirty = true;
   if (fiber.current) return;
   const length = diffs.push(fiber);

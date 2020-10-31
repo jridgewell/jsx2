@@ -13,6 +13,7 @@ export interface SharedFiber {
   depth: number;
   dirty: boolean;
   current: boolean;
+  mounted: boolean;
 }
 
 export interface RootFiber extends SharedFiber {
@@ -126,6 +127,7 @@ export function fiber<T extends Fiber['data']>(
     depth: 0,
     dirty: false,
     current: false,
+    mounted: true,
     key: null,
     dom: null,
     stateData: null,

@@ -20,6 +20,7 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
       cleanupConsumedContexts(current as FunctionComponentFiber, consumedContexts);
     }
     if (child) unmountRange(child, null);
+    current.mounted = false;
 
     current = current.next;
   } while (current !== end);
