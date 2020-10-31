@@ -60,4 +60,13 @@ describe('getAncestorFiber', () => {
     const fiber = getFromNode(body.firstChild!);
     expect(getAncestorFiber(fiber!)).toBe(getFromNode(slot));
   });
+
+  it('returns null if no ancestor fiber', () => {
+    const body = document.createElement('body');
+    const parentTree = createElement('div');
+    render(parentTree, body);
+
+    const fiber = getFromNode(body);
+    expect(getAncestorFiber(fiber!)).toBe(null);
+  });
 });
