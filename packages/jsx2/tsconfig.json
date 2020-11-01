@@ -10,7 +10,6 @@
     "allowSyntheticDefaultImports": true,
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
-    "rootDir": "src",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
   },
