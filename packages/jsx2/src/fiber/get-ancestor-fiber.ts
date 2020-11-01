@@ -1,4 +1,4 @@
-import type { Fiber } from './index';
+import type { Fiber } from '.';
 
 import { getFromNode } from './node';
 import { assert } from '../util/assert';

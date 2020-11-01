@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'eslint-plugin-local-rules'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -19,6 +19,7 @@ module.exports = {
         argsIgnorePattern: '^_',
       },
     ],
+    'local-rules/sort-imports': 'error',
     'no-constant-condition': 'off',
     'no-unused-labels': 'off',
   },
