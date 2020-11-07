@@ -1,7 +1,8 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 const { addNamed } = require('@babel/helper-module-imports');
 
-module.exports = function ({ types: t, template }, options = {}) {
+module.exports = function ({ types: t, template }, options) {
+  // istanbul ignore next
   const {
     json = true,
     minimalJson = false,
@@ -9,7 +10,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     prettyJson = false,
 
     importSource = 'jsx2',
-  } = options;
+  } = options || {};
   const importMap = new WeakMap();
 
   if (minimalJson && !json) {
