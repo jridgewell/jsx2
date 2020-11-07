@@ -21,6 +21,7 @@ module.exports = {
     ],
     'local-rules/sort-imports': 'error',
     'no-constant-condition': 'off',
+    'no-empty': ['error', { allowEmptyCatch: true }],
     'no-unused-labels': 'off',
   },
   overrides: [

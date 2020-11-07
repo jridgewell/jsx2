@@ -44,6 +44,7 @@ export function skipScheduling(skip: boolean): void {
   scheduling = !skip;
 }
 
+// istanbul ignore next
 function getRaf(): (process: () => void) => void {
   if (typeof requestAnimationFrame === 'undefined') {
     return setTimeoutRaf;
