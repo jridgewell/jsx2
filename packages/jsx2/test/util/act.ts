@@ -126,7 +126,7 @@ describe('act', () => {
         set = useState(0)[1];
         useEffect(effect);
       });
-      let ret = act(() => {
+      const ret = act(() => {
         makeTree(createElement(C), body);
         C.mockClear();
         return deferred.promise;
@@ -306,7 +306,7 @@ describe('act', () => {
 
       it('does not process mutations after inner async cb', async () => {
         const body = document.createElement('body');
-      const deferred = new Deferred<void>();
+        const deferred = new Deferred<void>();
         let set: (value: number) => void;
         const effect = jest.fn();
         const layoutEffect = jest.fn();
