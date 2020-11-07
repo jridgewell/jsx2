@@ -8,33 +8,33 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-  "type": "div",
-  "key": "",
-  "ref": null,
-  "props": {
-    "children": [
-      {
-        "type": 0,
-        "key": "",
-        "ref": null,
-        "props": null
-      },
-      {
-        "type": 0,
-        "key": "",
-        "ref": null,
-        "props": null
-      },
-      {
-        "type": 0,
-        "key": "",
-        "ref": null,
-        "props": null
-      },
-      1
-    ]
-  }
-}`);
+    "type": "div",
+    "key": "",
+    "ref": null,
+    "props": {
+      "children": [
+        {
+          "type": 0,
+          "key": "",
+          "ref": null,
+          "props": null
+        },
+        {
+          "type": 0,
+          "key": "",
+          "ref": null,
+          "props": null
+        },
+        {
+          "type": 0,
+          "key": "",
+          "ref": null,
+          "props": null
+        },
+        1
+      ]
+    }
+  }`);
 
   _template = () => tree;
 

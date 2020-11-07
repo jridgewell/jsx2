@@ -74,7 +74,7 @@ module.exports = function ({ types: t, template }, options) {
     });
 
     if (json) {
-      const cooked = stringify(tree, 0);
+      const cooked = stringify(tree, taggedTemplate ? 0 : 1);
       if (taggedTemplate) {
         return buildTaggedTemplate(path, cooked, expressions);
       }

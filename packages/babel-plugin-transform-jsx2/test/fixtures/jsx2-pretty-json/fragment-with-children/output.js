@@ -8,18 +8,18 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-  "type": 0,
-  "key": "",
-  "ref": null,
-  "props": {
-    "children": {
-      "type": "inner",
-      "key": "",
-      "ref": null,
-      "props": null
+    "type": 0,
+    "key": "",
+    "ref": null,
+    "props": {
+      "children": {
+        "type": "inner",
+        "key": "",
+        "ref": null,
+        "props": null
+      }
     }
-  }
-}`);
+  }`);
 
   _template = () => tree;
 
