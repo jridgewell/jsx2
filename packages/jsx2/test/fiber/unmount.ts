@@ -1,4 +1,4 @@
-import type { ContextHolder } from '../../src/context';
+import type { ContextHolder } from '../../src/create-context';
 import type { FunctionComponentFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';

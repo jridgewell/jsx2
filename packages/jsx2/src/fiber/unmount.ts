@@ -1,5 +1,5 @@
 import type { Fiber, FunctionComponentFiber } from '.';
-import type { ContextHolder } from '../context';
+import type { ContextHolder } from '../create-context';
 
 import { cleanupEffects } from '../diff/effects';
 import { setRef } from '../diff/ref';

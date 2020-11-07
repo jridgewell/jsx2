@@ -1,4 +1,4 @@
-import type { Context, ContextHolder } from './context';
+import type { Context, ContextHolder } from './create-context';
 import type { Ref, RefObject } from './create-ref';
 import type { Fiber } from './fiber';
 

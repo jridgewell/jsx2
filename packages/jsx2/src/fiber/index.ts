@@ -1,5 +1,5 @@
 import type { Component } from '../component';
-import type { Context, ContextHolder } from '../context';
+import type { Context, ContextHolder } from '../create-context';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
