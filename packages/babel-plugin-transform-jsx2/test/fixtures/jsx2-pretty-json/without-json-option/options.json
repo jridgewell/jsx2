@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    ["../../../..", {
+      "json": false
+    }]
+  ],
+  "throws": "\"prettyJson\" option requires \"json\" to be true"
+}

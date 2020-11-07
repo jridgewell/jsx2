@@ -2,8 +2,8 @@
   "plugins": [
     ["../../../..", {
       "minimalJson": false,
-      "prettyJson": false,
-      "taggedTemplate": true
+      "prettyJson": true,
+      "taggedTemplate": false
     }]
   ]
 }
