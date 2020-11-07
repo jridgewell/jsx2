@@ -1,14 +1,16 @@
 const jsx = require('@babel/plugin-syntax-jsx');
 const { addNamed } = require('@babel/helper-module-imports');
 
-module.exports = function ({ types: t, template }, options = {}) {
+module.exports = function ({ types: t, template }, options) {
+  // istanbul ignore next
   const {
     json = true,
     minimalJson = false,
     taggedTemplate = true,
+    prettyJson = false,
 
     importSource = 'jsx2',
-  } = options;
+  } = options || {};
   const importMap = new WeakMap();
 
   if (minimalJson && !json) {
@@ -16,6 +18,9 @@ module.exports = function ({ types: t, template }, options = {}) {
   }
   if (taggedTemplate && !json) {
     throw new Error('"taggedTemplate" option requires "json" to be true');
+  }
+  if (prettyJson && !json) {
+    throw new Error('"prettyJson" option requires "json" to be true');
   }
 
   return {
@@ -69,7 +74,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     });
 
     if (json) {
-      const cooked = stringify(tree);
+      const cooked = stringify(tree, taggedTemplate ? 0 : 1);
       if (taggedTemplate) {
         return buildTaggedTemplate(path, cooked, expressions);
       }
@@ -300,7 +305,7 @@ module.exports = function ({ types: t, template }, options = {}) {
     }, []);
   }
 
-  function stringify(node) {
+  function stringify(node, depth) {
     const { type } = node;
     switch (type) {
       case 'BooleanLiteral':
@@ -314,17 +319,31 @@ module.exports = function ({ types: t, template }, options = {}) {
         return JSON.stringify(node.name);
 
       case 'ArrayExpression':
-        return `[${node.elements.map(stringify)}]`;
+      case 'ObjectExpression': {
+        const { opening, closing, children } =
+          type === 'ArrayExpression'
+            ? { opening: '[', closing: ']', children: node.elements }
+            : { opening: '{', closing: '}', children: node.properties };
+        const childrenStrings = children.map((c) => stringify(c, depth + 1)).filter(Boolean);
 
-      case 'ObjectExpression':
-        return `{${node.properties.map(stringify).filter(Boolean)}}`;
+        if (!prettyJson) {
+          return opening + childrenStrings + closing;
+        }
+
+        const indentation = '  '.repeat(depth);
+        const innerIndentation = indentation + '  ';
+        const inner = childrenStrings.join(`,\n${innerIndentation}`);
+
+        return `${opening}\n${innerIndentation}${inner}\n${indentation}${closing}`;
+      }
 
       case 'ObjectProperty': {
         const { key, value } = node;
         if (t.isIdentifier(value, { name: 'undefined' })) {
           return '';
         }
-        return `${stringify(key)}:${stringify(value)}`;
+        const space = prettyJson ? ' ' : '';
+        return `${stringify(key, depth)}:${space}${stringify(value, depth)}`;
       }
     }
 

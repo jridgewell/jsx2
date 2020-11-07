@@ -3,6 +3,8 @@
     ["@babel/plugin-syntax-bigint"],
     ["../../../..", {
       "json": false,
+      "minimalJson": false,
+      "prettyJson": false,
       "taggedTemplate": false
     }]
   ]

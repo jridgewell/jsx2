@@ -2,7 +2,9 @@
   "plugins": [
     ["@babel/plugin-syntax-bigint"],
     ["../../../..", {
+      "json": true,
       "minimalJson": true,
+      "prettyJson": false,
       "taggedTemplate": false
     }]
   ]

@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    ["../../../..", {
+      "json": true,
+      "minimalJson": false,
+      "prettyJson": true,
+      "taggedTemplate": false
+    }]
+  ]
+}

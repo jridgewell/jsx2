@@ -1,0 +1,11 @@
+{
+  "plugins": [
+    ["@babel/plugin-syntax-bigint"],
+    ["../../../..", {
+      "json": true,
+      "minimalJson": false,
+      "prettyJson": true,
+      "taggedTemplate": false
+    }]
+  ]
+}

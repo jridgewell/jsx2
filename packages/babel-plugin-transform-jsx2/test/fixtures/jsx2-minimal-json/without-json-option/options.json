@@ -3,6 +3,7 @@
     ["../../../..", {
       "json": false,
       "minimalJson": true,
+      "prettyJson": false,
       "taggedTemplate": false
     }]
   ],
