@@ -1,7 +1,6 @@
 import type { Renderable } from '../src/render';
 
-import { createContext } from '../src/context';
-import { act, createElement, useContext, useState } from '../src/jsx2';
+import { act, createContext, createElement, useContext, useState } from '../src/jsx2';
 import { createTree } from '../src/diff/create-tree';
 import { coerceRenderable } from '../src/util/coerce-renderable';
 

@@ -16,4 +16,5 @@ export {
   useRef,
   useState,
 } from './hooks';
+export { createContext } from './context';
 export { act } from './util/act';
