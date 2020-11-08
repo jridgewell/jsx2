@@ -1,4 +1,4 @@
-import { act, createElement, render, useState, useReducer } from '../src/jsx2';
+import { act, createElement, render, useState, useReducer, useEffect } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
   expect(node).toBeTruthy();
@@ -596,6 +596,411 @@ describe('useReducer', () => {
       expect(C).toHaveBeenCalledTimes(1);
       expect(C2).toHaveBeenCalledTimes(1);
       expectTextNode(body.firstChild, 'second');
+    });
+  });
+});
+
+describe('useEffect', () => {
+  it('calls effect after next tick', () => {
+    const body = document.createElement('body');
+    const effect = jest.fn();
+    const C = jest.fn(() => {
+      useEffect(effect);
+    });
+
+    act(() => {
+      render(createElement(C), body);
+      expect(effect).not.toHaveBeenCalled();
+    });
+
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+
+  describe('when component rerenders', () => {
+    describe('when missing deps', () => {
+      it('calls effect again', () => {
+        const body = document.createElement('body');
+        const effect = jest.fn();
+        const C = jest.fn(() => {
+          useEffect(effect);
+        });
+
+        act(() => {
+          render(createElement(C), body);
+          expect(effect).not.toHaveBeenCalled();
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(effect).toHaveBeenCalledTimes(2);
+      });
+
+      it('cleans up effect', () => {
+        const body = document.createElement('body');
+        const cleanup = jest.fn();
+        const effect = jest.fn(() => cleanup);
+        const C = jest.fn(() => {
+          useEffect(effect);
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(cleanup).not.toHaveBeenCalled();
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(cleanup).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('with empty deps', () => {
+      it('skips effect', () => {
+        const body = document.createElement('body');
+        const effect = jest.fn();
+        const C = jest.fn(() => {
+          useEffect(effect, []);
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(effect).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not cleanup', () => {
+        const body = document.createElement('body');
+        const cleanup = jest.fn();
+        const effect = jest.fn(() => cleanup);
+        const C = jest.fn(() => {
+          useEffect(effect, []);
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(cleanup).not.toHaveBeenCalled();
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(cleanup).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('skips effect', () => {
+          const body = document.createElement('body');
+          const effect = jest.fn();
+          const C = jest.fn(() => {
+            useEffect(effect, ['dep']);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(effect).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not cleanup', () => {
+          const body = document.createElement('body');
+          const cleanup = jest.fn();
+          const effect = jest.fn(() => cleanup);
+          const C = jest.fn(() => {
+            useEffect(effect, ['dep']);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(cleanup).not.toHaveBeenCalled();
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(cleanup).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('calls effect again', () => {
+          const body = document.createElement('body');
+          const effect = jest.fn();
+          const C = jest.fn(() => {
+            useEffect(effect, [{}]);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+            expect(effect).not.toHaveBeenCalled();
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(effect).toHaveBeenCalledTimes(2);
+        });
+
+        it('cleans up effect', () => {
+          const body = document.createElement('body');
+          const cleanup = jest.fn();
+          const effect = jest.fn(() => cleanup);
+          const C = jest.fn(() => {
+            useEffect(effect, [{}]);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(cleanup).not.toHaveBeenCalled();
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+  });
+
+  describe('when component changes', () => {
+    describe('when missing deps', () => {
+      it('skips pending effects', () => {
+        const body = document.createElement('body');
+        const effect = jest.fn();
+        const C = jest.fn(() => {
+          useEffect(effect);
+        });
+        const C2 = jest.fn(() => {});
+
+        act(() => {
+          render(createElement(C), body);
+          render(createElement(C2), body);
+        });
+
+        expect(effect).not.toHaveBeenCalled();
+      });
+
+      it('cleanups up old cleanup of pending effect', () => {
+        const body = document.createElement('body');
+        const cleanup = jest.fn();
+        const effect = jest.fn(() => cleanup);
+        const C = jest.fn(() => {
+          useEffect(effect);
+        });
+        const C2 = jest.fn(() => {});
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).not.toHaveBeenCalled();
+
+        act(() => {
+          render(createElement(C), body);
+          render(createElement(C2), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).toHaveBeenCalledTimes(1);
+      });
+
+      it('cleans up any mounted effects', () => {
+        const body = document.createElement('body');
+        const cleanup = jest.fn();
+        const effect = jest.fn(() => cleanup);
+        const C = jest.fn(() => {
+          useEffect(effect);
+        });
+        const C2 = jest.fn(() => {});
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).not.toHaveBeenCalled();
+
+        act(() => {
+          render(createElement(C2), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('with empty deps', () => {
+      it('skips pending effects', () => {
+        const body = document.createElement('body');
+        const effect = jest.fn();
+        const C = jest.fn(() => {
+          useEffect(effect, []);
+        });
+        const C2 = jest.fn(() => {});
+
+        act(() => {
+          render(createElement(C), body);
+          render(createElement(C2), body);
+        });
+
+        expect(effect).not.toHaveBeenCalled();
+      });
+
+      it('cleans up any mounted effects', () => {
+        const body = document.createElement('body');
+        const cleanup = jest.fn();
+        const effect = jest.fn(() => cleanup);
+        const C = jest.fn(() => {
+          useEffect(effect, []);
+        });
+        const C2 = jest.fn(() => {});
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).not.toHaveBeenCalled();
+
+        act(() => {
+          render(createElement(C2), body);
+        });
+        expect(effect).toHaveBeenCalledTimes(1);
+        expect(cleanup).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('skips pending effects', () => {
+          const body = document.createElement('body');
+          const effect = jest.fn();
+          const C = jest.fn(() => {
+            useEffect(effect, ['deps']);
+          });
+          const C2 = jest.fn(() => {});
+
+          act(() => {
+            render(createElement(C), body);
+            render(createElement(C2), body);
+          });
+
+          expect(effect).not.toHaveBeenCalled();
+        });
+
+        it('cleans up any mounted effects', () => {
+          const body = document.createElement('body');
+          const cleanup = jest.fn();
+          const effect = jest.fn(() => cleanup);
+          const C = jest.fn(() => {
+            useEffect(effect, ['deps']);
+          });
+          const C2 = jest.fn(() => {});
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).not.toHaveBeenCalled();
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('skips pending effects', () => {
+          const body = document.createElement('body');
+          const effect = jest.fn();
+          const C = jest.fn(() => {
+            useEffect(effect, [{}]);
+          });
+          const C2 = jest.fn(() => {});
+
+          act(() => {
+            render(createElement(C), body);
+            render(createElement(C2), body);
+          });
+
+          expect(effect).not.toHaveBeenCalled();
+        });
+
+        it('cleanups up old cleanup of pending effect', () => {
+          const body = document.createElement('body');
+          const cleanup = jest.fn();
+          const effect = jest.fn(() => cleanup);
+          const C = jest.fn(() => {
+            useEffect(effect, [{}]);
+          });
+          const C2 = jest.fn(() => {});
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).not.toHaveBeenCalled();
+
+          act(() => {
+            render(createElement(C), body);
+            render(createElement(C2), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+
+        it('cleans up any mounted effects', () => {
+          const body = document.createElement('body');
+          const cleanup = jest.fn();
+          const effect = jest.fn(() => cleanup);
+          const C = jest.fn(() => {
+            useEffect(effect, [{}]);
+          });
+          const C2 = jest.fn(() => {});
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).not.toHaveBeenCalled();
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+          expect(effect).toHaveBeenCalledTimes(1);
+          expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+      });
     });
   });
 });
