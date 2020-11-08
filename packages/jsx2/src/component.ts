@@ -1,13 +1,15 @@
 import type { Renderable } from './render';
-type Props = Record<string, unknown>;
+
+export type ComponentProps = Record<string, unknown> & any;
+export type ComponentChildren = any;
 
 export interface FunctionComponent {
-  (props: Props): void | Renderable;
+  (props: ComponentProps): void | Renderable;
 }
 
 export class Component {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  render(_props: Props): void | Renderable {}
+  render(_props: ComponentProps): void | Renderable {}
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

@@ -1,6 +1,6 @@
 import { fiber } from '../../src/fiber';
-import { mark } from '../../src/fiber/mark';
 import { getPreviousFiber } from '../../src/fiber/get-previous-fiber';
+import { mark } from '../../src/fiber/mark';
 
 describe('getPreviousFiber', () => {
   it('returns null if fiber is first child', () => {

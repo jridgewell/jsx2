@@ -1,5 +1,5 @@
-import { coerceRenderable } from '../../src/util/coerce-renderable';
 import { createElement } from '../../src/jsx2';
+import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('coerceRenderable', () => {
   it('coerces null to null', () => {

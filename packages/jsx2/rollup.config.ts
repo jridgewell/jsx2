@@ -9,7 +9,7 @@ function configure(esm) {
         : { format: 'umd', name: 'dedent', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
     plugins: [
       // Compile TypeScript files
-      typescript(),
+      typescript({ tsconfig: './tsconfig.build.json' }),
 
       // Eliminate debug blocks.
       strip({ include: '**/*.ts', functions: [], labels: ['debug'] }),

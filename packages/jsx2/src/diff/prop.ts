@@ -1,5 +1,5 @@
-import type { StyleTypes } from './style';
 import type { ListenerTypes } from './event';
+import type { StyleTypes } from './style';
 import type { VNode } from '../create-element';
 
 import { diffEvent } from './event';

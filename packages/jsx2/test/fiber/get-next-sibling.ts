@@ -1,8 +1,8 @@
 import { fiber } from '../../src/fiber';
-import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/jsx2';
 import { getNextSibling } from '../../src/fiber/get-next-sibling';
 import { insert } from '../../src/fiber/insert';
+import { mark } from '../../src/fiber/mark';
 
 describe('getNextSibling', () => {
   function makeElementFiber(tag: string) {

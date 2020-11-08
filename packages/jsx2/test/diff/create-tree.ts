@@ -1,10 +1,8 @@
 import type { Renderable } from '../../src/render';
-import type { FunctionComponentVNode } from '../../src/create-element';
-import type { RefWork } from '../../src/diff/ref';
 
-import { createElement, Component, Fragment } from '../../src/jsx2';
+import { Component, createElement } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
-import { applyRefs } from '../../src/diff/ref';
+import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('createTree', () => {
   function expectTextNode(node: Node, text: string) {
@@ -19,14 +17,8 @@ describe('createTree', () => {
     expect((node as Element).localName).toBe(tag);
   }
 
-  function data(renderable: Renderable): FunctionComponentVNode {
-    return createElement(Fragment, null, renderable);
-  }
-
   function create(renderable: Renderable, container: Node) {
-    const refs: RefWork[] = [];
-    createTree(data(renderable), container, refs);
-    applyRefs(refs);
+    createTree(coerceRenderable(renderable), container);
   }
 
   describe('rendering null', () => {
@@ -170,7 +162,9 @@ describe('createTree', () => {
       });
 
       create(
-        data(createElement('div', { id: 'id', ref }, createElement('nested', { ref: nested }))),
+        coerceRenderable(
+          createElement('div', { id: 'id', ref }, createElement('nested', { ref: nested })),
+        ),
         body,
       );
 

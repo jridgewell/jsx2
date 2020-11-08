@@ -18,12 +18,11 @@
   "scripts": {
     "build": "run-s -n build:*",
     "build:rollup": "rollup -c rollup.config.ts",
-    "build:ts": "tsc --module commonjs",
     "lint": "run-s -n lint:*",
     "lint:prettier": "npm run test:lint:prettier -- --write",
     "lint:ts": "npm run test:lint:ts -- --fix",
     "prebuild": "rm -rf dist",
-    "test": "run-s -n test:lint 'test:only --no-cache'",
+    "test": "run-s -n test:lint 'test:only -- --no-cache'",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:lint": "run-s -n test:lint:*",
     "test:lint:prettier": "prettier --check '{src,test}/**/*.ts'",
@@ -34,6 +33,7 @@
     "prepublishOnly": "npm run preversion"
   },
   "devDependencies": {
+    "@jridgewell/path-sorter": "0.0.1",
     "@rollup/plugin-strip": "2.0.0",
     "@rollup/plugin-typescript": "6.0.0",
     "@types/jest": "26.0.15",
@@ -42,6 +42,7 @@
     "@typescript-eslint/parser": "4.6.1",
     "eslint": "7.12.0",
     "eslint-config-prettier": "6.14.0",
+    "eslint-plugin-rulesdir": "0.1.0",
     "jest": "26.6.1",
     "jest-config": "26.6.1",
     "npm-run-all": "4.1.5",

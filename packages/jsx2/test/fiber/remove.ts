@@ -1,8 +1,8 @@
 import { fiber } from '../../src/fiber';
-import { mark } from '../../src/fiber/mark';
 import { createElement } from '../../src/jsx2';
-import { remove } from '../../src/fiber/remove';
 import { insert } from '../../src/fiber/insert';
+import { mark } from '../../src/fiber/mark';
+import { remove } from '../../src/fiber/remove';
 
 describe('remove', () => {
   function makeElementFiber(tag: string) {

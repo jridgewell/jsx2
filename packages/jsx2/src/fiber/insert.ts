@@ -13,8 +13,8 @@ export function insert(fiber: Fiber, container: Node, before: null | Node): void
 function insertRange(fiber: Fiber, end: null | Fiber, container: Node, before: null | Node): void {
   let current: null | Fiber = fiber;
   do {
-    const { dom, child } = current!;
-    if (dom) {
+    const { dom, data, child } = current!;
+    if (dom !== null && dom !== data) {
       debug: assert(
         dom.parentNode === null || dom.parentNode === container,
         'fiber must not already be mounted, or be mounted as a direct child of container',

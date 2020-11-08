@@ -1,45 +1,36 @@
-import type { Renderable } from '../../src/render';
-import type { RenderableArray } from '../../src/render';
-import type { FunctionComponentVNode } from '../../src/create-element';
-import type { ClassComponentVNode } from '../../src/create-element';
-import type { RefWork } from '../../src/diff/ref';
-import type { Fiber } from '../../src/fiber';
+import type {
+  ClassComponentVNode,
+  ElementVNode,
+  FunctionComponentVNode,
+} from '../../src/create-element';
+import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
+import type { Renderable, RenderableArray } from '../../src/render';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
-import type { ElementVNode } from '../../src/create-element';
 
-import { createElement, Component, Fragment } from '../../src/jsx2';
+import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
-import { applyRefs } from '../../src/diff/ref';
-import { diffTree } from '../../src/diff/diff-tree';
+import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
+import { coerceRenderable } from '../../src/util/coerce-renderable';
+
+function makeTree(renderable: Renderable, container: Node) {
+  return createTree(coerceRenderable(renderable), container);
+}
+
+function expectTextNode(node: Node, text: string) {
+  expect(node).toBeTruthy();
+  expect(node.nodeType).toBe(Node.TEXT_NODE);
+  expect(node.textContent).toBe(text);
+}
 
 describe('diffTree', () => {
-  function expectTextNode(node: Node, text: string) {
-    expect(node).toBeTruthy();
-    expect(node.nodeType).toBe(Node.TEXT_NODE);
-    expect(node.textContent).toBe(text);
-  }
-
   function expectElement(node: Node, tag: string): asserts node is Element {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.ELEMENT_NODE);
     expect((node as Element).localName).toBe(tag);
   }
 
-  function data(renderable: Renderable): FunctionComponentVNode {
-    return createElement(Fragment, null, renderable);
-  }
-
-  function makeTree(renderable: Renderable, container: Node) {
-    const refs: RefWork[] = [];
-    const tree = createTree(data(renderable), container, refs);
-    applyRefs(refs);
-    return tree;
-  }
-
-  function diff(old: Fiber, renderable: CoercedRenderable, container: Node) {
-    const refs: RefWork[] = [];
-    diffTree(old, data(renderable), container, refs);
-    applyRefs(refs);
+  function diff(old: RootFiber, renderable: CoercedRenderable, container: Node) {
+    diffTree(old, coerceRenderable(renderable), container);
   }
 
   function expectShallowEqual<T, U>(actual: T[], expected: U[]) {
@@ -394,7 +385,7 @@ describe('diffTree', () => {
           const ref = oldRef;
           const tree = makeOldFiberTree(createElement('div', { ref: oldRef }), container);
           const renderable = createElement('div', { ref });
-          ref.mockReset();
+          ref.mockClear();
 
           diff(tree, renderable, container);
 
@@ -429,7 +420,7 @@ describe('diffTree', () => {
           const ref = oldRef;
           const tree = makeOldFiberTree(createElement('div', { ref: oldRef }), container);
           const renderable = createElement('before', { ref });
-          ref.mockReset();
+          ref.mockClear();
 
           diff(tree, renderable, container);
 
@@ -1762,5 +1753,74 @@ describe('diffTree', () => {
         });
       });
     });
+  });
+});
+
+describe('rediffComponent', () => {
+  function expectFunctionComponentFiber(fiber: null | Fiber): FunctionComponentFiber {
+    expect(fiber).not.toBeNull();
+    const { data } = fiber!;
+    expect(typeof data).toBe('object');
+    expect(typeof (data as any).type).toBe('function');
+    return fiber as FunctionComponentFiber;
+  }
+
+  it('invokes component with the same props', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    const props = {};
+    const tree = makeTree(createElement(C, props), container);
+    const component = expectFunctionComponentFiber(tree.child);
+    C.mockClear();
+
+    rediffComponent(component);
+
+    expect(C).toHaveBeenCalledTimes(1);
+    expect(C).toHaveBeenCalledWith(props);
+  });
+
+  it('updates render', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    C.mockReturnValue('before');
+    const tree = makeTree(createElement(C), container);
+    const component = expectFunctionComponentFiber(tree.child);
+    const old = container.firstChild!;
+
+    C.mockReturnValue('test');
+    rediffComponent(component);
+
+    expect(container.firstChild).toBe(old);
+    expect(container.lastChild).toBe(old);
+    expectTextNode(old, 'test');
+  });
+
+  it('applies layoutEffects from rerender', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    C.mockReturnValue('before');
+    const tree = makeTree(createElement(C), container);
+    const component = expectFunctionComponentFiber(tree.child);
+    const effect = jest.fn();
+
+    C.mockImplementation(() => {
+      useLayoutEffect(effect);
+    });
+    rediffComponent(component);
+
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+
+  it('diffs the component in isolation', () => {
+    const container = document.createElement('body');
+    const C = jest.fn();
+    const D = jest.fn();
+    const tree = makeTree([createElement(C), createElement(D)], container);
+    const cComponent = expectFunctionComponentFiber(tree.child!.child);
+    D.mockClear();
+
+    rediffComponent(cComponent);
+
+    expect(D).not.toHaveBeenCalled();
   });
 });
