@@ -153,6 +153,29 @@ describe('useState', () => {
         expectTextNode(body.firstChild, 'test');
       });
     });
+
+    it('only rerenders a single time per batch', () => {
+      const body = document.createElement('body');
+      let set: (value: string) => void;
+      const C = jest.fn(() => {
+        const [state, setter] = useState('before');
+        set = setter;
+        return state;
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+      C.mockClear();
+
+      act(() => {
+        set('first');
+        set('second');
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
+    });
   });
 
   describe('when component rerenders', () => {
@@ -249,6 +272,46 @@ describe('useState', () => {
       expect(sets[0]).toBeInstanceOf(Function);
       expect(sets[1]).toBeInstanceOf(Function);
       expect(sets[0]).not.toBe(sets[1]);
+    });
+
+    it('cancels pending diffs to state', () => {
+      const body = document.createElement('body');
+      let set: (value: string) => void;
+      const C = jest.fn(() => {
+        const state = useState('init');
+        set = state[1];
+      });
+      const C2 = jest.fn(() => 'second');
+
+      act(() => {
+        render(createElement(C), body);
+        set('test');
+        render(createElement(C2), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
+    });
+
+    it('skip further changes to state', () => {
+      const body = document.createElement('body');
+      let set: (value: string) => void;
+      const C = jest.fn(() => {
+        const state = useState('init');
+        set = state[1];
+      });
+      const C2 = jest.fn(() => 'second');
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C2), body);
+        set('test');
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
     });
   });
 });
@@ -374,6 +437,29 @@ describe('useReducer', () => {
       expect(C).toHaveBeenCalledTimes(1);
       expectTextNode(body.firstChild, 'test');
     });
+
+    it('only rerenders a single time per batch', () => {
+      const body = document.createElement('body');
+      let dispatch: (value: string) => void;
+      const C = jest.fn(() => {
+        const [state, dispatcher] = useReducer(reducer, 'before');
+        dispatch = dispatcher;
+        return state;
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+      C.mockClear();
+
+      act(() => {
+        dispatch('first');
+        dispatch('second');
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
+    });
   });
 
   describe('when component rerenders', () => {
@@ -470,6 +556,46 @@ describe('useReducer', () => {
       expect(dispatches[0]).toBeInstanceOf(Function);
       expect(dispatches[1]).toBeInstanceOf(Function);
       expect(dispatches[0]).not.toBe(dispatches[1]);
+    });
+
+    it('cancels pending diffs to state', () => {
+      const body = document.createElement('body');
+      let dispatch: (value: string) => void;
+      const C = jest.fn(() => {
+        const state = useReducer(reducer, 'init');
+        dispatch = state[1];
+      });
+      const C2 = jest.fn(() => 'second');
+
+      act(() => {
+        render(createElement(C), body);
+        dispatch('test');
+        render(createElement(C2), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
+    });
+
+    it('skip further changes to state', () => {
+      const body = document.createElement('body');
+      let dispatch: (value: string) => void;
+      const C = jest.fn(() => {
+        const state = useReducer(reducer, 'init');
+        dispatch = state[1];
+      });
+      const C2 = jest.fn(() => 'second');
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C2), body);
+        dispatch('test');
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'second');
     });
   });
 });
