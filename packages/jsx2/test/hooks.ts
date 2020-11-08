@@ -1,3 +1,258 @@
+import { act, createElement, render, useState } from '../src/jsx2';
+
+function expectTextNode(node: null | Node, text: string) {
+  expect(node).toBeTruthy();
+  expect(node!.nodeType).toBe(Node.TEXT_NODE);
+  expect(node!.textContent).toBe(text);
+}
+
+describe('useState', () => {
+  it('accepts an initial value', () => {
+    const body = document.createElement('body');
+    act(() => {
+      render(
+        createElement(() => {
+          const [state] = useState('init');
+          return state;
+        }),
+        body,
+      );
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+
+  it('accepts a lazy initialization function', () => {
+    const body = document.createElement('body');
+    act(() => {
+      render(
+        createElement(() => {
+          const [state] = useState(() => 'init');
+          return state;
+        }),
+        body,
+      );
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+
+  describe('when setting value', () => {
+    describe('when value is non-function', () => {
+      it('skips rerender when value is identical', () => {
+        const body = document.createElement('body');
+        let set: (value: string) => void;
+        const C = jest.fn(() => {
+          const [state, setter] = useState('before');
+          set = setter;
+          return state;
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        C.mockClear();
+
+        act(() => {
+          set('before');
+        });
+
+        expect(C).not.toHaveBeenCalled();
+        expectTextNode(body.firstChild, 'before');
+      });
+
+      it('enqueues rerender when value is changed', async () => {
+        const body = document.createElement('body');
+        let set: (value: string) => void;
+        const C = jest.fn(() => {
+          const [state, setter] = useState('before');
+          set = setter;
+          return state;
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        C.mockClear();
+
+        act(() => {
+          set('test');
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expectTextNode(body.firstChild, 'test');
+      });
+    });
+
+    describe('when new value is a reducing function', () => {
+      it('calls reducer with old value', () => {
+        const body = document.createElement('body');
+        let set: (value: string | ((prev: string) => string)) => void;
+        const C = jest.fn(() => {
+          const [state, setter] = useState('before');
+          set = setter;
+          return state;
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        C.mockClear();
+
+        const reducer = jest.fn(() => 'test');
+        act(() => {
+          set(reducer);
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expect(reducer).toHaveBeenCalledTimes(1);
+        expect(reducer).toHaveBeenCalledWith('before');
+      });
+
+      it('skips rerender when reduced value is identical', () => {
+        const body = document.createElement('body');
+        let set: (value: string | ((prev: string) => string)) => void;
+        const C = jest.fn(() => {
+          const [state, setter] = useState('before');
+          set = setter;
+          return state;
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        C.mockClear();
+
+        act(() => {
+          set(() => 'before');
+        });
+
+        expect(C).not.toHaveBeenCalled();
+        expectTextNode(body.firstChild, 'before');
+      });
+
+      it('enqueues rerender when reduced value is changed', async () => {
+        const body = document.createElement('body');
+        let set: (value: string | ((prev: string) => string)) => void;
+        const C = jest.fn(() => {
+          const [state, setter] = useState('before');
+          set = setter;
+          return state;
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        C.mockClear();
+
+        act(() => {
+          set(() => 'test');
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expectTextNode(body.firstChild, 'test');
+      });
+    });
+  });
+
+  describe('when component rerenders', () => {
+    it('preserves previous value', () => {
+      const body = document.createElement('body');
+      const states: string[] = [];
+      const C = jest
+        .fn()
+        .mockImplementationOnce(() => {
+          const state = useState('init');
+          states.push(state[0]);
+        })
+        .mockImplementationOnce(() => {
+          const state = useState('second');
+          states.push(state[0]);
+        });
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(2);
+      expect(states).toEqual(['init', 'init']);
+    });
+
+    it('the set function is identical', () => {
+      const body = document.createElement('body');
+      const sets: ((value: string) => void)[] = [];
+      const C = jest
+        .fn()
+        .mockImplementationOnce(() => {
+          const state = useState('init');
+          sets.push(state[1]);
+        })
+        .mockImplementationOnce(() => {
+          const state = useState('second');
+          sets.push(state[1]);
+        });
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(2);
+      expect(sets[0]).toBeInstanceOf(Function);
+      expect(sets[0]).toBe(sets[1]);
+    });
+  });
+
+  describe('when component changes', () => {
+    it('initial value is reset', () => {
+      const body = document.createElement('body');
+      const states: string[] = [];
+      const C = jest.fn(() => {
+        const state = useState('init');
+        states.push(state[0]);
+      });
+      const C2 = jest.fn(() => {
+        const state = useState('second');
+        states.push(state[0]);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C2), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expect(states).toEqual(['init', 'second']);
+    });
+
+    it('the set function changes', () => {
+      const body = document.createElement('body');
+      const sets: ((value: string) => void)[] = [];
+      const C = jest.fn(() => {
+        const state = useState('init');
+        sets.push(state[1]);
+      });
+      const C2 = jest.fn(() => {
+        const state = useState('second');
+        sets.push(state[1]);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+        render(createElement(C2), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expect(sets[0]).toBeInstanceOf(Function);
+      expect(sets[1]).toBeInstanceOf(Function);
+      expect(sets[0]).not.toBe(sets[1]);
+    });
+  });
+});
+
 describe('useLayoutEffect', () => {
   it.todo('pending layoutEffect is cancelled on unmount');
 });
