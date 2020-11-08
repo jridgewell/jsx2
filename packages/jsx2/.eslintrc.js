@@ -1,7 +1,10 @@
+const rulesDirPlugin = require('eslint-plugin-rulesdir');
+rulesDirPlugin.RULES_DIR = require('path').join(__dirname, 'eslint-rules');
+
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'eslint-plugin-local-rules'],
+  plugins: ['@typescript-eslint', 'rulesdir'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -19,10 +22,10 @@ module.exports = {
         argsIgnorePattern: '^_',
       },
     ],
-    'local-rules/sort-imports': 'error',
     'no-constant-condition': 'off',
     'no-empty': ['error', { allowEmptyCatch: true }],
     'no-unused-labels': 'off',
+    'rulesdir/sort-imports': 'error',
   },
   overrides: [
     {
@@ -32,5 +35,14 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'off',
       },
     },
+    {
+      files: ['*.js'],
+      env: {
+        node: true,
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      }
+    }
   ],
 };
