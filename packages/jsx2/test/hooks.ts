@@ -8,6 +8,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useCallback,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -1601,7 +1602,7 @@ describe('useRef', () => {
       expect(C).toHaveBeenCalledTimes(2);
       expect(refs).toHaveLength(2);
       expect(refs[0]).toHaveProperty('current', 0);
-    })
+    });
   });
 
   describe('when component changes', () => {
@@ -1629,6 +1630,187 @@ describe('useRef', () => {
       expect(refs[0]).not.toBe(refs[1]);
       expect(refs[0]).toHaveProperty('current', 'before');
       expect(refs[1]).toHaveProperty('current', 'test');
+    });
+  });
+});
+
+describe('useCallback', () => {
+  it('initializes value with function', () => {
+    const body = document.createElement('body');
+    const C = jest.fn(() => {
+      const cb = jest.fn(() => 'init');
+      const memo = useCallback(cb, []);
+      expect(memo).toBe(cb);
+      expect(cb).not.toHaveBeenCalled();
+      return 'init';
+    });
+
+    act(() => {
+      render(createElement(C), body);
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+
+  describe('when component rerenders', () => {
+    describe('with empty deps', () => {
+      it('reuses memo value', () => {
+        const body = document.createElement('body');
+        const callbacks: jest.Mock[] = [];
+        const C = jest.fn(() => {
+          callbacks.push(useCallback(jest.fn(), []));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(callbacks).toHaveLength(2);
+        expect(callbacks[0]).toBe(callbacks[1]);
+        expect(callbacks[0]).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('reuses memo value', () => {
+          const body = document.createElement('body');
+          const callbacks: jest.Mock[] = [];
+          const C = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), ['dep']));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(callbacks).toHaveLength(2);
+          expect(callbacks[0]).toBe(callbacks[1]);
+          expect(callbacks[0]).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const callbacks: jest.Mock[] = [];
+          const C = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), [{}]));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(callbacks).toHaveLength(2);
+          expect(callbacks[0]).not.toBe(callbacks[1]);
+          expect(callbacks[0]).not.toHaveBeenCalled();
+          expect(callbacks[1]).not.toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
+  describe('when component changes', () => {
+    describe('with empty deps', () => {
+      it('initializes value again', () => {
+        const body = document.createElement('body');
+        const callbacks: jest.Mock[] = [];
+        const C = jest.fn(() => {
+          callbacks.push(useCallback(jest.fn(), []));
+        });
+        const C2 = jest.fn(() => {
+          callbacks.push(useCallback(jest.fn(), []));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        act(() => {
+          render(createElement(C2), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expect(C2).toHaveBeenCalledTimes(1);
+        expect(callbacks).toHaveLength(2);
+        expect(callbacks[0]).not.toBe(callbacks[1]);
+        expect(callbacks[0]).not.toHaveBeenCalled();
+        expect(callbacks[1]).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const callbacks: jest.Mock[] = [];
+          const C = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), ['deps']));
+          });
+          const C2 = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), ['deps']));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(callbacks).toHaveLength(2);
+          expect(callbacks[0]).not.toBe(callbacks[1]);
+          expect(callbacks[0]).not.toHaveBeenCalled();
+          expect(callbacks[1]).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const callbacks: jest.Mock[] = [];
+          const C = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), [{}]));
+          });
+          const C2 = jest.fn(() => {
+            callbacks.push(useCallback(jest.fn(), [{}]));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(callbacks).toHaveLength(2);
+          expect(callbacks[0]).not.toBe(callbacks[1]);
+          expect(callbacks[0]).not.toHaveBeenCalled();
+          expect(callbacks[1]).not.toHaveBeenCalled();
+        });
+      });
     });
   });
 });
