@@ -1,5 +1,7 @@
 import type {
-  ClassComponentVNode, ElementVNode, FunctionComponentVNode,
+  ClassComponentVNode,
+  ElementVNode,
+  FunctionComponentVNode,
 } from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { Renderable, RenderableArray } from '../../src/render';
