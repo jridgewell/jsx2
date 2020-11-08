@@ -9,6 +9,7 @@ import {
   useMemo,
   useRef,
   useCallback,
+  useDebugValue,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -1814,3 +1815,22 @@ describe('useCallback', () => {
     });
   });
 });
+
+describe('useDebugValue', () => {
+  it("doesn't throw", () => {
+    const body = document.createElement('body');
+    const C = jest.fn(() => {
+      useDebugValue('foo');
+      return 'init';
+    });
+    act(() => {
+      render(createElement(C), body);
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+});
+
+describe('useContext', () => {
+
+})

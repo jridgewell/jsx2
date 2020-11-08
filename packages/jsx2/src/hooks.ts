@@ -142,7 +142,7 @@ export function useCallback<T>(cb: T, deps: unknown[]): T {
   return useMemo(() => cb, deps);
 }
 
-export function useDebugValue(): void {
+export function useDebugValue(_label: string): void {
   // purposefully noop.
 }
 
