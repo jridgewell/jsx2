@@ -23,9 +23,7 @@ describe('createContext', () => {
           createElement(
             Context.Provider,
             { value },
-            createElement(
-              'div',
-              null,
+            createElement(() =>
               createElement(() => {
                 v = useContext(Context);
               }),
@@ -51,7 +49,7 @@ describe('createContext', () => {
             createElement(
               Context.Provider,
               { value },
-              createElement('div', null, createElement(Context.Consumer, null, render)),
+              createElement(() => createElement(Context.Consumer, null, render)),
             ),
             container,
           );
@@ -76,7 +74,7 @@ describe('createContext', () => {
                 return createElement(
                   Context.Provider,
                   { value },
-                  createElement('div', null, createElement(Context.Consumer, null, render)),
+                  createElement(() => createElement(Context.Consumer, null, render)),
                 );
               }),
               container,
@@ -100,11 +98,7 @@ describe('createContext', () => {
           let set: (v: typeof value) => void;
 
           act(() => {
-            const children = createElement(
-              'div',
-              null,
-              createElement(Context.Consumer, null, render),
-            );
+            const children = createElement(() => createElement(Context.Consumer, null, render));
             makeTree(
               createElement(() => {
                 const [value, setValue] = useState(defaultValue);
@@ -129,6 +123,7 @@ describe('createContext', () => {
         it('rerenders children', async () => {
           const container = document.createElement('body');
           const Context = createContext(defaultValue);
+          const render = jest.fn();
           let set: (v: typeof defaultValue) => void;
 
           act(() => {
@@ -140,22 +135,20 @@ describe('createContext', () => {
                 return createElement(
                   Context.Provider,
                   { value: value ?? defaultValue },
-                  createElement(
-                    'div',
-                    null,
-                    createElement(Context.Consumer, null, () => {}),
-                  ),
+                  createElement(() => createElement(Context.Consumer, null, render)),
                 );
               }),
               container,
             );
+            render.mockClear();
           });
 
           act(() => {
             set!(defaultValue);
           });
 
-          expect(container.querySelector('div')).not.toBe(null);
+          expect(render).toHaveBeenCalledTimes(1);
+          expect(render).toHaveBeenCalledWith(defaultValue);
         });
 
         it("does not pierce memo'd intermediate node", async () => {
@@ -165,11 +158,7 @@ describe('createContext', () => {
           let set: (v: typeof value) => void;
 
           act(() => {
-            const children = createElement(
-              'div',
-              null,
-              createElement(Context.Consumer, null, render),
-            );
+            const children = createElement(() => createElement(Context.Consumer, null, render));
             makeTree(
               createElement(() => {
                 const [value, setValue] = useState(defaultValue);
