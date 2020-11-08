@@ -11,7 +11,9 @@ import {
   useCallback,
   useDebugValue,
   useContext,
+  useImperativeHandle,
   createContext,
+  createRef,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -2094,6 +2096,631 @@ describe('useContext', () => {
           expect(ctxs[0]).toBe(value);
           expect(ctxs[1]).toBe(value);
           expect(ctxs[2]).toBe(value);
+        });
+      });
+    });
+  });
+});
+
+describe('useImperativeHandle', () => {
+  it('calls factory after render', () => {
+    const body = document.createElement('body');
+    const factory = jest.fn();
+    const C = jest.fn(() => {
+      const ref = useRef(null);
+      useImperativeHandle(ref, factory);
+    });
+
+    act(() => {
+      render(createElement(C), body);
+      expect(factory).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('with ref object', () => {
+    it('sets current of ref object', () => {
+      const body = document.createElement('body');
+      const factory = jest.fn(() => 1);
+      const ref = createRef();
+      const C = jest.fn(() => {
+        useImperativeHandle(ref, factory);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      expect(ref.current).toBe(1);
+    });
+
+    describe('when component rerenders', () => {
+      describe('when missing deps', () => {
+        it('calls factory again', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn();
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(factory).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(factory).toHaveBeenCalledTimes(2);
+        });
+
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(ref.current).toBe(2);
+        });
+      });
+
+      describe('with empty deps', () => {
+        it('skips calling factory', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn();
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(factory).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(factory).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps previous current value', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(ref.current).toBe(1);
+        });
+      });
+
+      describe('with non-empty deps', () => {
+        describe('with shallow equal deps', () => {
+          it('skips calling factory', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn();
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+            expect(factory).toHaveBeenCalledTimes(1);
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(factory).toHaveBeenCalledTimes(1);
+          });
+
+          it('keeps previous current value', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(ref.current).toBe(1);
+          });
+        });
+
+        describe('with changed deps', () => {
+          it('calls factory again', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn();
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+            expect(factory).toHaveBeenCalledTimes(1);
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(factory).toHaveBeenCalledTimes(2);
+          });
+
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(ref.current).toBe(2);
+          });
+        });
+      });
+    });
+
+    describe('when component changes', () => {
+      describe('when missing deps', () => {
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, () => 1);
+          });
+          const C2 = jest.fn(() => {
+            useImperativeHandle(ref, () => 2);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ref.current).toBe(2);
+        });
+      });
+
+      describe('with empty deps', () => {
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const ref = createRef();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, () => 1, []);
+          });
+          const C2 = jest.fn(() => {
+            useImperativeHandle(ref, () => 2, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ref.current).toBe(2);
+        });
+      });
+
+      describe('with non-empty deps', () => {
+        describe('with shallow equal deps', () => {
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, () => 1, ['dep']);
+            });
+            const C2 = jest.fn(() => {
+              useImperativeHandle(ref, () => 2, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C2), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(1);
+            expect(C2).toHaveBeenCalledTimes(1);
+            expect(ref.current).toBe(2);
+          });
+        });
+
+        describe('with changed deps', () => {
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const ref = createRef();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, () => 1, [{}]);
+            });
+            const C2 = jest.fn(() => {
+              useImperativeHandle(ref, () => 2, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C2), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(1);
+            expect(C2).toHaveBeenCalledTimes(1);
+            expect(ref.current).toBe(2);
+          });
+        });
+      });
+    });
+  });
+
+  describe('with ref function', () => {
+    it('sets current of ref object', () => {
+      const body = document.createElement('body');
+      const factory = jest.fn(() => 1);
+      const ref = jest.fn();
+      const C = jest.fn(() => {
+        useImperativeHandle(ref, factory);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      expect(ref).toHaveBeenCalledTimes(1);
+      expect(ref).toHaveBeenCalledWith(1);
+    });
+
+    describe('when component rerenders', () => {
+      describe('when missing deps', () => {
+        it('calls factory again', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn();
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(factory).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(factory).toHaveBeenCalledTimes(2);
+        });
+
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(ref).toHaveBeenCalledTimes(2);
+          expect(ref).toHaveBeenCalledWith(1);
+          expect(ref).toHaveBeenLastCalledWith(2);
+        });
+      });
+
+      describe('with empty deps', () => {
+        it('skips calling factory', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn();
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(factory).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(factory).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps previous current value', () => {
+          const body = document.createElement('body');
+          const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, factory, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(ref).toHaveBeenCalledTimes(1);
+          expect(ref).toHaveBeenCalledWith(1);
+        });
+      });
+
+      describe('with non-empty deps', () => {
+        describe('with shallow equal deps', () => {
+          it('skips calling factory', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn();
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+            expect(factory).toHaveBeenCalledTimes(1);
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(factory).toHaveBeenCalledTimes(1);
+          });
+
+          it('keeps previous current value', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(ref).toHaveBeenCalledTimes(1);
+            expect(ref).toHaveBeenCalledWith(1);
+          });
+        });
+
+        describe('with changed deps', () => {
+          it('calls factory again', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn();
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+            expect(factory).toHaveBeenCalledTimes(1);
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(factory).toHaveBeenCalledTimes(2);
+          });
+
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const factory = jest.fn().mockReturnValueOnce(1).mockReturnValueOnce(2);
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, factory, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(2);
+            expect(ref).toHaveBeenCalledTimes(2);
+            expect(ref).toHaveBeenCalledWith(1);
+            expect(ref).toHaveBeenLastCalledWith(2);
+          });
+        });
+      });
+    });
+
+    describe('when component changes', () => {
+      describe('when missing deps', () => {
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, () => 1);
+          });
+          const C2 = jest.fn(() => {
+            useImperativeHandle(ref, () => 2);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ref).toHaveBeenCalledTimes(2);
+          expect(ref).toHaveBeenCalledWith(1);
+          expect(ref).toHaveBeenLastCalledWith(2);
+        });
+      });
+
+      describe('with empty deps', () => {
+        it('updates current value', () => {
+          const body = document.createElement('body');
+          const ref = jest.fn();
+          const C = jest.fn(() => {
+            useImperativeHandle(ref, () => 1, []);
+          });
+          const C2 = jest.fn(() => {
+            useImperativeHandle(ref, () => 2, []);
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ref).toHaveBeenCalledTimes(2);
+          expect(ref).toHaveBeenCalledWith(1);
+          expect(ref).toHaveBeenLastCalledWith(2);
+        });
+      });
+
+      describe('with non-empty deps', () => {
+        describe('with shallow equal deps', () => {
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, () => 1, ['dep']);
+            });
+            const C2 = jest.fn(() => {
+              useImperativeHandle(ref, () => 2, ['dep']);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C2), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(1);
+            expect(C2).toHaveBeenCalledTimes(1);
+            expect(ref).toHaveBeenCalledTimes(2);
+            expect(ref).toHaveBeenCalledWith(1);
+            expect(ref).toHaveBeenLastCalledWith(2);
+          });
+        });
+
+        describe('with changed deps', () => {
+          it('updates current value', () => {
+            const body = document.createElement('body');
+            const ref = jest.fn();
+            const C = jest.fn(() => {
+              useImperativeHandle(ref, () => 1, [{}]);
+            });
+            const C2 = jest.fn(() => {
+              useImperativeHandle(ref, () => 2, [{}]);
+            });
+
+            act(() => {
+              render(createElement(C), body);
+            });
+
+            act(() => {
+              render(createElement(C2), body);
+            });
+
+            expect(C).toHaveBeenCalledTimes(1);
+            expect(C2).toHaveBeenCalledTimes(1);
+            expect(ref).toHaveBeenCalledTimes(2);
+            expect(ref).toHaveBeenCalledWith(1);
+            expect(ref).toHaveBeenLastCalledWith(2);
+          });
         });
       });
     });
