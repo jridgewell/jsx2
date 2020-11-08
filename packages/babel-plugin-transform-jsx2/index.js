@@ -59,7 +59,7 @@ module.exports = function ({ types: t, template }, options) {
       expressionMarker(node) {
         const { length } = expressions;
         expressions.push(node);
-        return t.numericLiteral(taggedTemplate ? length + 1 : length);
+        return t.numericLiteral(length);
       },
 
       fragMarker() {
@@ -245,7 +245,7 @@ module.exports = function ({ types: t, template }, options) {
     }
 
     const { node } = value;
-    if (isLiteral(value) && !value.isNumericLiteral()) return node;
+    if (isLiteral(node) && !value.isNumericLiteral()) return node;
 
     if (state) return state.expressionMarker(node);
     return node;
@@ -383,15 +383,48 @@ module.exports = function ({ types: t, template }, options) {
     const regex = /((?:[^"\d]+(?:"(?:[^"\\]*|\\[^])+")?)+)(\d+|$)/g;
     const elements = [];
     const orderedExpressions = [];
+    const remapped = { __proto__: null };
+    const { scope } = path;
 
+    let expected = 0;
     let match;
     while ((match = regex.exec(json))) {
       elements.push(buildTemplateElement(match[1]));
 
+      // Is this the end of the json?
+      if (match[2] === '') continue;
+
       const digit = +match[2];
-      if (digit > 0) {
-        orderedExpressions.push(t.cloneNode(expressions[digit - 1]));
+      if (digit === expected) {
+        orderedExpressions.push(expressions[digit]);
+        expected++;
+        continue;
+      } else if (digit < expected) {
+        orderedExpressions.push(t.cloneNode(remapped[digit] || expressions[digit]));
+        continue;
       }
+
+      const sequence = [];
+      while (expected < digit) {
+        const expression = expressions[expected];
+        if (isLiteral(expression)) {
+          expected++;
+          continue;
+        }
+        const id = scope.generateUidIdentifierBasedOnNode(expression);
+        remapped[expected] = id;
+
+        scope.push({ id });
+        sequence.push(template.expression.ast`${t.cloneNode(id)} = ${expression}`);
+        expected++;
+      }
+      if (sequence.length === 0) {
+        orderedExpressions.push(expressions[digit]);
+      } else {
+        sequence.push(expressions[digit]);
+        orderedExpressions.push(t.sequenceExpression(sequence));
+      }
+      expected++;
     }
 
     return t.taggedTemplateExpression(
@@ -407,11 +440,11 @@ module.exports = function ({ types: t, template }, options) {
     });
   }
 
-  function isLiteral(path) {
-    if (!path.isLiteral()) return false;
-    if (path.isRegExpLiteral()) return false;
-    if (path.isTemplateLiteral()) {
-      return path.get('expressions').every(isLiteral);
+  function isLiteral(node) {
+    if (!t.isLiteral(node)) return false;
+    if (t.isRegExpLiteral(node)) return false;
+    if (t.isTemplateLiteral(node)) {
+      return node.expressions.every(isLiteral);
     }
     if (json && path.isBigIntLiteral()) return false;
     return true;

@@ -1,3 +1,3 @@
 function test() {
-  return <div children={first_children} key={second_key} ref={third_ref}>{fourth_static_child}</div>;
+  return <div children={first_children} ref={second_ref} key={third_key}>{fourth_static_child}</div>;
 }
