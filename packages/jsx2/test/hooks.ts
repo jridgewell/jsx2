@@ -10,6 +10,8 @@ import {
   useRef,
   useCallback,
   useDebugValue,
+  useContext,
+  createContext,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -1832,5 +1834,268 @@ describe('useDebugValue', () => {
 });
 
 describe('useContext', () => {
+  const defaultValue = { default: true };
+  const value = { default: false };
 
-})
+  describe('outside any context provider', () => {
+    it('returns default context value', () => {
+      const body = document.createElement('body');
+      const Context = createContext(defaultValue);
+      const ctxs: typeof defaultValue[] = [];
+
+      act(() => {
+        render(
+          createElement(() => {
+            ctxs.push(useContext(Context));
+          }),
+          body,
+        );
+      });
+
+      expect(ctxs).toHaveLength(1);
+      expect(ctxs[0]).toBe(defaultValue);
+    });
+
+    describe('when component rerenders', () => {
+      it('returns default context value', () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const C = jest.fn(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+          render(createElement(C), body);
+        });
+
+        expect(ctxs).toHaveLength(2);
+        expect(ctxs[0]).toBe(defaultValue);
+        expect(ctxs[1]).toBe(defaultValue);
+      });
+    });
+
+    describe('when component changes', () => {
+      it('returns default context value', () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const C = jest.fn(() => {
+          ctxs.push(useContext(Context));
+        });
+        const C2 = jest.fn(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+          render(createElement(C2), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expect(C2).toHaveBeenCalledTimes(1);
+        expect(ctxs).toHaveLength(2);
+        expect(ctxs[0]).toBe(defaultValue);
+        expect(ctxs[1]).toBe(defaultValue);
+      });
+    });
+  });
+
+  describe('nested inside context provider', () => {
+    it('returns current context value', () => {
+      const body = document.createElement('body');
+      const Context = createContext(defaultValue);
+      const ctxs: typeof defaultValue[] = [];
+      const C = jest.fn(() => {
+        ctxs.push(useContext(Context));
+      });
+
+      act(() => {
+        render(createElement(Context.Provider, { value }, createElement(C)), body);
+      });
+
+      expect(ctxs).toHaveLength(1);
+      expect(ctxs[0]).toBe(value);
+    });
+
+    describe('when provider rerenders with different value', () => {
+      it('rerenders component', async () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const C = jest.fn(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(Context.Provider, { value: defaultValue }, createElement(C)), body);
+          render(createElement(Context.Provider, { value }, createElement(C)), body);
+        });
+
+        expect(ctxs).toHaveLength(2);
+        expect(ctxs[0]).toBe(defaultValue);
+        expect(ctxs[1]).toBe(value);
+      });
+
+      it("pierces memo'd intermediate node", async () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const children = createElement(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(Context.Provider, { value: defaultValue }, children), body);
+          render(createElement(Context.Provider, { value }, children), body);
+        });
+
+        expect(ctxs).toHaveLength(2);
+        expect(ctxs[0]).toBe(defaultValue);
+        expect(ctxs[1]).toBe(value);
+      });
+
+      describe('when component rerenders', () => {
+        it('returns current context value', () => {
+          const body = document.createElement('body');
+          const Context = createContext(defaultValue);
+          const ctxs: typeof defaultValue[] = [];
+          const C = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+
+          act(() => {
+            render(
+              createElement(Context.Provider, { value: defaultValue }, createElement(C)),
+              body,
+            );
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+          });
+
+          expect(ctxs).toHaveLength(3);
+          expect(ctxs[0]).toBe(defaultValue);
+          expect(ctxs[1]).toBe(value);
+          expect(ctxs[2]).toBe(value);
+        });
+      });
+
+      describe('when component changes', () => {
+        it('returns current context value', () => {
+          const body = document.createElement('body');
+          const Context = createContext(defaultValue);
+          const ctxs: typeof defaultValue[] = [];
+          const C = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+          const C2 = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+
+          act(() => {
+            render(
+              createElement(Context.Provider, { value: defaultValue }, createElement(C)),
+              body,
+            );
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C2)), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ctxs).toHaveLength(3);
+          expect(ctxs[0]).toBe(defaultValue);
+          expect(ctxs[1]).toBe(value);
+          expect(ctxs[2]).toBe(value);
+        });
+      });
+    });
+
+    describe('when provider rerenders with same value', () => {
+      it('rerenders component', async () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const C = jest.fn(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(Context.Provider, { value }, createElement(C)), body);
+          render(createElement(Context.Provider, { value }, createElement(C)), body);
+        });
+
+        expect(ctxs).toHaveLength(2);
+        expect(ctxs[0]).toBe(value);
+        expect(ctxs[1]).toBe(value);
+      });
+
+      it("does not pierce memo'd intermediate node", async () => {
+        const body = document.createElement('body');
+        const Context = createContext(defaultValue);
+        const ctxs: typeof defaultValue[] = [];
+        const children = createElement(() => {
+          ctxs.push(useContext(Context));
+        });
+
+        act(() => {
+          render(createElement(Context.Provider, { value }, children), body);
+          render(createElement(Context.Provider, { value }, children), body);
+        });
+
+        expect(ctxs).toHaveLength(1);
+        expect(ctxs[0]).toBe(value);
+      });
+
+      describe('when component rerenders', () => {
+        it('returns current context value', () => {
+          const body = document.createElement('body');
+          const Context = createContext(defaultValue);
+          const ctxs: typeof defaultValue[] = [];
+          const C = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+
+          act(() => {
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+          });
+
+          expect(ctxs).toHaveLength(3);
+          expect(ctxs[0]).toBe(value);
+          expect(ctxs[1]).toBe(value);
+          expect(ctxs[2]).toBe(value);
+        });
+      });
+
+      describe('when component changes', () => {
+        it('returns current context value', () => {
+          const body = document.createElement('body');
+          const Context = createContext(defaultValue);
+          const ctxs: typeof defaultValue[] = [];
+          const C = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+          const C2 = jest.fn(() => {
+            ctxs.push(useContext(Context));
+          });
+
+          act(() => {
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C)), body);
+            render(createElement(Context.Provider, { value }, createElement(C2)), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(ctxs).toHaveLength(3);
+          expect(ctxs[0]).toBe(value);
+          expect(ctxs[1]).toBe(value);
+          expect(ctxs[2]).toBe(value);
+        });
+      });
+    });
+  });
+});

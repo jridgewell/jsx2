@@ -154,16 +154,15 @@ export function useContext<T>(ctx: Context<T>): T {
   }
 
   const { fiber } = getCurrentFiberState();
-  let holder: ContextHolder<T> = { value: ctx._defaultValue, consumers: [] };
+  let holder: ContextHolder<T> = { value: ctx._defaultValue, context: ctx, consumers: [] };
   let current: null | Fiber = fiber;
   while ((current = current.parent || getAncestorFiber(current)) !== null) {
-    const { providedContexts } = current;
-    if (providedContexts === null) continue;
-    const h = providedContexts.get(ctx);
-    if (h === undefined) continue;
+    const { providedContext } = current;
+    if (providedContext === null) continue;
+    if (providedContext.context !== ctx) continue;
 
     const consumedContexts = (fiber.consumedContexts ||= []);
-    holder = h;
+    holder = providedContext;
     consumedContexts.push(holder);
     holder.consumers.push(fiber);
     break;

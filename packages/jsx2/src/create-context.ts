@@ -13,6 +13,7 @@ export interface Context<T> {
 
 export type ContextHolder<T> = {
   value: T;
+  context: Context<T>;
   consumers: FunctionComponentFiber[];
 };
 
@@ -35,19 +36,18 @@ export function createContext<T>(defaultValue: T): Context<T> {
   function Provider(props: ProviderProps<T>): Renderable {
     const { value, children } = props;
     const { fiber } = getCurrentFiberState();
-    const providedContexts = (fiber.providedContexts ||= new WeakMap());
-    const holder = providedContexts.get(ctx) as undefined | ContextHolder<T>;
-    if (holder === undefined) {
-      providedContexts.set(ctx, { value, consumers: [] });
+    const providedContext = (fiber.providedContext ||= {
+      value,
+      context: ctx,
+      consumers: [],
+    });
+
+    if (providedContext.value === value) {
       return children;
     }
 
-    if (holder.value === value) {
-      return children;
-    }
-
-    holder.value = value;
-    const { consumers } = holder;
+    providedContext.value = value;
+    const { consumers } = providedContext;
     for (let i = 0; i < consumers.length; i++) {
       enqueueDiff(consumers[i]);
     }

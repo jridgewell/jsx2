@@ -1,5 +1,5 @@
 import type { Component } from '../component';
-import type { Context, ContextHolder } from '../create-context';
+import type { ContextHolder } from '../create-context';
 import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
@@ -22,7 +22,7 @@ export interface RootFiber extends SharedFiber {
   dom: Node;
   stateData: null;
   component: null;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null;
 }
@@ -33,7 +33,7 @@ export interface NullFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null;
 }
@@ -44,7 +44,7 @@ export interface TextFiber extends SharedFiber {
   dom: null | Text;
   stateData: null;
   component: null;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null;
 }
@@ -55,7 +55,7 @@ export interface ElementFiber extends SharedFiber {
   dom: null | Element;
   stateData: null;
   component: null;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null | Ref;
 }
@@ -66,7 +66,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   dom: null;
   stateData: HookState[];
   component: null;
-  providedContexts: null | WeakMap<Context<any>, ContextHolder<any>>;
+  providedContext: null | ContextHolder<any>;
   consumedContexts: null | ContextHolder<any>[];
   ref: null;
 }
@@ -77,7 +77,7 @@ export interface ClassComponentFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null | Component;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null | Ref;
 }
@@ -88,7 +88,7 @@ export interface ArrayFiber extends SharedFiber {
   dom: null;
   stateData: null;
   component: null;
-  providedContexts: null;
+  providedContext: null;
   consumedContexts: null;
   ref: null;
 }
@@ -132,7 +132,7 @@ export function fiber<T extends Fiber['data']>(
     dom: null,
     stateData: null,
     component: null,
-    providedContexts: null,
+    providedContext: null,
     consumedContexts: null,
     parent: null,
     child: null,

@@ -325,6 +325,7 @@ describe('unmount', () => {
     function makeContextHolder(fiber: FunctionComponentFiber): ContextHolder<null> {
       const holder = {
         value: null,
+        context: {} as any,
         consumers: [fiber],
       };
       fiber.consumedContexts = [holder];
