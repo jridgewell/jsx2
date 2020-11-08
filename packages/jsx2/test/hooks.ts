@@ -7,6 +7,7 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -1541,6 +1542,93 @@ describe('useMemo', () => {
           expect(memos[0]).not.toBe(memos[1]);
         });
       });
+    });
+  });
+});
+
+describe('useRef', () => {
+  it('initializes ref with current value', () => {
+    const body = document.createElement('body');
+    const C = jest.fn(() => {
+      return useRef('init').current;
+    });
+
+    act(() => {
+      render(createElement(C), body);
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+
+  describe('when component rerenders', () => {
+    it('reuses ref', () => {
+      const body = document.createElement('body');
+      const refs: { current: number }[] = [];
+      let count = 0;
+      const C = jest.fn(() => {
+        refs.push(useRef(count++));
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(2);
+      expect(refs).toHaveLength(2);
+      expect(refs[0]).toBe(refs[1]);
+    });
+
+    it('does not update current value', () => {
+      const body = document.createElement('body');
+      const refs: { current: number }[] = [];
+      let count = 0;
+      const C = jest.fn(() => {
+        refs.push(useRef(count++));
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(2);
+      expect(refs).toHaveLength(2);
+      expect(refs[0]).toHaveProperty('current', 0);
+    })
+  });
+
+  describe('when component changes', () => {
+    it('initializes ref again', () => {
+      const body = document.createElement('body');
+      const refs: { current: string }[] = [];
+      const C = jest.fn(() => {
+        refs.push(useRef('before'));
+      });
+      const C2 = jest.fn(() => {
+        refs.push(useRef('test'));
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      act(() => {
+        render(createElement(C2), body);
+      });
+
+      expect(C).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+      expect(refs).toHaveLength(2);
+      expect(refs[0]).not.toBe(refs[1]);
+      expect(refs[0]).toHaveProperty('current', 'before');
+      expect(refs[1]).toHaveProperty('current', 'test');
     });
   });
 });
