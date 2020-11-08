@@ -1,6 +1,6 @@
 import type { Renderable } from '../../src/render';
 
-import { createElement, Component } from '../../src/jsx2';
+import { Component, createElement } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 

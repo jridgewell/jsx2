@@ -1,4 +1,4 @@
-import { diffProp, diffProps, addProps } from '../../src/diff/prop';
+import { addProps, diffProp, diffProps } from '../../src/diff/prop';
 
 describe('diffProp', () => {
   describe('children', () => {

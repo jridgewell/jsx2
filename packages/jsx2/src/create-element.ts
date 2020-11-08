@@ -1,4 +1,4 @@
-import type { FunctionComponent, Component, ComponentProps, ComponentChildren } from './component';
+import type { Component, ComponentChildren, ComponentProps, FunctionComponent } from './component';
 import type { Ref } from './create-ref';
 import type { Renderable } from './render';
 

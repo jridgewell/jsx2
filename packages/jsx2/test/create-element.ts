@@ -1,4 +1,4 @@
-import { createElement, Component } from '../src/jsx2';
+import { Component, createElement } from '../src/jsx2';
 
 describe('createElement', () => {
   it('returns object with type set to type arg', () => {

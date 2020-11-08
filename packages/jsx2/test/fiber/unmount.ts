@@ -2,7 +2,7 @@ import type { ContextHolder } from '../../src/create-context';
 import type { FunctionComponentFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';
-import { createElement, Component } from '../../src/jsx2';
+import { Component, createElement } from '../../src/jsx2';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 

@@ -1,5 +1,5 @@
 import { fiber } from '../../src/fiber';
-import { render, createElement } from '../../src/jsx2';
+import { createElement, render } from '../../src/jsx2';
 import { getFromNode, setOnNode } from '../../src/fiber/node';
 
 describe('getFromNode', () => {

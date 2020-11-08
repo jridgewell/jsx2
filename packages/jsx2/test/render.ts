@@ -1,4 +1,4 @@
-import { render, createElement } from '../src/jsx2';
+import { createElement, render } from '../src/jsx2';
 
 describe('render', () => {
   function expectTextNode(node: Node, text: string) {

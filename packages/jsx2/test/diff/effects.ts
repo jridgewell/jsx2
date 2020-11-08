@@ -1,6 +1,6 @@
-import type { Effect, EffectHookState, EffectCleanup, HookState } from '../../src/hooks';
+import type { Effect, EffectCleanup, EffectHookState, HookState } from '../../src/hooks';
 
-import { scheduleEffect, cleanupEffects, applyEffects } from '../../src/diff/effects';
+import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
   return {

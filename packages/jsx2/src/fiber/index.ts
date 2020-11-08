@@ -1,6 +1,6 @@
 import type { Component } from '../component';
 import type { ContextHolder } from '../create-context';
-import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
+import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
 import type { RenderableArray } from '../render';

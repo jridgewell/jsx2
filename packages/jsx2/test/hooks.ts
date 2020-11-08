@@ -1,19 +1,19 @@
 import {
   act,
+  createContext,
   createElement,
+  createRef,
   render,
-  useState,
-  useReducer,
+  useCallback,
+  useContext,
+  useDebugValue,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
+  useReducer,
   useRef,
-  useCallback,
-  useDebugValue,
-  useContext,
-  useImperativeHandle,
-  createContext,
-  createRef,
+  useState,
 } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {

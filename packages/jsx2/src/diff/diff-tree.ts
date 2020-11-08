@@ -1,6 +1,6 @@
 import type { RefWork } from './ref';
-import type { ElementVNode, FunctionComponentVNode, ClassComponentVNode } from '../create-element';
-import type { Fiber, DiffableFiber, FunctionComponentFiber } from '../fiber';
+import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '../create-element';
+import type { DiffableFiber, Fiber, FunctionComponentFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { RenderableArray } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';

@@ -1,13 +1,11 @@
 import type {
-  FunctionComponentVNode,
-  ClassComponentVNode,
-  ElementVNode,
+  ClassComponentVNode, ElementVNode, FunctionComponentVNode,
 } from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { Renderable, RenderableArray } from '../../src/render';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
-import { createElement, useLayoutEffect, Component } from '../../src/jsx2';
+import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
 import { createTree } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
