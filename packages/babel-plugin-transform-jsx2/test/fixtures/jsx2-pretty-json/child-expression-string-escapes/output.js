@@ -6,17 +6,17 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-    "type": "div",
-    "key": "",
-    "ref": null,
-    "props": {
-      "children": [
-        "a\`'\\"b\${c}d\\nf",
-        "a\`'\\"b\${c}d\\nf",
-        "a\`'\\"b\${c}d\\nf"
-      ]
-    }
-  }`);
+  "type": "div",
+  "key": "",
+  "ref": null,
+  "props": {
+    "children": [
+      "a\`'\\"b\${c}d\\nf",
+      "a\`'\\"b\${c}d\\nf",
+      "a\`'\\"b\${c}d\\nf"
+    ]
+  }
+}`);
 
   _template = () => tree;
 

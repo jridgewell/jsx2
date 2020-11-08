@@ -6,13 +6,13 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-    "type": "div",
-    "key": "",
-    "ref": null,
-    "props": {
-      "children": 0
-    }
-  }`);
+  "type": "div",
+  "key": "",
+  "ref": null,
+  "props": {
+    "children": 0
+  }
+}`);
 
   _template = () => tree;
 
@@ -21,13 +21,13 @@ function _template() {
 
 function _template2() {
   const tree = JSON.parse(`{
-    "type": "inner",
-    "key": "",
-    "ref": null,
-    "props": {
-      "children": 0
-    }
-  }`);
+  "type": "inner",
+  "key": "",
+  "ref": null,
+  "props": {
+    "children": 0
+  }
+}`);
 
   _template2 = () => tree;
 

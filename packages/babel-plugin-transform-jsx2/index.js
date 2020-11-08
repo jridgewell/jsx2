@@ -74,7 +74,7 @@ module.exports = function ({ types: t, template }, options) {
     });
 
     if (json) {
-      const cooked = stringify(tree, taggedTemplate ? 0 : 1);
+      const cooked = stringify(tree);
       if (taggedTemplate) {
         return buildTaggedTemplate(path, cooked, expressions);
       }
@@ -137,9 +137,9 @@ module.exports = function ({ types: t, template }, options) {
     const staticChildren = [];
     const objs = [];
     let objProps = [];
-    let key = minimalJson ? t.identifier('undefined') : t.stringLiteral('');
-    let ref = minimalJson ? t.identifier('undefined') : t.nullLiteral();
-    let props = state && minimalJson ? t.identifier('undefined') : t.nullLiteral();
+    let key = minimalJson ? voidExpression() : t.stringLiteral('');
+    let ref = minimalJson ? voidExpression() : t.nullLiteral();
+    let props = state && minimalJson ? voidExpression() : t.nullLiteral();
     let children = null;
 
     for (const attribute of attributePaths) {
@@ -245,7 +245,7 @@ module.exports = function ({ types: t, template }, options) {
     }
 
     const { node } = value;
-    if (isLiteral(node) && !value.isNumericLiteral()) return node;
+    if (isLiteral(node, !json) && !value.isNumericLiteral()) return node;
 
     if (state) return state.expressionMarker(node);
     return node;
@@ -305,50 +305,12 @@ module.exports = function ({ types: t, template }, options) {
     }, []);
   }
 
-  function stringify(node, depth) {
-    const { type } = node;
-    switch (type) {
-      case 'BooleanLiteral':
-      case 'NullLiteral':
-      case 'NumericLiteral':
-      case 'StringLiteral':
-      case 'TemplateLiteral':
-        return JSON.stringify(literalValue(node));
+  function voidExpression() {
+    return template.expression.ast`void 0`;
+  }
 
-      case 'Identifier':
-        return JSON.stringify(node.name);
-
-      case 'ArrayExpression':
-      case 'ObjectExpression': {
-        const { opening, closing, children } =
-          type === 'ArrayExpression'
-            ? { opening: '[', closing: ']', children: node.elements }
-            : { opening: '{', closing: '}', children: node.properties };
-        const childrenStrings = children.map((c) => stringify(c, depth + 1)).filter(Boolean);
-
-        if (!prettyJson) {
-          return opening + childrenStrings + closing;
-        }
-
-        const indentation = '  '.repeat(depth);
-        const innerIndentation = indentation + '  ';
-        const inner = childrenStrings.join(`,\n${innerIndentation}`);
-
-        return `${opening}\n${innerIndentation}${inner}\n${indentation}${closing}`;
-      }
-
-      case 'ObjectProperty': {
-        const { key, value } = node;
-        if (t.isIdentifier(value, { name: 'undefined' })) {
-          return '';
-        }
-        const space = prettyJson ? ' ' : '';
-        return `${stringify(key, depth)}:${space}${stringify(value, depth)}`;
-      }
-    }
-
-    // istanbul ignore next
-    throw new Error(`Can't handle type "${type}"`);
+  function stringify(node) {
+    return JSON.stringify(literalValue(node), null, prettyJson ? 2 : 0);
   }
 
   function literalValue(node) {
@@ -372,6 +334,25 @@ module.exports = function ({ types: t, template }, options) {
           s += literalValue(expressions[i - 1]) + literalValue(quasis[i]);
         }
         return s;
+      }
+
+      case 'Identifier':
+        return node.name;
+
+      case 'UnaryExpression':
+        return undefined;
+
+      case 'ArrayExpression':
+        return node.elements.map(literalValue);
+
+      case 'ObjectExpression': {
+        const o = { __proto__: null };
+        const { properties } = node;
+        for (let i = 0; i < properties.length; i++) {
+          const { key, value } = properties[i];
+          o[literalValue(key)] = literalValue(value);
+        }
+        return o;
       }
     }
 
@@ -407,7 +388,7 @@ module.exports = function ({ types: t, template }, options) {
       const sequence = [];
       while (expected < digit) {
         const expression = expressions[expected];
-        if (isLiteral(expression)) {
+        if (isLiteral(expression, true)) {
           expected++;
           continue;
         }
@@ -440,13 +421,13 @@ module.exports = function ({ types: t, template }, options) {
     });
   }
 
-  function isLiteral(node) {
+  function isLiteral(node, allowBigInt) {
     if (!t.isLiteral(node)) return false;
     if (t.isRegExpLiteral(node)) return false;
     if (t.isTemplateLiteral(node)) {
-      return node.expressions.every(isLiteral);
+      return node.expressions.every((e) => isLiteral(e, allowBigInt));
     }
-    if (json && path.isBigIntLiteral()) return false;
+    if (!allowBigInt && t.isBigIntLiteral(node)) return false;
     return true;
   }
 };

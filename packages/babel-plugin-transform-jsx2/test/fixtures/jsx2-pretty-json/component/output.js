@@ -11,31 +11,31 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-    "type": "div",
-    "key": "",
-    "ref": null,
-    "props": {
-      "children": [
-        {
-          "type": "before",
-          "key": "",
-          "ref": null,
-          "props": {
-            "children": 0
-          }
-        },
-        1,
-        {
-          "type": "after",
-          "key": "",
-          "ref": null,
-          "props": {
-            "children": 2
-          }
+  "type": "div",
+  "key": "",
+  "ref": null,
+  "props": {
+    "children": [
+      {
+        "type": "before",
+        "key": "",
+        "ref": null,
+        "props": {
+          "children": 0
         }
-      ]
-    }
-  }`);
+      },
+      1,
+      {
+        "type": "after",
+        "key": "",
+        "ref": null,
+        "props": {
+          "children": 2
+        }
+      }
+    ]
+  }
+}`);
 
   _template = () => tree;
 
@@ -44,13 +44,13 @@ function _template() {
 
 function _template2() {
   const tree = JSON.parse(`{
-    "type": "first",
-    "key": "",
-    "ref": null,
-    "props": {
-      "children": 0
-    }
-  }`);
+  "type": "first",
+  "key": "",
+  "ref": null,
+  "props": {
+    "children": 0
+  }
+}`);
 
   _template2 = () => tree;
 
@@ -59,13 +59,13 @@ function _template2() {
 
 function _template3() {
   const tree = JSON.parse(`{
-    "type": "third",
-    "key": "",
-    "ref": null,
-    "props": {
-      "third": "third"
-    }
-  }`);
+  "type": "third",
+  "key": "",
+  "ref": null,
+  "props": {
+    "third": "third"
+  }
+}`);
 
   _template3 = () => tree;
 
@@ -74,13 +74,13 @@ function _template3() {
 
 function _template4() {
   const tree = JSON.parse(`{
-    "type": "fifth",
-    "key": "",
-    "ref": null,
-    "props": {
-      "fifth": 0
-    }
-  }`);
+  "type": "fifth",
+  "key": "",
+  "ref": null,
+  "props": {
+    "fifth": 0
+  }
+}`);
 
   _template4 = () => tree;
 

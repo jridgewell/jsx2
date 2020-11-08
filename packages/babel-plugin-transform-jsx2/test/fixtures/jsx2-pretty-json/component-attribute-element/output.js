@@ -10,11 +10,11 @@ function test() {
 
 function _template() {
   const tree = JSON.parse(`{
-    "type": "inner",
-    "key": "",
-    "ref": null,
-    "props": null
-  }`);
+  "type": "inner",
+  "key": "",
+  "ref": null,
+  "props": null
+}`);
 
   _template = () => tree;
 
