@@ -35,6 +35,35 @@ describe('createContext', () => {
 
       expect(v).toBe(value);
     });
+
+    it('provides deeply nested children wiht current context value', () => {
+      const container = document.createElement('body');
+      const Context = createContext(defaultValue);
+      const Context2 = createContext('nested');
+      let v;
+      let v2;
+
+      act(() => {
+        makeTree(
+          createElement(
+            Context.Provider,
+            { value },
+            createElement(
+              Context2.Provider,
+              { value: 'nested2' },
+              createElement(() => {
+                v = useContext(Context);
+                v2 = useContext(Context2);
+              }),
+            ),
+          ),
+          container,
+        );
+      });
+
+      expect(v).toBe(value);
+      expect(v2).toBe('nested2');
+    });
   });
 
   describe('Consumer', () => {
