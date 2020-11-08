@@ -1,4 +1,13 @@
-import { act, createElement, render, useState, useReducer, useEffect, useLayoutEffect } from '../src/jsx2';
+import {
+  act,
+  createElement,
+  render,
+  useState,
+  useReducer,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+} from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
   expect(node).toBeTruthy();
@@ -1290,6 +1299,246 @@ describe('useLayoutEffect', () => {
           });
           expect(effect).toHaveBeenCalledTimes(1);
           expect(cleanup).toHaveBeenCalledTimes(1);
+        });
+      });
+    });
+  });
+});
+
+describe('useMemo', () => {
+  it('initializes value with function', () => {
+    const body = document.createElement('body');
+    const init = jest.fn(() => 'init');
+    const C = jest.fn(() => {
+      return useMemo(init, undefined);
+    });
+
+    act(() => {
+      render(createElement(C), body);
+    });
+
+    expectTextNode(body.firstChild, 'init');
+  });
+
+  describe('when component rerenders', () => {
+    describe('when missing deps', () => {
+      it('initializes value again', () => {
+        const body = document.createElement('body');
+        const init = jest.fn(() => ({ memo: true }));
+        const memos: { memo: boolean }[] = [];
+        const C = jest.fn(() => {
+          memos.push(useMemo(init, undefined));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(init).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(init).toHaveBeenCalledTimes(2);
+        expect(memos).toHaveLength(2);
+        expect(memos[0]).not.toBe(memos[1]);
+      });
+    });
+
+    describe('with empty deps', () => {
+      it('reuses memo value', () => {
+        const body = document.createElement('body');
+        const init = jest.fn(() => ({ memo: true }));
+        const memos: { memo: boolean }[] = [];
+        const C = jest.fn(() => {
+          memos.push(useMemo(init, []));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(init).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(2);
+        expect(init).toHaveBeenCalledTimes(1);
+        expect(memos).toHaveLength(2);
+        expect(memos[0]).toBe(memos[1]);
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('reuses memo value', () => {
+          const body = document.createElement('body');
+          const init = jest.fn(() => ({ memo: true }));
+          const memos: { memo: boolean }[] = [];
+          const C = jest.fn(() => {
+            memos.push(useMemo(init, ['dep']));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(init).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(init).toHaveBeenCalledTimes(1);
+          expect(memos).toHaveLength(2);
+          expect(memos[0]).toBe(memos[1]);
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const init = jest.fn(() => ({ memo: true }));
+          const memos: { memo: boolean }[] = [];
+          const C = jest.fn(() => {
+            memos.push(useMemo(init, [{}]));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(init).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(2);
+          expect(init).toHaveBeenCalledTimes(2);
+          expect(memos).toHaveLength(2);
+          expect(memos[0]).not.toBe(memos[1]);
+        });
+      });
+    });
+  });
+
+  describe('when component changes', () => {
+    describe('when missing deps', () => {
+      it('initializes value again', () => {
+        const body = document.createElement('body');
+        const init = jest.fn(() => ({ memo: true }));
+        const memos: { memo: boolean }[] = [];
+        const C = jest.fn(() => {
+          memos.push(useMemo(init, undefined));
+        });
+        const C2 = jest.fn(() => {
+          memos.push(useMemo(init, undefined));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(init).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C2), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expect(C2).toHaveBeenCalledTimes(1);
+        expect(init).toHaveBeenCalledTimes(2);
+        expect(memos).toHaveLength(2);
+        expect(memos[0]).not.toBe(memos[1]);
+      });
+    });
+
+    describe('with empty deps', () => {
+      it('initializes value again', () => {
+        const body = document.createElement('body');
+        const init = jest.fn(() => ({ memo: true }));
+        const memos: { memo: boolean }[] = [];
+        const C = jest.fn(() => {
+          memos.push(useMemo(init, []));
+        });
+        const C2 = jest.fn(() => {
+          memos.push(useMemo(init, []));
+        });
+
+        act(() => {
+          render(createElement(C), body);
+        });
+        expect(init).toHaveBeenCalledTimes(1);
+
+        act(() => {
+          render(createElement(C2), body);
+        });
+
+        expect(C).toHaveBeenCalledTimes(1);
+        expect(C2).toHaveBeenCalledTimes(1);
+        expect(init).toHaveBeenCalledTimes(2);
+        expect(memos).toHaveLength(2);
+        expect(memos[0]).not.toBe(memos[1]);
+      });
+    });
+
+    describe('with non-empty deps', () => {
+      describe('with shallow equal deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const init = jest.fn(() => ({ memo: true }));
+          const memos: { memo: boolean }[] = [];
+          const C = jest.fn(() => {
+            memos.push(useMemo(init, ['deps']));
+          });
+          const C2 = jest.fn(() => {
+            memos.push(useMemo(init, ['deps']));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(init).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(init).toHaveBeenCalledTimes(2);
+          expect(memos).toHaveLength(2);
+          expect(memos[0]).not.toBe(memos[1]);
+        });
+      });
+
+      describe('with changed deps', () => {
+        it('initializes value again', () => {
+          const body = document.createElement('body');
+          const init = jest.fn(() => ({ memo: true }));
+          const memos: { memo: boolean }[] = [];
+          const C = jest.fn(() => {
+            memos.push(useMemo(init, [{}]));
+          });
+          const C2 = jest.fn(() => {
+            memos.push(useMemo(init, [{}]));
+          });
+
+          act(() => {
+            render(createElement(C), body);
+          });
+          expect(init).toHaveBeenCalledTimes(1);
+
+          act(() => {
+            render(createElement(C2), body);
+          });
+
+          expect(C).toHaveBeenCalledTimes(1);
+          expect(C2).toHaveBeenCalledTimes(1);
+          expect(init).toHaveBeenCalledTimes(2);
+          expect(memos).toHaveLength(2);
+          expect(memos[0]).not.toBe(memos[1]);
         });
       });
     });
