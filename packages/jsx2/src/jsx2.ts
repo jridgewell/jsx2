@@ -18,3 +18,4 @@ export {
   useState,
 } from './hooks';
 export { act } from './util/act';
+export { memo } from './memo';

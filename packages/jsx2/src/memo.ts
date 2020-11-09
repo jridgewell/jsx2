@@ -13,7 +13,6 @@ function shallowObjectEquals(
   prev: Record<string, unknown>,
   props: Record<string, unknown>,
 ): boolean {
-  if (prev === props) return true;
   for (const key in prev) {
     if (key !== '__source' && !(key in props)) return false;
   }
