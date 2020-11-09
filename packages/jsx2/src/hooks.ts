@@ -1,5 +1,5 @@
 import type { Context, ContextHolder } from './create-context';
-import type { Ref, RefObject } from './create-ref';
+import type { Ref } from './create-ref';
 import type { Fiber } from './fiber';
 
 import { scheduleEffect } from './diff/effects';
@@ -134,7 +134,7 @@ export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {
   return init;
 }
 
-export function useRef(initial: unknown): RefObject {
+export function useRef<T extends unknown>(initial: T): { current: T } {
   return useMemo(() => ({ current: initial }), []);
 }
 

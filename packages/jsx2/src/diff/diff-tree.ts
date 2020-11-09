@@ -84,7 +84,7 @@ function diffChild(
 
   return renderComponent(
     old,
-    renderable as FunctionComponentVNode | ClassComponentVNode,
+    renderable as FunctionComponentVNode<any> | ClassComponentVNode<any>,
     parentFiber,
     previousFiber,
     container,
@@ -259,7 +259,7 @@ function renderElement(
 
 function renderComponent(
   old: DiffableFiber,
-  renderable: FunctionComponentVNode | ClassComponentVNode,
+  renderable: FunctionComponentVNode<any> | ClassComponentVNode<any>,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   container: Node,

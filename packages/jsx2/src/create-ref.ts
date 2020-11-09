@@ -5,6 +5,6 @@ export interface RefObject {
 
 export type Ref = RefObject | ((current: any | null) => void);
 
-export function createRef(): RefObject {
+export function createRef<T extends unknown>(): { current: null | T } {
   return { current: null };
 }

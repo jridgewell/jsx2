@@ -61,8 +61,8 @@ export interface ElementFiber extends SharedFiber {
 }
 
 export interface FunctionComponentFiber extends SharedFiber {
-  data: FunctionComponentVNode;
-  key: FunctionComponentVNode['key'];
+  data: FunctionComponentVNode<any>;
+  key: FunctionComponentVNode<any>['key'];
   dom: null;
   stateData: HookState[];
   component: null;
@@ -72,11 +72,11 @@ export interface FunctionComponentFiber extends SharedFiber {
 }
 
 export interface ClassComponentFiber extends SharedFiber {
-  data: ClassComponentVNode;
-  key: ClassComponentVNode['key'];
+  data: ClassComponentVNode<any>;
+  key: ClassComponentVNode<any>['key'];
   dom: null;
   stateData: null;
-  component: null | Component;
+  component: null | Component<any>;
   providedContext: null;
   consumedContexts: null;
   ref: null | Ref;

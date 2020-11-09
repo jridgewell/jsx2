@@ -13,22 +13,22 @@ export interface ElementVNode extends SharedVNode {
   readonly type: string;
 }
 
-export interface FunctionComponentVNode extends SharedVNode {
-  readonly type: FunctionComponent;
+export interface FunctionComponentVNode<P extends ComponentProps> extends SharedVNode {
+  readonly type: FunctionComponent<P>;
 }
 
-export interface ClassComponentVNode extends SharedVNode {
-  readonly type: new (props: Record<string, unknown>) => Component;
+export interface ClassComponentVNode<P extends ComponentProps> extends SharedVNode {
+  readonly type: new (props: P) => Component<P>;
 }
 
-export type VNode = ElementVNode | FunctionComponentVNode | ClassComponentVNode;
+export type VNode = ElementVNode | FunctionComponentVNode<any> | ClassComponentVNode<any>;
 
 export type RegularProps = Record<string, unknown>;
 
 export interface SpecialProps {
   readonly key?: SharedVNode['key'];
   readonly ref?: SharedVNode['ref'];
-  readonly children?: Renderable;
+  readonly children?: unknown;
 }
 
 export type Props = SpecialProps & RegularProps;
@@ -40,14 +40,21 @@ const nilProps: { key: null; ref: null; children?: null } = {
 
 export function createElement<T extends VNode['type']>(
   type: T,
-  props?: null | undefined | (T extends ElementVNode['type'] ? Props : ComponentProps),
-  ...children: T extends ElementVNode['type'] ? Renderable[] : ComponentChildren
+  props?:
+    | null
+    | undefined
+    | (T extends FunctionComponentVNode<infer P>['type']
+        ? P
+        : T extends ClassComponentVNode<infer P>['type']
+        ? P
+        : Props),
+  ...children: T extends ElementVNode['type'] ? Renderable[] : ComponentChildren[]
 ): T extends ElementVNode['type']
   ? ElementVNode
-  : T extends FunctionComponentVNode['type']
-  ? FunctionComponentVNode
-  : T extends ClassComponentVNode['type']
-  ? ClassComponentVNode
+  : T extends FunctionComponentVNode<any>['type']
+  ? FunctionComponentVNode<any>
+  : T extends ClassComponentVNode<any>['type']
+  ? ClassComponentVNode<any>
   : never {
   const { key = null, ref = null, ..._props } = (props || nilProps) as Props;
   if (children.length > 0) {
