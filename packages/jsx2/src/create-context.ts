@@ -23,8 +23,8 @@ type ConsumerProps<T> = {
 export type ContextConsumer<T> = (props: ConsumerProps<T>) => Renderable;
 
 type ProviderProps<T> = {
-  value: T;
-  children: Renderable;
+  value?: T;
+  children?: Renderable;
 };
 export type ContextProvider<T> = (props: ProviderProps<T>) => Renderable;
 

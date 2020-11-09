@@ -21,7 +21,7 @@ export function getCurrentFiberState(): FiberState {
 }
 
 export function renderComponentWithHooks(
-  type: FunctionComponent,
+  type: FunctionComponent<any>,
   props: VNode['props'],
   fiber: FunctionComponentFiber,
   layoutEffects: EffectState[],

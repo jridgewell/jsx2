@@ -658,7 +658,7 @@ describe('diffTree', () => {
   });
 
   describe('rendered function component', () => {
-    function makeOldFiberTree(old: FunctionComponentVNode, container: Node) {
+    function makeOldFiberTree(old: FunctionComponentVNode<any>, container: Node) {
       return makeTree(old, container);
     }
 
@@ -877,7 +877,7 @@ describe('diffTree', () => {
   });
 
   describe('rendered class component', () => {
-    function makeOldFiberTree(old: ClassComponentVNode, container: Node) {
+    function makeOldFiberTree(old: ClassComponentVNode<any>, container: Node) {
       return makeTree(old, container);
     }
 

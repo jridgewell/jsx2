@@ -4,8 +4,8 @@ import type { FunctionComponentVNode } from './create-element';
 import { createElement } from './create-element';
 import { useRef } from './hooks';
 
-type MemoContainer = {
-  vnode: FunctionComponentVNode;
+type MemoContainer<P extends ComponentProps> = {
+  vnode: FunctionComponentVNode<P>;
   props: ComponentProps;
 };
 
@@ -23,9 +23,12 @@ function shallowObjectEquals(
   return true;
 }
 
-export function memo(Comp: FunctionComponent, areEqual = shallowObjectEquals): FunctionComponent {
-  return (props: ComponentProps) => {
-    const ref = useRef<null | MemoContainer>(null);
+export function memo<P extends ComponentProps>(
+  Comp: FunctionComponent<P>,
+  areEqual = shallowObjectEquals,
+): FunctionComponent<P> {
+  return (props: P) => {
+    const ref = useRef<null | MemoContainer<P>>(null);
     let { current } = ref;
     if (current === null || !areEqual(current.props, props)) {
       current = ref.current = {
