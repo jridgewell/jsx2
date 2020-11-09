@@ -1,4 +1,4 @@
-import { Component, createElement } from '../src/jsx2';
+import { Component, createElement, isValidElement } from '../src/jsx2';
 
 describe('createElement', () => {
   it('returns object with type set to type arg', () => {
@@ -182,5 +182,80 @@ describe('createElement', () => {
 
       expect(el.props).toHaveProperty('children', [2, 3]);
     });
+  });
+});
+
+describe('isValidElement', () => {
+  it('passes for element vnode', () => {
+    const el = createElement('div');
+    expect(isValidElement(el)).toBe(true);
+  });
+
+  it('passes for function vnode', () => {
+    const el = createElement(() => {});
+    expect(isValidElement(el)).toBe(true);
+  });
+
+  it('passes for Component vnode', () => {
+    class C extends Component {}
+    const el = createElement(C);
+    expect(isValidElement(el)).toBe(true);
+  });
+
+  it('passes for manually constructed object', () => {
+    const el = {
+      type: 'div',
+      constructor: undefined,
+    };
+    expect(isValidElement(el)).toBe(true);
+  });
+
+  it('fails for null', () => {
+    const el = null;
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for undefined', () => {
+    const el = undefined;
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for true', () => {
+    const el = true;
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for false', () => {
+    const el = false;
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for a string', () => {
+    const el = 'test';
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for an array', () => {
+    const el: any[] = [];
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for a basic object', () => {
+    const el = {};
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('fails for a JSON.parsed object', () => {
+    const el = JSON.parse(JSON.stringify(createElement('div')));
+    expect(isValidElement(el)).toBe(false);
+  });
+
+  it('sanity-check: naive JSON.parse cannot set constructor to undefined', () => {
+    expect(() => {
+      JSON.parse(`{"constructor": undefined}`);
+    }).toThrow();
+
+    const parsed = JSON.parse(`{"__proto__": null}`);
+    expect(parsed.constructor).not.toBe(undefined);
   });
 });
