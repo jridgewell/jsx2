@@ -22,6 +22,31 @@ describe('getCurrentFiberState', () => {
 
     expect(fs!.fiber).toBe(component);
   });
+
+  describe('reentrancy', () => {
+    it('returns most nested currently rendering fiber state', () => {
+      const fs: FiberState[] = [];;
+      const C = jest.fn(() => {
+        fs.push(getCurrentFiberState());
+        renderComponentWithHooks(nested.data.type, {}, nested, layoutEffects);
+        fs.push(getCurrentFiberState());
+      });
+      const C2 = jest.fn(() => {
+        fs.push(getCurrentFiberState());
+      });
+      const component = fiber(createElement(C));
+      const nested = fiber(createElement(C2));
+      const props = {};
+      const layoutEffects: EffectState[] = [];
+
+      renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+
+      expect(fs).toHaveLength(3);
+      expect(fs[0].fiber).toBe(component);
+      expect(fs[1].fiber).toBe(nested);
+      expect(fs[2].fiber).toBe(component);
+    })
+  });
 });
 
 describe('renderComponentWithHooks', () => {

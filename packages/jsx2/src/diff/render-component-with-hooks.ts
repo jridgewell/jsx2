@@ -13,11 +13,12 @@ export type FiberState = {
   layoutEffects: EffectState[];
 };
 
-let currentFiber: null | FiberState = null;
+let currentFiberState: null | FiberState = null;
+const fiberStateStack: FiberState[] = [];
 
 export function getCurrentFiberState(): FiberState {
-  debug: assert(currentFiber !== null, 'current fiber is not assigned');
-  return currentFiber;
+  debug: assert(currentFiberState !== null, 'current fiber is not assigned');
+  return currentFiberState;
 }
 
 export function renderComponentWithHooks(
@@ -29,12 +30,12 @@ export function renderComponentWithHooks(
   const { length } = layoutEffects;
   let rendered;
 
-  debug: assert(currentFiber === null, 'current fiber already assigned');
-  currentFiber = {
+  currentFiberState = {
     index: 0,
     fiber,
     layoutEffects,
   };
+  fiberStateStack.push(currentFiberState);
   fiber.current = true;
 
   for (let renderCount = 0; renderCount < 25; renderCount++) {
@@ -45,11 +46,13 @@ export function renderComponentWithHooks(
     if (!fiber.dirty) break;
 
     layoutEffects.length = length;
-    currentFiber.index = 0;
+    currentFiberState.index = 0;
   }
 
   fiber.current = false;
-  currentFiber = null;
+  fiberStateStack.pop();
+  currentFiberState =
+    fiberStateStack.length > 0 ? fiberStateStack[fiberStateStack.length - 1] : null;
 
   return coerceRenderable(rendered);
 }
