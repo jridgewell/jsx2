@@ -72,7 +72,7 @@ export function createChild(
   if (isFunctionComponent(type)) {
     f.stateData = [];
     createChild(
-      renderComponentWithHooks(type, props, f as FunctionComponentFiber, layoutEffects),
+      renderComponentWithHooks(type, props, ref, f as FunctionComponentFiber, layoutEffects),
       f,
       null,
       refs,

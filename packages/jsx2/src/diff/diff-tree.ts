@@ -39,9 +39,11 @@ export function diffTree(
 }
 
 export function rediffComponent(fiber: FunctionComponentFiber): void {
-  const { type, props } = fiber.data;
+  const { type, props, ref } = fiber.data;
   const layoutEffects: EffectState[] = [];
-  const rendered = coerceRenderable(renderComponentWithHooks(type, props, fiber, layoutEffects));
+  const rendered = coerceRenderable(
+    renderComponentWithHooks(type, props, ref, fiber, layoutEffects),
+  );
   diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
 }
 
@@ -293,10 +295,10 @@ function renderComponent(
     );
   }
 
-  const { props } = renderable;
+  const { props, ref } = renderable;
   const rendered = coerceRenderable(
     isFunctionComponent(type)
-      ? renderComponentWithHooks(type, props, old as FunctionComponentFiber, layoutEffects)
+      ? renderComponentWithHooks(type, props, ref, old as FunctionComponentFiber, layoutEffects)
       : old.component!.render(props),
   );
 
