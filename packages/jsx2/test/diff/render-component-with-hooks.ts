@@ -16,19 +16,20 @@ describe('getCurrentFiberState', () => {
     });
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(fs!.fiber).toBe(component);
   });
 
   describe('reentrancy', () => {
     it('returns most nested currently rendering fiber state', () => {
-      const fs: FiberState[] = [];;
+      const fs: FiberState[] = [];
       const C = jest.fn(() => {
         fs.push(getCurrentFiberState());
-        renderComponentWithHooks(nested.data.type, {}, nested, layoutEffects);
+        renderComponentWithHooks(nested.data.type, {}, null, nested, layoutEffects);
         fs.push(getCurrentFiberState());
       });
       const C2 = jest.fn(() => {
@@ -37,15 +38,16 @@ describe('getCurrentFiberState', () => {
       const component = fiber(createElement(C));
       const nested = fiber(createElement(C2));
       const props = {};
+      const ref = null;
       const layoutEffects: EffectState[] = [];
 
-      renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+      renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
       expect(fs).toHaveLength(3);
       expect(fs[0].fiber).toBe(component);
       expect(fs[1].fiber).toBe(nested);
       expect(fs[2].fiber).toBe(component);
-    })
+    });
   });
 });
 
@@ -63,9 +65,10 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(C).toHaveBeenCalledTimes(1);
     expect(C).toHaveBeenLastCalledWith(props);
@@ -75,12 +78,13 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     C.mockImplementationOnce(() => {
       component.dirty = true;
     });
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(C).toHaveBeenCalledTimes(2);
     expect(C).toHaveBeenNthCalledWith(1, props);
@@ -91,12 +95,13 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     C.mockImplementation(() => {
       component.dirty = true;
     });
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(C).toHaveBeenCalledTimes(25);
   });
@@ -105,6 +110,7 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     const currents: boolean[] = [];
     C.mockImplementationOnce(() => {
@@ -115,7 +121,7 @@ describe('renderComponentWithHooks', () => {
     });
 
     expect(component.current).toBe(false);
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
     expect(component.current).toBe(false);
 
     expect(currents).toEqual([true, true]);
@@ -125,6 +131,7 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     const dirties: boolean[] = [];
     C.mockImplementationOnce(() => {
@@ -135,7 +142,7 @@ describe('renderComponentWithHooks', () => {
     });
 
     expect(component.dirty).toBe(false);
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
     expect(component.dirty).toBe(false);
 
     expect(dirties).toEqual([false, false]);
@@ -145,6 +152,7 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     const indices: number[] = [];
     C.mockImplementationOnce(() => {
@@ -157,7 +165,7 @@ describe('renderComponentWithHooks', () => {
       indices.push(s.index);
     });
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(indices).toEqual([0, 0]);
   });
@@ -166,6 +174,7 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const firstEffect = makeEffect();
     const secondEffect = makeEffect();
     const thirdEffect = makeEffect();
@@ -177,7 +186,7 @@ describe('renderComponentWithHooks', () => {
       layoutEffects.push(thirdEffect);
     });
 
-    renderComponentWithHooks(component.data.type, props, component, layoutEffects);
+    renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
     expect(layoutEffects).toHaveLength(2);
     expect(layoutEffects[0]).toBe(firstEffect);
@@ -188,6 +197,7 @@ describe('renderComponentWithHooks', () => {
     const C = jest.fn();
     const component = fiber(createElement(C));
     const props = {};
+    const ref = null;
     const layoutEffects: EffectState[] = [];
     C.mockImplementationOnce(() => {
       component.dirty = true;
@@ -199,6 +209,7 @@ describe('renderComponentWithHooks', () => {
     const renderable = renderComponentWithHooks(
       component.data.type,
       props,
+      ref,
       component,
       layoutEffects,
     );

@@ -1,5 +1,6 @@
 import type { FunctionComponent } from '../component';
 import type { VNode } from '../create-element';
+import type { Ref } from '../create-ref';
 import type { FunctionComponentFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
@@ -11,6 +12,7 @@ export type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
   layoutEffects: EffectState[];
+  ref: null | Ref;
 };
 
 let currentFiberState: null | FiberState = null;
@@ -24,6 +26,7 @@ export function getCurrentFiberState(): FiberState {
 export function renderComponentWithHooks(
   type: FunctionComponent<any>,
   props: VNode['props'],
+  ref: VNode['ref'],
   fiber: FunctionComponentFiber,
   layoutEffects: EffectState[],
 ): CoercedRenderable {
@@ -34,6 +37,7 @@ export function renderComponentWithHooks(
     index: 0,
     fiber,
     layoutEffects,
+    ref,
   };
   fiberStateStack.push(currentFiberState);
   fiber.current = true;
