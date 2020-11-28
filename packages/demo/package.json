@@ -13,7 +13,7 @@
     "@babel/preset-typescript": "7.12.1",
     "@snowpack/plugin-babel": "2.1.4",
     "babel-plugin-transform-jsx2": "0.0.0",
-    "prettier": "2.1.2",
+    "prettier": "2.2.1",
     "snowpack": "2.15.1"
   }
 }
