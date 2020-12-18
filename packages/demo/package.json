@@ -14,6 +14,6 @@
     "@snowpack/plugin-babel": "2.1.4",
     "babel-plugin-transform-jsx2": "0.0.0",
     "prettier": "2.1.2",
-    "snowpack": "2.15.1"
+    "snowpack": "2.18.5"
   }
 }
