@@ -1,5 +1,5 @@
 import { createElement, render } from '/jsx2/jsx2';
-import { Raf } from './App.js';
+import { App, Raf } from './App.js';
 import './index.css';
 
-render(<Raf />, document.getElementById('root'));
+render(<App />, document.getElementById('root'));
