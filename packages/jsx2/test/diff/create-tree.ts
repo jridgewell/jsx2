@@ -148,6 +148,25 @@ describe('createTree', () => {
       expect(firstChild.namespaceURI).toBe('http://www.w3.org/1999/xhtml');
     });
 
+    it('does not execute script contents', () => {
+      // Use the real body, because it will execute scripts
+      const body = document.body;
+
+      let err: Error | null = null;
+      window.addEventListener('error', (event) => {
+        err = event.error;
+      });
+      const createElementSpy = jest.spyOn(document, 'createElement');
+      const createElementNSSpy = jest.spyOn(document, 'createElementNS');
+      create(createElement('script', null, 'throw new Error("executed");'), body);
+
+      const firstChild = body.firstChild!;
+      expectElement(firstChild, 'script');
+      expect(err).toBe(null);
+      expect(createElementSpy).not.toHaveBeenCalledWith('script');
+      expect(createElementNSSpy).not.toHaveBeenCalledWith(expect.anything(), 'script');
+    });
+
     it('renders props', () => {
       const body = document.createElement('body');
 
