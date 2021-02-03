@@ -1,12 +1,12 @@
-import typescript from '@rollup/plugin-typescript';
 import strip from '@rollup/plugin-strip';
+import typescript from '@rollup/plugin-typescript';
 
 function configure(esm) {
   return {
     input: 'src/jsx2.ts',
     output:  esm
         ? { format: 'es', dir: 'dist', entryFileNames: '[name].mjs', sourcemap: true }
-        : { format: 'umd', name: 'dedent', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
+        : { format: 'umd', name: 'jsx2', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
     plugins: [
       // Compile TypeScript files
       typescript({ tsconfig: './tsconfig.build.json' }),
