@@ -72,7 +72,7 @@ export function createChild(
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
     if (type === 'svg') namespace = NS.SVG;
-    const el = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
+    const el = createElementNS(namespace, type);
     const childNs = childSpace(namespace, type);
     setOnNode(el, f);
     f.dom = el;
@@ -101,4 +101,16 @@ export function createChild(
   createChild(coerceRenderable(component.render(props)), f, null, namespace, refs, layoutEffects);
   deferRef(refs, component, null, renderable.ref);
   return f;
+}
+
+function createElementNS(namespace: NS, name: string): HTMLElement | SVGElement {
+  if (namespace !== NS.HTML) {
+    return document.createElementNS(nsToNode(namespace), name) as SVGElement;
+  }
+  if (name === 'script') {
+    const c = document.createElement('div');
+    c.innerHTML = '<script>';
+    return c.removeChild(c.firstChild as HTMLScriptElement);
+  }
+  return document.createElement(name);
 }
