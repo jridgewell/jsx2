@@ -7,7 +7,7 @@ type ListenerElement = HTMLElement & {
 export type ListenerTypes = null | undefined | Listener;
 
 export function diffEvent(
-  _el: HTMLElement,
+  _el: HTMLElement | SVGElement,
   name: string,
   oldValue: ListenerTypes,
   newValue: ListenerTypes,

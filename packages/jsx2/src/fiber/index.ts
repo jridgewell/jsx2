@@ -5,10 +5,13 @@ import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
 import type { RenderableArray } from '../render';
 
+import { NS } from '../util/namespace';
+
 export interface SharedFiber {
   parent: null | Fiber;
   child: null | DiffableFiber;
   next: null | DiffableFiber;
+  namespace: NS;
   index: number;
   depth: number;
   dirty: boolean;
@@ -138,5 +141,6 @@ export function fiber<T extends Fiber['data']>(
     child: null,
     next: null,
     ref: null,
+    namespace: NS.HTML,
   } as any;
 }

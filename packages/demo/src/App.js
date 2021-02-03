@@ -39,7 +39,6 @@ export function Raf() {
   useEffect(() => {
     bucket.push(performance.now() - start);
     const avg = average(bucket).toFixed(2);
-    console.log(avg);
     set(avg);
     increment(i => i + 1);
   });
@@ -59,6 +58,7 @@ export function App() {
 
   return (
     <div className="App">
+      <Raf />
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <div>
