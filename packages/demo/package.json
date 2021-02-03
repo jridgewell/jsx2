@@ -9,8 +9,8 @@
     "jsx2": "0.0.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-react-jsx": "7.12.1",
-    "@babel/preset-typescript": "7.12.1",
+    "@babel/plugin-transform-react-jsx": "7.12.13",
+    "@babel/preset-typescript": "7.12.13",
     "@snowpack/plugin-babel": "2.1.4",
     "babel-plugin-transform-jsx2": "0.0.0",
     "prettier": "2.1.2",

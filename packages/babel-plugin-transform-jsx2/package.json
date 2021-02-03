@@ -15,11 +15,11 @@
   "author": "Justin Ridgewell <justin@ridgewell.name>",
   "license": "MIT",
   "dependencies": {
-    "@babel/helper-module-imports": "7.12.1",
-    "@babel/plugin-syntax-jsx": "7.12.1"
+    "@babel/helper-module-imports": "7.12.13",
+    "@babel/plugin-syntax-jsx": "7.12.13"
   },
   "devDependencies": {
-    "@babel/helper-plugin-test-runner": "7.10.4",
+    "@babel/helper-plugin-test-runner": "7.12.13",
     "@babel/plugin-syntax-bigint": "7.8.3",
     "jest": "25.1.0"
   },
