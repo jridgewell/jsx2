@@ -685,7 +685,9 @@ describe('diffTree', () => {
         describe('rendered was inside foreignObject', () => {
           it('preserves HTML namespace in children', () => {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            const container = svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'));
+            const container = svg.appendChild(
+              document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'),
+            );
             const tree = makeOldFiberTree(createElement('div'), container);
             const renderable = createElement('a');
 

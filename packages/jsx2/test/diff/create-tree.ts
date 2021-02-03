@@ -232,7 +232,10 @@ describe('createTree', () => {
       it('switches from SVG namespace to HTML namespace inside foreignObject', () => {
         const body = document.createElement('body');
 
-        create(createElement('svg', null, createElement('foreignObject', null, createElement('div'))), body);
+        create(
+          createElement('svg', null, createElement('foreignObject', null, createElement('div'))),
+          body,
+        );
 
         const firstChild = body.firstChild!;
         expectElement(firstChild, 'svg', 'http://www.w3.org/2000/svg');
