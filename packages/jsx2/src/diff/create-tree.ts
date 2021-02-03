@@ -15,13 +15,16 @@ import { setOnNode } from '../fiber/node';
 import { verify } from '../fiber/verify';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
+import { NS, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
 export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
   const root = fiber(container);
+  const namespace = nsFromNode(container);
   root.dom = container;
+  root.namespace = namespace;
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
-  createChild(renderable, root, null, refs, layoutEffects);
+  createChild(renderable, root, null, namespace, refs, layoutEffects);
   insert(root, container, null);
   verify(root);
   applyRefs(refs);
@@ -33,10 +36,12 @@ export function createChild(
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
+  namespace: NS,
   refs: RefWork[],
   layoutEffects: EffectState[],
 ): DiffableFiber {
   const f = fiber(renderable);
+  f.namespace = namespace;
   mark(f, parentFiber, previousFiber);
 
   if (renderable === null) return f;
@@ -49,7 +54,14 @@ export function createChild(
   if (isArray(renderable)) {
     let last: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
-      const child = createChild(coerceRenderable(renderable[i]), f, last, refs, layoutEffects);
+      const child = createChild(
+        coerceRenderable(renderable[i]),
+        f,
+        last,
+        namespace,
+        refs,
+        layoutEffects,
+      );
       mark(child, f, last);
       last = child;
     }
@@ -59,12 +71,14 @@ export function createChild(
   f.key = renderable.key;
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
-    const el = document.createElement(type);
+    if (type === 'svg') namespace = NS.SVG;
+    const el = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
+    const childNs = childSpace(namespace, type);
     setOnNode(el, f);
     f.dom = el;
     f.ref = ref;
     addProps(el, props);
-    createChild(coerceRenderable(props.children), f, null, refs, layoutEffects);
+    createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects);
     deferRef(refs, el, null, ref);
     return f;
   }
@@ -75,6 +89,7 @@ export function createChild(
       renderComponentWithHooks(type, props, ref, f as FunctionComponentFiber, layoutEffects),
       f,
       null,
+      namespace,
       refs,
       layoutEffects,
     );
@@ -83,7 +98,7 @@ export function createChild(
 
   const component = (f.component = new type(props));
   f.ref = ref;
-  createChild(coerceRenderable(component.render(props)), f, null, refs, layoutEffects);
+  createChild(coerceRenderable(component.render(props)), f, null, namespace, refs, layoutEffects);
   deferRef(refs, component, null, renderable.ref);
   return f;
 }

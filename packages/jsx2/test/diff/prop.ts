@@ -284,12 +284,13 @@ describe('diffProp', () => {
       const el = document.createElement('div');
       const prop = 'foo';
       const foo = 'test';
+      const spy = jest.spyOn(el, 'setAttributeNS');
 
       diffProp(el, prop, null, foo);
-      const spy = jest.spyOn(el, 'setAttribute');
-      diffProp(el, prop, foo, foo);
+      expect(spy).toHaveBeenCalledTimes(1);
 
-      expect(spy).not.toHaveBeenCalled();
+      diffProp(el, prop, foo, foo);
+      expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it('does not unset attribute if value is empty string', () => {
@@ -344,12 +345,184 @@ describe('diffProp', () => {
       const el = document.createElement('div');
       const prop = 'foo';
       const foo = () => {};
-      const spy = jest.spyOn(el, 'setAttribute');
+      const spy = jest.spyOn(el, 'setAttributeNS');
 
       diffProp(el, prop, null, foo);
 
       expect(spy).not.toHaveBeenCalled();
       expect(el).not.toHaveProperty(prop);
+    });
+  });
+
+  describe('xlink namespace', () => {
+    describe('camelCase', () => {
+      it('sets the attribute', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const old = null;
+        const foo = 'test';
+
+        diffProp(el, prop, old, foo);
+
+        expect(el.getAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(foo);
+      });
+
+      it('does not reset attribute if old is same value', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const foo = 'test';
+
+        diffProp(el, prop, null, foo);
+        const spy = jest.spyOn(el, 'setAttributeNS');
+        diffProp(el, prop, foo, foo);
+
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it('does not unset attribute if value is empty string', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const old = 'test';
+        const foo = '';
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(true);
+      });
+
+      it('unsets the attribute with false', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const old = 'test';
+        const foo = false;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('unsets the attribute with undefined', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const old = 'test';
+        const foo = undefined;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('unsets the attribute with null', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const old = 'test';
+        const foo = null;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('does not set value if it is a function', () => {
+        const el = document.createElement('div');
+        const prop = 'xlinkFoo';
+        const foo = () => {};
+        const spy = jest.spyOn(el, 'setAttributeNS');
+
+        diffProp(el, prop, null, foo);
+
+        expect(spy).not.toHaveBeenCalled();
+        expect(el).not.toHaveProperty(prop);
+      });
+    });
+
+    describe('xml prefixed', () => {
+      it('sets the attribute', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const old = null;
+        const foo = 'test';
+
+        diffProp(el, prop, old, foo);
+
+        expect(el.getAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(foo);
+      });
+
+      it('does not reset attribute if old is same value', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const foo = 'test';
+
+        diffProp(el, prop, null, foo);
+        const spy = jest.spyOn(el, 'setAttributeNS');
+        diffProp(el, prop, foo, foo);
+
+        expect(spy).not.toHaveBeenCalled();
+      });
+
+      it('does not unset attribute if value is empty string', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const old = 'test';
+        const foo = '';
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(true);
+      });
+
+      it('unsets the attribute with false', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const old = 'test';
+        const foo = false;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('unsets the attribute with undefined', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const old = 'test';
+        const foo = undefined;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('unsets the attribute with null', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const old = 'test';
+        const foo = null;
+
+        diffProp(el, prop, null, old);
+        diffProp(el, prop, old, foo);
+
+        expect(el.hasAttributeNS('http://www.w3.org/1999/xlink', 'foo')).toBe(false);
+      });
+
+      it('does not set value if it is a function', () => {
+        const el = document.createElement('div');
+        const prop = 'xlink:foo';
+        const foo = () => {};
+        const spy = jest.spyOn(el, 'setAttributeNS');
+
+        diffProp(el, prop, null, foo);
+
+        expect(spy).not.toHaveBeenCalled();
+        expect(el).not.toHaveProperty(prop);
+      });
     });
   });
 });

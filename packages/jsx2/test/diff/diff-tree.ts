@@ -23,10 +23,15 @@ function expectTextNode(node: Node, text: string) {
 }
 
 describe('diffTree', () => {
-  function expectElement(node: Node, tag: string): asserts node is Element {
+  function expectElement(
+    node: Node,
+    tag: string,
+    namespace = 'http://www.w3.org/1999/xhtml',
+  ): asserts node is Element {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.ELEMENT_NODE);
     expect((node as Element).localName).toBe(tag);
+    expect(node.namespaceURI).toBe(namespace);
   }
 
   function diff(old: RootFiber, renderable: CoercedRenderable, container: Node) {
@@ -121,6 +126,41 @@ describe('diffTree', () => {
         expectElement(container.firstChild!, 'div');
         expect(container.firstChild).toBe(container.lastChild);
       });
+
+      describe('namespace', () => {
+        it('preserves HTML namespace in children', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree(container);
+          const renderable = createElement('div');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'div', 'http://www.w3.org/1999/xhtml');
+        });
+
+        it('preserves SVG namespace in children', () => {
+          const container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const tree = makeOldFiberTree(container);
+          const renderable = createElement('circle');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'circle', 'http://www.w3.org/2000/svg');
+        });
+
+        it('preserves HTML namespace in children of foreignObject', () => {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const container = svg.appendChild(
+            document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'),
+          );
+          const tree = makeOldFiberTree(container);
+          const renderable = createElement('div');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'div', 'http://www.w3.org/1999/xhtml');
+        });
+      });
     });
 
     describe('rendering function component', () => {
@@ -211,6 +251,41 @@ describe('diffTree', () => {
 
         expectElement(container.firstChild!, 'div');
         expect(container.firstChild).toBe(container.lastChild);
+      });
+
+      describe('namespace', () => {
+        it('preserves HTML namespace in children', () => {
+          const container = document.createElement('body');
+          const tree = makeOldFiberTree('before', container);
+          const renderable = createElement('div');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'div', 'http://www.w3.org/1999/xhtml');
+        });
+
+        it('preserves SVG namespace in children', () => {
+          const container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const tree = makeOldFiberTree('before', container);
+          const renderable = createElement('circle');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'circle', 'http://www.w3.org/2000/svg');
+        });
+
+        it('preserves HTML namespace in children of foreignObject', () => {
+          const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const container = svg.appendChild(
+            document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'),
+          );
+          const tree = makeOldFiberTree('before', container);
+          const renderable = createElement('div');
+
+          diff(tree, renderable, container);
+
+          expectElement(container.firstChild!, 'div', 'http://www.w3.org/1999/xhtml');
+        });
       });
     });
 
@@ -569,6 +644,65 @@ describe('diffTree', () => {
 
           expect(container.firstChild).not.toBe(old);
           expect(container.firstChild!.firstChild).not.toBe(oldText);
+        });
+      });
+
+      describe('namespace', () => {
+        describe('rendered was HTML namespace', () => {
+          it('preserves HTML namespace in children', () => {
+            const container = document.createElement('body');
+            const tree = makeOldFiberTree(createElement('div'), container);
+            const renderable = createElement('a');
+
+            diff(tree, renderable, container);
+
+            expectElement(container.firstChild!, 'a', 'http://www.w3.org/1999/xhtml');
+          });
+
+          it('creates SVG namespace', () => {
+            const container = document.createElement('body');
+            const tree = makeOldFiberTree(createElement('div'), container);
+            const renderable = createElement('svg');
+
+            diff(tree, renderable, container);
+
+            expectElement(container.firstChild!, 'svg', 'http://www.w3.org/2000/svg');
+          });
+        });
+
+        describe('rendered was SVG namespace', () => {
+          it('preserves SVG namespace in children', () => {
+            const container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const tree = makeOldFiberTree(createElement('circle'), container);
+            const renderable = createElement('a');
+
+            diff(tree, renderable, container);
+
+            expectElement(container.firstChild!, 'a', 'http://www.w3.org/2000/svg');
+          });
+        });
+
+        describe('rendered was inside foreignObject', () => {
+          it('preserves HTML namespace in children', () => {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const container = svg.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject'));
+            const tree = makeOldFiberTree(createElement('div'), container);
+            const renderable = createElement('a');
+
+            diff(tree, renderable, container);
+
+            expectElement(container.firstChild!, 'a', 'http://www.w3.org/1999/xhtml');
+          });
+
+          it('creates SVG namespace', () => {
+            const container = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            const tree = makeOldFiberTree(createElement('circle'), container);
+            const renderable = createElement('svg');
+
+            diff(tree, renderable, container);
+
+            expectElement(container.firstChild!, 'svg', 'http://www.w3.org/2000/svg');
+          });
         });
       });
     });

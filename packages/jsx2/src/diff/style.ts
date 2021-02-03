@@ -5,7 +5,11 @@ const empty = {
   __proto__: null,
 };
 
-export function diffStyle(el: HTMLElement, oldValue: StyleTypes, newValue: StyleTypes): void {
+export function diffStyle(
+  el: HTMLElement | SVGElement,
+  oldValue: StyleTypes,
+  newValue: StyleTypes,
+): void {
   const { style } = el;
   if (typeof newValue === 'string') {
     style.cssText = newValue;

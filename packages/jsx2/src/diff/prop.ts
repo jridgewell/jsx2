@@ -4,9 +4,10 @@ import type { VNode } from '../create-element';
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';
+import { DOM_XLINK_NAMESPACE } from '../util/namespace';
 
 export function diffProp(
-  el: HTMLElement,
+  el: HTMLElement | SVGElement,
   name: string,
   oldValue: unknown,
   newValue: unknown,
@@ -25,15 +26,24 @@ export function diffProp(
   } else if (name in el) {
     (el as any)[name] = newValue == null ? '' : newValue;
   } else if (typeof newValue !== 'function') {
+    let ns: Parameters<Element['setAttributeNS']>[0] = null;
+    if (name.startsWith('xlink')) {
+      name = 'xlink:' + name.replace(/xlink:?/, '').toLowerCase();
+      ns = DOM_XLINK_NAMESPACE;
+    }
     if (newValue == null || newValue === false) {
       el.removeAttribute(name);
     } else {
-      el.setAttribute(name, newValue as any);
+      el.setAttributeNS(ns, name, newValue as any);
     }
   }
 }
 
-export function diffProps(el: HTMLElement, oldProps: VNode['props'], props: VNode['props']): void {
+export function diffProps(
+  el: HTMLElement | SVGElement,
+  oldProps: VNode['props'],
+  props: VNode['props'],
+): void {
   for (const name in oldProps) {
     if (!(name in props)) diffProp(el, name, oldProps[name], null);
   }
@@ -42,7 +52,7 @@ export function diffProps(el: HTMLElement, oldProps: VNode['props'], props: VNod
   }
 }
 
-export function addProps(el: HTMLElement, props: VNode['props']): void {
+export function addProps(el: HTMLElement | SVGElement, props: VNode['props']): void {
   for (const name in props) {
     diffProp(el, name, null, props[name]);
   }
