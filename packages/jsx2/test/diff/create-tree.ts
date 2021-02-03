@@ -150,21 +150,27 @@ describe('createTree', () => {
 
     it('does not execute script contents', () => {
       // Use the real body, because it will execute scripts
-      const body = document.body;
-
+      const { body } = document;
       let err: Error | null = null;
-      window.addEventListener('error', (event) => {
+      function onError(event: ErrorEvent) {
         err = event.error;
-      });
-      const createElementSpy = jest.spyOn(document, 'createElement');
-      const createElementNSSpy = jest.spyOn(document, 'createElementNS');
-      create(createElement('script', null, 'throw new Error("executed");'), body);
+      }
+      window.addEventListener('error', onError);
 
-      const firstChild = body.firstChild!;
-      expectElement(firstChild, 'script');
-      expect(err).toBe(null);
-      expect(createElementSpy).not.toHaveBeenCalledWith('script');
-      expect(createElementNSSpy).not.toHaveBeenCalledWith(expect.anything(), 'script');
+      try {
+        const createElementSpy = jest.spyOn(document, 'createElement');
+        const createElementNSSpy = jest.spyOn(document, 'createElementNS');
+        create(createElement('script', null, 'throw new Error("executed");'), body);
+
+        const firstChild = body.firstChild!;
+        expectElement(firstChild, 'script');
+        expect(err).toBe(null);
+        expect(createElementSpy).not.toHaveBeenCalledWith('script');
+        expect(createElementNSSpy).not.toHaveBeenCalledWith(expect.anything(), 'script');
+      } finally {
+        body.innerHTML = '';
+        window.removeEventListener('error', onError);
+      }
     });
 
     it('renders props', () => {
