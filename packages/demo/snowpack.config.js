@@ -2,7 +2,7 @@ module.exports = {
   mount: {
     public: '/',
     src: '/_dist_',
-    '../jsx2/src': '/jsx2'
+    // '../jsx2/src': '/jsx2'
   },
   devOptions: {
     hmr: false,

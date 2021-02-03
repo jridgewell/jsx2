@@ -1,4 +1,4 @@
-import { createElement, render } from '/jsx2/jsx2';
+import { createElement, render } from 'jsx2';
 import { App, Raf } from './App.js';
 import './index.css';
 
