@@ -1,10 +1,14 @@
 {
   "plugins": [
-    ["../../..", {
-      "json": true,
-      "minimalJson": false,
-      "prettyJson": false,
-      "taggedTemplate": true
-    }]
+    [
+      "../../..",
+      {
+        "staticBlocks": true,
+        "json": true,
+        "minimalJson": false,
+        "prettyJson": false,
+        "taggedTemplate": true
+      }
+    ]
   ]
 }

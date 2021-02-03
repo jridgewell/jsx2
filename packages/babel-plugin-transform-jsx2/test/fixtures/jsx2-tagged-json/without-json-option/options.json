@@ -1,11 +1,15 @@
 {
   "plugins": [
-    ["../../../..", {
-      "json": false,
-      "minimalJson": false,
-      "prettyJson": false,
-      "taggedTemplate": true
-    }]
+    [
+      "../../../..",
+      {
+        "staticBlocks": true,
+        "json": false,
+        "minimalJson": false,
+        "prettyJson": false,
+        "taggedTemplate": true
+      }
+    ]
   ],
   "throws": "\"taggedTemplate\" option requires \"json\" to be true"
 }

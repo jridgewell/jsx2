@@ -4,6 +4,7 @@ const { addNamed } = require('@babel/helper-module-imports');
 module.exports = function ({ types: t, template }, options) {
   // istanbul ignore next
   const {
+    staticBlocks = true,
     json = true,
     minimalJson = false,
     taggedTemplate = true,
@@ -13,6 +14,9 @@ module.exports = function ({ types: t, template }, options) {
   } = options || {};
   const importMap = new WeakMap();
 
+  if (json && !staticBlocks) {
+    throw new Error('"json" option requires "staticBlocks" to be true');
+  }
   if (minimalJson && !json) {
     throw new Error('"minimalJson" option requires "json" to be true');
   }
@@ -47,7 +51,7 @@ module.exports = function ({ types: t, template }, options) {
   }
 
   function buildTemplate(path) {
-    if (isComponent(path)) {
+    if (!staticBlocks || isComponent(path)) {
       return buildElement(path);
     }
 
@@ -107,7 +111,11 @@ module.exports = function ({ types: t, template }, options) {
     }
 
     const frag = path.isJSXFragment();
-    const type = frag ? state.fragMarker() : elementType(path);
+    const type = frag
+      ? state
+        ? state.fragMarker()
+        : getImport(path, 'Fragment')
+      : elementType(path);
 
     const { props, key, ref, children } = buildProps(
       frag ? [] : path.get('openingElement.attributes'),

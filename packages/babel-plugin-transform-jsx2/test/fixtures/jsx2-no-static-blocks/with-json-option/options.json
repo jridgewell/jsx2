@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    [
+      "../../../..",
+      {
+        "staticBlocks": false,
+        "json": true,
+        "minimalJson": false,
+        "prettyJson": false,
+        "taggedTemplate": false
+      }
+    ]
+  ],
+  "throws": "\"json\" option requires \"staticBlocks\" to be true"
+}
