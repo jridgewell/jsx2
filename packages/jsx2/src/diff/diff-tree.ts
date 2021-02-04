@@ -201,7 +201,7 @@ function renderArray(
       }
     }
 
-    const f = createChild(r, old, last, old.namespace, refs, layoutEffects);
+    const f = createChild(r, old, last, old.namespace, refs, layoutEffects, null);
     insert(f, container, before);
     last = f;
   }
@@ -315,6 +315,14 @@ function replaceFiber(
   refs: RefWork[],
   layoutEffects: EffectState[],
 ): Fiber {
-  const f = createChild(renderable, parentFiber, previousFiber, old.namespace, refs, layoutEffects);
+  const f = createChild(
+    renderable,
+    parentFiber,
+    previousFiber,
+    old.namespace,
+    refs,
+    layoutEffects,
+    null,
+  );
   return replace(old, f, parentFiber, container);
 }

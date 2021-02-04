@@ -6,7 +6,7 @@ import { coerceRenderable } from '../src/util/coerce-renderable';
 
 describe('createContext', () => {
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container);
+    return createTree(coerceRenderable(renderable), container, false);
   }
 
   const defaultValue = { default: true };

@@ -25,6 +25,11 @@ export function render(_renderable: Renderable, container: Container): void {
     diffTree(old, renderable, container);
   } else {
     container.textContent = '';
-    setOnNode(container, createTree(renderable, container));
+    setOnNode(container, createTree(renderable, container, false));
   }
+}
+
+export function hydrate(_renderable: Renderable, container: Container): void {
+  const renderable = coerceRenderable(_renderable);
+  setOnNode(container, createTree(renderable, container, true));
 }

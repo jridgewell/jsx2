@@ -5,7 +5,7 @@ export { createRef } from './create-ref';
 export { forwardRef } from './forward-ref';
 export { Fragment } from './fragment';
 export { memo } from './memo';
-export { render } from './render';
+export { render, hydrate } from './render';
 export { templateBlock } from './template-block';
 export {
   useCallback,
