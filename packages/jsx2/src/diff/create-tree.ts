@@ -18,37 +18,7 @@ import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { NS, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
-export function createTree(
-  renderable: CoercedRenderable,
-  container: Node,
-  hydrate: boolean,
-): RootFiber {
-  const root = fiber(container);
-  const namespace = nsFromNode(container);
-  root.dom = container;
-  root.namespace = namespace;
-  const refs: RefWork[] = [];
-  const layoutEffects: EffectState[] = [];
-  if (hydrate) {
-    createChild(
-      renderable,
-      root,
-      null,
-      namespace,
-      refs,
-      layoutEffects,
-      new HydrateWalker(container),
-    );
-  } else {
-    createChild(renderable, root, null, namespace, refs, layoutEffects, null);
-    insert(root, container, null);
-  }
-  verify(root);
-  applyRefs(refs);
-  applyEffects(layoutEffects);
-  return root;
-}
-
+let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
   private declare parent: Node;
   public declare current: Node | null;
@@ -77,6 +47,35 @@ class HydrateWalker {
   }
 }
 
+export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
+  return internal(renderable, container, false);
+}
+
+export function hydrateTree(renderable: CoercedRenderable, container: Node): RootFiber {
+  const oldWalker = hydrateWalker;
+  try {
+    hydrateWalker = new HydrateWalker(container);
+    return internal(renderable, container, true);
+  } finally {
+    hydrateWalker = oldWalker;
+  }
+}
+
+function internal(renderable: CoercedRenderable, container: Node, hydrate: boolean): RootFiber {
+  const root = fiber(container);
+  const namespace = nsFromNode(container);
+  root.dom = container;
+  root.namespace = namespace;
+  const refs: RefWork[] = [];
+  const layoutEffects: EffectState[] = [];
+  createChild(renderable, root, null, namespace, refs, layoutEffects);
+  if (!hydrate) insert(root, container, null);
+  verify(root);
+  applyRefs(refs);
+  applyEffects(layoutEffects);
+  return root;
+}
+
 export function createChild(
   renderable: CoercedRenderable,
   parentFiber: Fiber,
@@ -84,7 +83,6 @@ export function createChild(
   namespace: NS,
   refs: RefWork[],
   layoutEffects: EffectState[],
-  walker: null | HydrateWalker,
 ): DiffableFiber {
   const f = fiber(renderable);
   f.namespace = namespace;
@@ -93,13 +91,13 @@ export function createChild(
   if (renderable === null) return f;
 
   if (typeof renderable === 'string') {
-    if (walker) {
-      const dom = walker.current;
+    if (hydrateWalker) {
+      const dom = hydrateWalker.current;
       debug: {
         assert(dom !== null && dom.nodeType === Node.TEXT_NODE, 'failed to hydrate text node');
         assertType<Text>(dom);
       }
-      walker.nextSibling();
+      hydrateWalker.nextSibling();
       if (dom.data !== renderable) dom.data = renderable;
       f.dom = dom;
     } else {
@@ -118,7 +116,6 @@ export function createChild(
         namespace,
         refs,
         layoutEffects,
-        walker,
       );
       mark(child, f, last);
       last = child;
@@ -133,14 +130,14 @@ export function createChild(
     const childNs = childSpace(namespace, type);
 
     let dom: HTMLElement | SVGElement;
-    if (walker) {
-      const c = walker.current;
+    if (hydrateWalker) {
+      const c = hydrateWalker.current;
       debug: {
         assert(c !== null && c.nodeType === Node.ELEMENT_NODE, 'failed to hydrate element node');
         assertType<HTMLElement | SVGElement>(c);
       }
       dom = c;
-      walker.firstChild();
+      hydrateWalker.firstChild();
     } else {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
     }
@@ -149,15 +146,15 @@ export function createChild(
     f.dom = dom;
     f.ref = ref;
 
-    if (walker) {
+    if (hydrateWalker) {
       addListeners(dom, props);
     } else {
       addProps(dom, props);
     }
-    createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects, walker);
+    createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects);
     deferRef(refs, dom, null, ref);
 
-    if (walker) walker.parentNext();
+    if (hydrateWalker) hydrateWalker.parentNext();
     return f;
   }
 
@@ -170,22 +167,13 @@ export function createChild(
       namespace,
       refs,
       layoutEffects,
-      walker,
     );
     return f;
   }
 
   const component = (f.component = new type(props));
   f.ref = ref;
-  createChild(
-    coerceRenderable(component.render(props)),
-    f,
-    null,
-    namespace,
-    refs,
-    layoutEffects,
-    walker,
-  );
+  createChild(coerceRenderable(component.render(props)), f, null, namespace, refs, layoutEffects);
   deferRef(refs, component, null, renderable.ref);
   return f;
 }
