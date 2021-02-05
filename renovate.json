@@ -2,6 +2,11 @@
   "extends": [
     "config:base"
   ],
+  "force": {
+    "constraints": {
+      "npm": "7"
+    }
+  },
   "packageRules": [
     {
       "packagePatterns": [ "lerna", "@types/*" ],
