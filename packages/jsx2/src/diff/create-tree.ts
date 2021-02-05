@@ -4,7 +4,7 @@ import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
 import { applyEffects } from './effects';
-import { addProps } from './prop';
+import { addListeners, addProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
@@ -93,20 +93,18 @@ export function createChild(
   if (renderable === null) return f;
 
   if (typeof renderable === 'string') {
-    let dom: Text;
     if (walker) {
-      const c = walker.current;
+      const dom = walker.current;
       debug: {
-        assert(c !== null && c.nodeType === Node.TEXT_NODE, 'failed to hydrate text node');
-        assertType<Text>(c);
+        assert(dom !== null && dom.nodeType === Node.TEXT_NODE, 'failed to hydrate text node');
+        assertType<Text>(dom);
       }
-      dom = c;
       walker.nextSibling();
       if (dom.data !== renderable) dom.data = renderable;
+      f.dom = dom;
     } else {
-      dom = document.createTextNode(renderable);
+      f.dom = document.createTextNode(renderable);
     }
-    f.dom = dom;
     return f;
   }
 
@@ -131,8 +129,10 @@ export function createChild(
   f.key = renderable.key;
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
-    let dom: HTMLElement | SVGElement;
     if (type === 'svg') namespace = NS.SVG;
+    const childNs = childSpace(namespace, type);
+
+    let dom: HTMLElement | SVGElement;
     if (walker) {
       const c = walker.current;
       debug: {
@@ -144,13 +144,16 @@ export function createChild(
     } else {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
     }
-    const childNs = childSpace(namespace, type);
+
     setOnNode(dom, f);
     f.dom = dom;
     f.ref = ref;
 
-    // TODO: don't diff, only events
-    addProps(dom, props);
+    if (walker) {
+      addListeners(dom, props);
+    } else {
+      addProps(dom, props);
+    }
     createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects, walker);
     deferRef(refs, dom, null, ref);
 

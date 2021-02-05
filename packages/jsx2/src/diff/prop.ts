@@ -57,3 +57,9 @@ export function addProps(el: HTMLElement | SVGElement, props: VNode['props']): v
     diffProp(el, name, null, props[name]);
   }
 }
+
+export function addListeners(el: HTMLElement | SVGElement, props: VNode['props']): void {
+  for (const name in props) {
+    if (name.startsWith('on')) diffEvent(el, name, null, props[name] as ListenerTypes);
+  }
+}
