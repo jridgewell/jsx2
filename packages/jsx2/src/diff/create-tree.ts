@@ -2,6 +2,7 @@ import type { RefWork } from './ref';
 import type { DiffableFiber, Fiber, FunctionComponentFiber, RootFiber } from '../fiber';
 import type { EffectState } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
+import type { NS } from '../util/namespace';
 
 import { applyEffects } from './effects';
 import { addListeners, addProps } from './prop';
@@ -16,7 +17,7 @@ import { verify } from '../fiber/verify';
 import { assert, assertType } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
-import { NS, childSpace, nsFromNode, nsToNode } from '../util/namespace';
+import { NS_SVG, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
 let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
@@ -126,7 +127,7 @@ export function createChild(
   f.key = renderable.key;
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
-    if (type === 'svg') namespace = NS.SVG;
+    if (type === 'svg') namespace = NS_SVG;
     const childNs = childSpace(namespace, type);
 
     let dom: HTMLElement | SVGElement;
