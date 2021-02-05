@@ -13,7 +13,7 @@ describe('enqueueDiff', () => {
   }
 
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container, false);
+    return createTree(coerceRenderable(renderable), container);
   }
 
   function expectCalledBefore(first: jest.Mock, second: jest.Mock) {

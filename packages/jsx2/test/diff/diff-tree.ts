@@ -13,7 +13,7 @@ import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 function makeTree(renderable: Renderable, container: Node) {
-  return createTree(coerceRenderable(renderable), container, false);
+  return createTree(coerceRenderable(renderable), container);
 }
 
 function expectTextNode(node: Node, text: string) {

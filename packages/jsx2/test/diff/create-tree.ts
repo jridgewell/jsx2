@@ -19,7 +19,7 @@ describe('createTree', () => {
   }
 
   function create(renderable: Renderable, container: Node) {
-    createTree(coerceRenderable(renderable), container, false);
+    createTree(coerceRenderable(renderable), container);
   }
 
   describe('rendering null', () => {

@@ -8,7 +8,7 @@ import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('getAncestorFiber', () => {
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container, false);
+    return createTree(coerceRenderable(renderable), container);
   }
 
   function expectElementFiber(fiber: Fiber, tag: string): ElementFiber {
