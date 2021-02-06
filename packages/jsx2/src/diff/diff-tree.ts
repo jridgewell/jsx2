@@ -315,6 +315,14 @@ function replaceFiber(
   refs: RefWork[],
   layoutEffects: EffectState[],
 ): Fiber {
-  const f = createChild(renderable, parentFiber, previousFiber, old.namespace, false, refs, layoutEffects);
+  const f = createChild(
+    renderable,
+    parentFiber,
+    previousFiber,
+    old.namespace,
+    false,
+    refs,
+    layoutEffects,
+  );
   return replace(old, f, parentFiber, container);
 }
