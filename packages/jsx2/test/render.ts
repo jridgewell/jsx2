@@ -150,6 +150,43 @@ describe('hydrate', () => {
     expect(div.nextSibling).toBe(container.lastChild);
   });
 
+  describe('does not confuse SSR children when creating nodes', () => {
+    it('creates new element for child', () => {
+      const container = document.createElement('body');
+      const d = container.appendChild(document.createElement('div'));
+
+      hydrate(
+        [createElement('first', null, createElement('div')), createElement('div')],
+        container,
+      );
+
+      const first = container.firstChild!;
+      expectElement(first, 'first');
+      expect(first.nextSibling).toBe(d);
+      expect(container.lastChild).toBe(d);
+      const div = first.firstChild!;
+      expectElement(div, 'div');
+      expect(first.lastChild).toBe(div);
+      expect(div).not.toBe(d);
+    });
+
+    it('creates new text for child', () => {
+      const container = document.createElement('body');
+      const t = container.appendChild(document.createTextNode('text'));
+
+      hydrate([createElement('first', null, 'text'), 'text'], container);
+
+      const first = container.firstChild!;
+      expectElement(first, 'first');
+      expect(first.nextSibling).toBe(t);
+      expect(container.lastChild).toBe(t);
+      const text = first.firstChild!;
+      expectTextNode(text, 'text');
+      expect(first.lastChild).toBe(text);
+      expect(text).not.toBe(t);
+    });
+  });
+
   it('keeps SSR children', () => {
     const container = document.createElement('body');
     const child = container.appendChild(document.createElement('div'));
