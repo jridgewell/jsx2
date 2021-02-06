@@ -134,13 +134,16 @@ describe('hydrate', () => {
     const container = document.createElement('body');
     container.appendChild(document.createElement('div'));
 
-    hydrate([createElement('div', null, createElement('span', { id: 'foo' }, 'test')), 'ing'], container);
+    hydrate(
+      [createElement('div', null, createElement('span', { id: 'foo' }, 'test')), 'ing'],
+      container,
+    );
 
     const div = container.firstChild!;
     expectElement(div, 'div');
     const span = div.firstChild! as HTMLElement;
     expectElement(span, 'span');
-    expect(span.id).toBe('foo')
+    expect(span.id).toBe('foo');
     expectTextNode(span.firstChild!, 'test');
     expect(span.firstChild).toBe(span.lastChild);
     expectTextNode(div.nextSibling!, 'ing');
@@ -148,25 +151,23 @@ describe('hydrate', () => {
   });
 
   it('keeps SSR children', () => {
-    const el = createElement('div', { id: 'foo' });
     const container = document.createElement('body');
     const child = container.appendChild(document.createElement('div'));
 
-    hydrate(el, container);
+    hydrate(createElement('div', { id: 'foo' }), container);
 
-    expect(child.id).toBe(null);
+    expect(child.hasAttribute('id')).toBe(false);
     expect(container.firstChild).toBe(child);
     expect(container.lastChild).toBe(child);
   });
 
   it('prunes remaining nodes', () => {
-    const el = createElement('div', { id: 'foo' });
     const container = document.createElement('body');
     const child = container.appendChild(document.createElement('div'));
     child.appendChild(document.createTextNode('test'));
     container.appendChild(document.createElement('test'));
 
-    hydrate(el, container);
+    hydrate(createElement('div'), container);
 
     expect(container.firstChild).toBe(child);
     expect(container.lastChild).toBe(child);
@@ -189,19 +190,12 @@ describe('hydrate', () => {
   });
 
   it('applies refs after fully mounting DOM', () => {
+    const container = document.createElement('body');
     const ref = jest.fn((el: Element) => {
       expect(container.contains(el)).toBe(true);
     });
-    const el = createElement(
-      'div',
-      { id: 'foo' },
-      createElement('inner', {
-        ref,
-      }),
-    );
-    const container = document.createElement('body');
 
-    hydrate(el, container);
+    hydrate(createElement('div', { id: 'foo' }, createElement('inner', { ref })), container);
 
     expect(ref).toHaveBeenCalled();
   });

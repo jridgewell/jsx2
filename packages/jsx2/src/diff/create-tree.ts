@@ -10,7 +10,6 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
-import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { setOnNode } from '../fiber/node';
 import { verify } from '../fiber/verify';
@@ -87,8 +86,7 @@ export function createTree(renderable: CoercedRenderable, container: Node): Root
   root.namespace = namespace;
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
-  createChild(renderable, root, null, namespace, refs, layoutEffects);
-  insert(root, container, null);
+  createChild(renderable, root, null, container, namespace, refs, layoutEffects);
   verify(root);
   applyRefs(refs);
   applyEffects(layoutEffects);
@@ -99,6 +97,7 @@ export function createChild(
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
+  container: Node,
   namespace: NS,
   refs: RefWork[],
   layoutEffects: EffectState[],
@@ -120,7 +119,9 @@ export function createChild(
         return f;
       }
     }
-    f.dom = document.createTextNode(renderable);
+    const dom = document.createTextNode(renderable);
+    f.dom = dom;
+    container.insertBefore(dom, hydrateWalker ? hydrateWalker.current : null);
     return f;
   }
 
@@ -131,6 +132,7 @@ export function createChild(
         coerceRenderable(renderable[i]),
         f,
         last,
+        container,
         namespace,
         refs,
         layoutEffects,
@@ -148,7 +150,7 @@ export function createChild(
     const childNs = childSpace(namespace, type);
 
     let dom: null | HTMLElement | SVGElement = null;
-    let pop = false;
+    let hydrated = false;
     if (hydrateWalker) {
       const c = hydrateWalker.current;
 
@@ -158,23 +160,33 @@ export function createChild(
           dom = c;
           addListeners(dom, props);
           hydrateWalker.firstChild();
-          pop = true;
+          hydrated = true;
         }
       }
     }
     if (dom === null) {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
       addProps(dom, props);
+      container.insertBefore(dom, hydrateWalker ? hydrateWalker.current : null);
     }
 
     setOnNode(dom, f);
     f.dom = dom;
     f.ref = ref;
 
-    createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects);
+    createChild(
+      coerceRenderable(props.children),
+      f,
+      null,
+      dom,
+      childNs,
+      hydrated,
+      refs,
+      layoutEffects,
+    );
     deferRef(refs, dom, null, ref);
 
-    if (pop) hydrateWalker!.parentNext();
+    if (hydrated) hydrateWalker!.parentNext();
     return f;
   }
 
@@ -184,6 +196,7 @@ export function createChild(
       renderComponentWithHooks(type, props, ref, f as FunctionComponentFiber, layoutEffects),
       f,
       null,
+      container,
       namespace,
       refs,
       layoutEffects,
@@ -193,7 +206,15 @@ export function createChild(
 
   const component = (f.component = new type(props));
   f.ref = ref;
-  createChild(coerceRenderable(component.render(props)), f, null, namespace, refs, layoutEffects);
+  createChild(
+    coerceRenderable(component.render(props)),
+    f,
+    null,
+    container,
+    namespace,
+    refs,
+    layoutEffects,
+  );
   deferRef(refs, component, null, renderable.ref);
   return f;
 }
