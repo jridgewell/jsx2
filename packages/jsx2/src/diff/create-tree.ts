@@ -55,13 +55,7 @@ class HydrateWalker {
     insert(fiber, parent, current);
   }
 
-  prune(container: Node) {
-    do {
-      this.removeRemaining();
-    } while (this.parent !== container);
-  }
-
-  private removeRemaining() {
+  removeRemaining() {
     const { parent } = this;
     debug: assert(parent !== null);
 
@@ -79,7 +73,7 @@ export function hydrateTree(renderable: CoercedRenderable, container: Node): Roo
   try {
     hydrateWalker = new HydrateWalker(container);
     const f = createTree(renderable, container);
-    hydrateWalker.prune(container);
+    hydrateWalker.removeRemaining();
     return f;
   } finally {
     hydrateWalker = oldWalker;
