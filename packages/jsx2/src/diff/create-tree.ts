@@ -10,6 +10,7 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
+import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { setOnNode } from '../fiber/node';
 import { verify } from '../fiber/verify';
@@ -20,8 +21,8 @@ import { NS_SVG, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
 let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
-  private declare parent: null | Node;
-  public declare current: null | Node;
+  declare parent: null | Node;
+  declare current: null | Node;
   constructor(parent: Node) {
     this.parent = parent;
     this.current = parent.firstChild;
@@ -46,6 +47,12 @@ class HydrateWalker {
     debug: assert(parent !== null);
     this.current = parent.nextSibling;
     this.parent = parent.parentNode;
+  }
+
+  insert(fiber: Fiber) {
+    const { current, parent } = this;
+    debug: assert(parent !== null);
+    insert(fiber, parent, current);
   }
 
   prune(container: Node) {
@@ -86,7 +93,8 @@ export function createTree(renderable: CoercedRenderable, container: Node): Root
   root.namespace = namespace;
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
-  createChild(renderable, root, null, container, namespace, true, refs, layoutEffects);
+  createChild(renderable, root, null, namespace, true, refs, layoutEffects);
+  if (!hydrateWalker) insert(root, container, null);
   verify(root);
   applyRefs(refs);
   applyEffects(layoutEffects);
@@ -97,7 +105,6 @@ export function createChild(
   renderable: CoercedRenderable,
   parentFiber: Fiber,
   previousFiber: null | Fiber,
-  container: Node,
   namespace: NS,
   allowHydration: boolean,
   refs: RefWork[],
@@ -122,7 +129,7 @@ export function createChild(
     }
     const dom = document.createTextNode(renderable);
     f.dom = dom;
-    container.insertBefore(dom, hydrateWalker && allowHydration ? hydrateWalker.current : null);
+    if (hydrateWalker && allowHydration) hydrateWalker.insert(f);
     return f;
   }
 
@@ -133,7 +140,6 @@ export function createChild(
         coerceRenderable(renderable[i]),
         f,
         last,
-        container,
         namespace,
         allowHydration,
         refs,
@@ -169,26 +175,22 @@ export function createChild(
     if (dom === null) {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
       addProps(dom, props);
-      container.insertBefore(dom, hydrateWalker && allowHydration ? hydrateWalker.current : null);
     }
 
     setOnNode(dom, f);
     f.dom = dom;
     f.ref = ref;
 
-    createChild(
-      coerceRenderable(props.children),
-      f,
-      null,
-      dom,
-      childNs,
-      hydrated,
-      refs,
-      layoutEffects,
-    );
+    createChild(coerceRenderable(props.children), f, null, childNs, hydrated, refs, layoutEffects);
     deferRef(refs, dom, null, ref);
 
-    if (hydrated) hydrateWalker!.parentNext();
+    if (hydrateWalker && allowHydration) {
+      if (hydrated) {
+        hydrateWalker!.parentNext();
+      } else {
+        hydrateWalker.insert(f);
+      }
+    }
     return f;
   }
 
@@ -198,7 +200,6 @@ export function createChild(
       renderComponentWithHooks(type, props, ref, f as FunctionComponentFiber, layoutEffects),
       f,
       null,
-      container,
       namespace,
       allowHydration,
       refs,
@@ -213,7 +214,6 @@ export function createChild(
     coerceRenderable(component.render(props)),
     f,
     null,
-    container,
     namespace,
     allowHydration,
     refs,
