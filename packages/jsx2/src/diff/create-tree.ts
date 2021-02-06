@@ -21,7 +21,7 @@ import { NS_SVG, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
 let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
-  declare parent: null | Node;
+  declare parent: Node;
   declare current: null | Node;
   constructor(parent: Node) {
     this.parent = parent;
@@ -42,25 +42,20 @@ class HydrateWalker {
 
   parentNext() {
     this.removeRemaining();
-
     const { parent } = this;
-    debug: assert(parent !== null);
+    debug: assert(parent.parentNode !== null);
     this.current = parent.nextSibling;
     this.parent = parent.parentNode;
   }
 
   insert(fiber: Fiber) {
     const { current, parent } = this;
-    debug: assert(parent !== null);
     insert(fiber, parent, current);
   }
 
   removeRemaining() {
     const { parent } = this;
-    debug: assert(parent !== null);
-
-    let { current } = this;
-    while (current !== null) {
+    for (let { current } = this; current !== null; ) {
       const next = current.nextSibling;
       parent.removeChild(current);
       current = next;
