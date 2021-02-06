@@ -1,4 +1,4 @@
-import { createElement, render } from '../src/jsx2';
+import { createElement, hydrate, render } from '../src/jsx2';
 
 describe('render', () => {
   function expectTextNode(node: Node, text: string) {
@@ -114,5 +114,95 @@ describe('render', () => {
     render(createElement('div', null, createElement('span', null, 'after', 'after')), container);
     const records = mo.takeRecords();
     expect(records).toHaveLength(0);
+  });
+});
+
+describe('hydrate', () => {
+  function expectTextNode(node: Node, text: string) {
+    expect(node).toBeTruthy();
+    expect(node.nodeType).toBe(Node.TEXT_NODE);
+    expect(node.textContent).toBe(text);
+  }
+
+  function expectElement(node: Node, tag: string) {
+    expect(node).toBeTruthy();
+    expect(node.nodeType).toBe(Node.ELEMENT_NODE);
+    expect((node as Element).localName).toBe(tag);
+  }
+
+  it('creates missing nodes', () => {
+    const container = document.createElement('body');
+    container.appendChild(document.createElement('div'));
+
+    hydrate([createElement('div', null, createElement('span', { id: 'foo' }, 'test')), 'ing'], container);
+
+    const div = container.firstChild!;
+    expectElement(div, 'div');
+    const span = div.firstChild! as HTMLElement;
+    expectElement(span, 'span');
+    expect(span.id).toBe('foo')
+    expectTextNode(span.firstChild!, 'test');
+    expect(span.firstChild).toBe(span.lastChild);
+    expectTextNode(div.nextSibling!, 'ing');
+    expect(div.nextSibling).toBe(container.lastChild);
+  });
+
+  it('keeps SSR children', () => {
+    const el = createElement('div', { id: 'foo' });
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+
+    hydrate(el, container);
+
+    expect(child.id).toBe(null);
+    expect(container.firstChild).toBe(child);
+    expect(container.lastChild).toBe(child);
+  });
+
+  it('prunes remaining nodes', () => {
+    const el = createElement('div', { id: 'foo' });
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+    child.appendChild(document.createTextNode('test'));
+    container.appendChild(document.createElement('test'));
+
+    hydrate(el, container);
+
+    expect(container.firstChild).toBe(child);
+    expect(container.lastChild).toBe(child);
+    expect(child.firstChild).toBe(null);
+  });
+
+  it('rerenders after hydrating', () => {
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+
+    hydrate(createElement('div'), container);
+
+    render(createElement('div', { id: 'bar' }, 'baz'), container);
+
+    expect(container.firstChild).toBe(child);
+    expect(child.id).toBe('bar');
+    expectTextNode(child.firstChild!, 'baz');
+    expect(child.firstChild).toBe(child.lastChild);
+    expect(container.firstChild).toBe(container.lastChild);
+  });
+
+  it('applies refs after fully mounting DOM', () => {
+    const ref = jest.fn((el: Element) => {
+      expect(container.contains(el)).toBe(true);
+    });
+    const el = createElement(
+      'div',
+      { id: 'foo' },
+      createElement('inner', {
+        ref,
+      }),
+    );
+    const container = document.createElement('body');
+
+    hydrate(el, container);
+
+    expect(ref).toHaveBeenCalled();
   });
 });

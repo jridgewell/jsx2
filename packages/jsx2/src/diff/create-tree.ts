@@ -21,8 +21,8 @@ import { NS_SVG, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
 let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
-  private declare parent: Node;
-  public declare current: Node | null;
+  private declare parent: null | Node;
+  public declare current: null | Node;
   constructor(parent: Node) {
     this.parent = parent;
     this.current = parent.firstChild;
@@ -41,28 +41,46 @@ class HydrateWalker {
   }
 
   parentNext() {
+    this.removeRemaining();
+
     const { parent } = this;
-    debug: assert(parent.parentNode !== null);
+    debug: assert(parent !== null);
     this.current = parent.nextSibling;
     this.parent = parent.parentNode;
   }
-}
 
-export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
-  return internal(renderable, container, false);
+  prune(container: Node) {
+    do {
+      this.removeRemaining();
+    } while (this.parent !== container);
+  }
+
+  private removeRemaining() {
+    const { parent } = this;
+    debug: assert(parent !== null);
+
+    let { current } = this;
+    while (current !== null) {
+      const next = current.nextSibling;
+      parent.removeChild(current);
+      current = next;
+    }
+  }
 }
 
 export function hydrateTree(renderable: CoercedRenderable, container: Node): RootFiber {
   const oldWalker = hydrateWalker;
   try {
     hydrateWalker = new HydrateWalker(container);
-    return internal(renderable, container, true);
+    const f = createTree(renderable, container);
+    hydrateWalker.prune(container);
+    return f;
   } finally {
     hydrateWalker = oldWalker;
   }
 }
 
-function internal(renderable: CoercedRenderable, container: Node, hydrate: boolean): RootFiber {
+export function createTree(renderable: CoercedRenderable, container: Node): RootFiber {
   const root = fiber(container);
   const namespace = nsFromNode(container);
   root.dom = container;
@@ -70,7 +88,7 @@ function internal(renderable: CoercedRenderable, container: Node, hydrate: boole
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
   createChild(renderable, root, null, namespace, refs, layoutEffects);
-  if (!hydrate) insert(root, container, null);
+  insert(root, container, null);
   verify(root);
   applyRefs(refs);
   applyEffects(layoutEffects);
@@ -93,17 +111,16 @@ export function createChild(
 
   if (typeof renderable === 'string') {
     if (hydrateWalker) {
-      const dom = hydrateWalker.current;
-      debug: {
-        assert(dom !== null && dom.nodeType === Node.TEXT_NODE, 'failed to hydrate text node');
-        assertType<Text>(dom);
+      const c = hydrateWalker.current;
+      if (c !== null && c.nodeType === Node.TEXT_NODE) {
+        assertType<Text>(c);
+        hydrateWalker.nextSibling();
+        f.dom = c;
+        if (c.data !== renderable) c.data = renderable;
+        return f;
       }
-      hydrateWalker.nextSibling();
-      if (dom.data !== renderable) dom.data = renderable;
-      f.dom = dom;
-    } else {
-      f.dom = document.createTextNode(renderable);
     }
+    f.dom = document.createTextNode(renderable);
     return f;
   }
 
@@ -130,32 +147,34 @@ export function createChild(
     if (type === 'svg') namespace = NS_SVG;
     const childNs = childSpace(namespace, type);
 
-    let dom: HTMLElement | SVGElement;
+    let dom: null | HTMLElement | SVGElement = null;
+    let pop = false;
     if (hydrateWalker) {
       const c = hydrateWalker.current;
-      debug: {
-        assert(c !== null && c.nodeType === Node.ELEMENT_NODE, 'failed to hydrate element node');
+
+      if (c !== null && c.nodeType === Node.ELEMENT_NODE) {
         assertType<HTMLElement | SVGElement>(c);
+        if (c.localName === type) {
+          dom = c;
+          addListeners(dom, props);
+          hydrateWalker.firstChild();
+          pop = true;
+        }
       }
-      dom = c;
-      hydrateWalker.firstChild();
-    } else {
+    }
+    if (dom === null) {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
+      addProps(dom, props);
     }
 
     setOnNode(dom, f);
     f.dom = dom;
     f.ref = ref;
 
-    if (hydrateWalker) {
-      addListeners(dom, props);
-    } else {
-      addProps(dom, props);
-    }
     createChild(coerceRenderable(props.children), f, null, childNs, refs, layoutEffects);
     deferRef(refs, dom, null, ref);
 
-    if (hydrateWalker) hydrateWalker.parentNext();
+    if (pop) hydrateWalker!.parentNext();
     return f;
   }
 
