@@ -150,6 +150,24 @@ describe('hydrate', () => {
     expect(div.nextSibling).toBe(container.lastChild);
   });
 
+  it('updates incorrect text children', () => {
+    const container = document.createElement('body');
+    const d = container.appendChild(document.createElement('div'));
+    const t1 = d.appendChild(document.createTextNode('before'));
+    const t2 = container.appendChild(document.createTextNode('before'));
+
+    hydrate([createElement('div', null, 'after'), 'after'], container);
+
+    const div = container.firstChild!;
+    expectElement(div, 'div');
+    expectTextNode(t1, 'after');
+    expect(div.firstChild).toBe(t1);
+    expect(div.lastChild).toBe(t1);
+    expectTextNode(t2, 'after');
+    expect(div.nextSibling).toBe(t2);
+    expect(container.lastChild).toBe(t2);
+  });
+
   describe('does not confuse SSR children when creating nodes', () => {
     it('creates new element for child', () => {
       const container = document.createElement('body');
