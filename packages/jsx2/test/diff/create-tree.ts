@@ -1,10 +1,10 @@
 import type { Renderable } from '../../src/render';
 
 import { Component, createElement } from '../../src/jsx2';
-import { createTree } from '../../src/diff/create-tree';
+import { createRoot } from '../../src/diff/create-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
-describe('createTree', () => {
+describe('createRoot', () => {
   function expectTextNode(node: Node, text: string) {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.TEXT_NODE);
@@ -19,7 +19,7 @@ describe('createTree', () => {
   }
 
   function create(renderable: Renderable, container: Node) {
-    createTree(coerceRenderable(renderable), container);
+    createRoot(coerceRenderable(renderable), container);
   }
 
   describe('rendering null', () => {

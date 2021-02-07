@@ -1,12 +1,12 @@
 import type { Renderable } from '../../src/render';
 
 import { act, createElement, useEffect, useLayoutEffect, useState } from '../../src/jsx2';
-import { createTree } from '../../src/diff/create-tree';
+import { createRoot } from '../../src/diff/create-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('act', () => {
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container);
+    return createRoot(coerceRenderable(renderable), container);
   }
 
   function expectCalledBefore(first: jest.Mock, second: jest.Mock) {

@@ -1,12 +1,12 @@
 import type { Renderable } from '../src/render';
 
 import { act, createContext, createElement, useContext, useState } from '../src/jsx2';
-import { createTree } from '../src/diff/create-tree';
+import { createRoot } from '../src/diff/create-tree';
 import { coerceRenderable } from '../src/util/coerce-renderable';
 
 describe('createContext', () => {
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container);
+    return createRoot(coerceRenderable(renderable), container);
   }
 
   const defaultValue = { default: true };

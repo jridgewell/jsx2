@@ -8,12 +8,12 @@ import type { Renderable, RenderableArray } from '../../src/render';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
 import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
-import { createTree } from '../../src/diff/create-tree';
+import { createRoot } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 function makeTree(renderable: Renderable, container: Node) {
-  return createTree(coerceRenderable(renderable), container);
+  return createRoot(coerceRenderable(renderable), container);
 }
 
 function expectTextNode(node: Node, text: string) {
