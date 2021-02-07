@@ -5,7 +5,7 @@ import type { EffectState } from '../hooks';
 import type { RenderableArray } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { createChild } from './create-tree';
+import { CREATION, createChild } from './create-tree';
 import { applyEffects } from './effects';
 import { diffProps } from './prop';
 import { applyRefs, deferRef } from './ref';
@@ -201,7 +201,7 @@ function renderArray(
       }
     }
 
-    const f = createChild(r, old, last, old.namespace, false, refs, layoutEffects);
+    const f = createChild(r, old, last, old.namespace, CREATION, refs, layoutEffects);
     insert(f, container, before);
     last = f;
   }
@@ -320,7 +320,7 @@ function replaceFiber(
     parentFiber,
     previousFiber,
     old.namespace,
-    false,
+    CREATION,
     refs,
     layoutEffects,
   );

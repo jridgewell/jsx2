@@ -19,6 +19,10 @@ import { coerceRenderable } from '../util/coerce-renderable';
 import { isArray } from '../util/is-array';
 import { NS_SVG, childSpace, nsFromNode, nsToNode } from '../util/namespace';
 
+export const CREATION = 0;
+export const HYDRATION = 1;
+type CreateMode = typeof HYDRATION | typeof CREATION;
+
 let hydrateWalker: null | HydrateWalker = null;
 class HydrateWalker {
   declare parent: Node;
@@ -82,7 +86,15 @@ export function createTree(renderable: CoercedRenderable, container: Node): Root
   root.namespace = namespace;
   const refs: RefWork[] = [];
   const layoutEffects: EffectState[] = [];
-  createChild(renderable, root, null, namespace, true, refs, layoutEffects);
+  createChild(
+    renderable,
+    root,
+    null,
+    namespace,
+    hydrateWalker ? HYDRATION : CREATION,
+    refs,
+    layoutEffects,
+  );
   if (!hydrateWalker) insert(root, container, null);
   verify(root);
   applyRefs(refs);
@@ -95,7 +107,7 @@ export function createChild(
   parentFiber: Fiber,
   previousFiber: null | Fiber,
   namespace: NS,
-  allowHydration: boolean,
+  mode: CreateMode,
   refs: RefWork[],
   layoutEffects: EffectState[],
 ): DiffableFiber {
@@ -106,7 +118,7 @@ export function createChild(
   if (renderable === null) return f;
 
   if (typeof renderable === 'string') {
-    if (hydrateWalker && allowHydration) {
+    if (hydrateWalker && mode === HYDRATION) {
       const c = hydrateWalker.current;
       if (c !== null && c.nodeType === Node.TEXT_NODE) {
         assertType<Text>(c);
@@ -118,7 +130,7 @@ export function createChild(
     }
     const dom = document.createTextNode(renderable);
     f.dom = dom;
-    if (hydrateWalker && allowHydration) hydrateWalker.insert(f);
+    if (hydrateWalker && mode === HYDRATION) hydrateWalker.insert(f);
     return f;
   }
 
@@ -130,7 +142,7 @@ export function createChild(
         f,
         last,
         namespace,
-        allowHydration,
+        mode,
         refs,
         layoutEffects,
       );
@@ -148,7 +160,7 @@ export function createChild(
 
     let dom: null | HTMLElement | SVGElement = null;
     let hydrated = false;
-    if (hydrateWalker && allowHydration) {
+    if (hydrateWalker && mode === HYDRATION) {
       const c = hydrateWalker.current;
 
       if (c !== null && c.nodeType === Node.ELEMENT_NODE) {
@@ -170,10 +182,18 @@ export function createChild(
     f.dom = dom;
     f.ref = ref;
 
-    createChild(coerceRenderable(props.children), f, null, childNs, hydrated, refs, layoutEffects);
+    createChild(
+      coerceRenderable(props.children),
+      f,
+      null,
+      childNs,
+      hydrated ? HYDRATION : CREATION,
+      refs,
+      layoutEffects,
+    );
     deferRef(refs, dom, null, ref);
 
-    if (hydrateWalker && allowHydration) {
+    if (hydrateWalker && mode === HYDRATION) {
       if (hydrated) {
         hydrateWalker!.parentNext();
       } else {
@@ -190,7 +210,7 @@ export function createChild(
       f,
       null,
       namespace,
-      allowHydration,
+      mode,
       refs,
       layoutEffects,
     );
@@ -204,7 +224,7 @@ export function createChild(
     f,
     null,
     namespace,
-    allowHydration,
+    mode,
     refs,
     layoutEffects,
   );
