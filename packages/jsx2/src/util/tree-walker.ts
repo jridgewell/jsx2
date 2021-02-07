@@ -43,5 +43,6 @@ export class TreeWalker {
       parent.removeChild(current);
       current = next;
     }
+    this.current = null;
   }
 }
