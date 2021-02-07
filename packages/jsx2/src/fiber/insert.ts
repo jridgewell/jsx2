@@ -53,7 +53,9 @@ function verifyFiberMountedInContianer(fiber: Fiber, end: Fiber | null, containe
     if (dom && dom !== data) {
       assert(
         dom.parentNode === container,
-        'fiber must be mounted inside container to be reordered',
+        container
+          ? 'fiber must not be mounted'
+          : 'fiber must be mounted inside container to be reordered',
       );
     }
     if (child) verifyFiberMountedInContianer(child, null, container && dom ? dom : null);

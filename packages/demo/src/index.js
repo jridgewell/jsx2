@@ -1,5 +1,9 @@
-import { createElement, render } from 'jsx2';
+import { createElement, render, hydrate } from 'jsx2';
 import { App, Raf } from './App.js';
 import './index.css';
 
-render(<App />, document.getElementById('root'));
+const r = document.createElement('root');
+const root = document.getElementById('root');
+render(<App />, r);
+root.innerHTML = r.innerHTML;
+hydrate(<App />, root);

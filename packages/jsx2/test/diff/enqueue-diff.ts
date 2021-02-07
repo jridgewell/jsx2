@@ -2,7 +2,7 @@ import type { Fiber, FunctionComponentFiber } from '../../src/fiber';
 import type { Renderable } from '../../src/render';
 
 import { createElement } from '../../src/jsx2';
-import { createTree } from '../../src/diff/create-tree';
+import { createRoot } from '../../src/diff/create-tree';
 import { enqueueDiff } from '../../src/diff/enqueue-diff';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
@@ -13,7 +13,7 @@ describe('enqueueDiff', () => {
   }
 
   function makeTree(renderable: Renderable, container: Node) {
-    return createTree(coerceRenderable(renderable), container);
+    return createRoot(coerceRenderable(renderable), container);
   }
 
   function expectCalledBefore(first: jest.Mock, second: jest.Mock) {

@@ -1,4 +1,4 @@
-import { addProps, diffProp, diffProps } from '../../src/diff/prop';
+import { addListeners, addProps, diffProp, diffProps } from '../../src/diff/prop';
 
 describe('diffProp', () => {
   describe('children', () => {
@@ -536,6 +536,35 @@ describe('addProps', () => {
 
     expect(el.getAttribute('foo')).toBe('bar');
     expect(el.getAttribute('class')).toBe('class');
+  });
+});
+
+describe('addListeners', () => {
+  it('adds each event listener to element', () => {
+    const el = document.createElement('div');
+    const onClick = jest.fn();
+    const onFoo = jest.fn();
+    const click = new Event('click');
+    const foo = new Event('Foo');
+
+    addListeners(el, { onClick, onFoo });
+    el.dispatchEvent(click);
+    el.dispatchEvent(foo);
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledWith(click);
+    expect(onFoo).toHaveBeenCalledTimes(1);
+    expect(onFoo).toHaveBeenCalledWith(foo);
+  });
+
+  it('skips regular attributes', () => {
+    const el = document.createElement('div');
+    const props = { foo: 'bar', class: 'class' };
+
+    addListeners(el, props);
+
+    expect(el.getAttribute('foo')).toBe(null);
+    expect(el.getAttribute('class')).toBe(null);
   });
 });
 

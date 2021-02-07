@@ -4,8 +4,9 @@ import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
 import type { RenderableArray } from '../render';
+import type { NS } from '../util/namespace';
 
-import { NS } from '../util/namespace';
+import { NS_HTML } from '../util/namespace';
 
 export interface SharedFiber {
   parent: null | Fiber;
@@ -141,6 +142,6 @@ export function fiber<T extends Fiber['data']>(
     child: null,
     next: null,
     ref: null,
-    namespace: NS.HTML,
+    namespace: NS_HTML,
   } as any;
 }
