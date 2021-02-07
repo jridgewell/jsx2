@@ -15,7 +15,7 @@ import { isValidElement } from '../create-element';
 import { clone } from '../fiber/clone';
 import { getContainer } from '../fiber/get-container';
 import { getNextSibling } from '../fiber/get-next-sibling';
-import { insert } from '../fiber/insert';
+import { insert, reorder } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { remove } from '../fiber/remove';
 import { replace } from '../fiber/replace';
@@ -191,7 +191,7 @@ function renderArray(
         if (current === already) {
           current = current.next;
         } else {
-          insert(cloned, container, before);
+          reorder(cloned, container, before);
         }
 
         const f = diffChild(cloned, r, old, last, container, refs, layoutEffects);
