@@ -3,7 +3,7 @@
     [
       "../../../..",
       {
-        "staticBlocks": true,
+        "templateBlocks": true,
         "json": false,
         "minimalJson": true,
         "prettyJson": false,

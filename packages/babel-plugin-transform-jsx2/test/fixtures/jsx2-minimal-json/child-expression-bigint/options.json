@@ -4,7 +4,7 @@
     [
       "../../../..",
       {
-        "staticBlocks": true,
+        "templateBlocks": true,
         "json": true,
         "minimalJson": true,
         "prettyJson": false,

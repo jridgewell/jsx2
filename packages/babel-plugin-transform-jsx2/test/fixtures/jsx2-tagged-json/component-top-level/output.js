@@ -1,10 +1,10 @@
 var _createElement = require("jsx2").createElement;
 
-var _templateBlock = require("jsx2").templateBlock;
+var _taggedTemplateBlock = require("jsx2").taggedTemplateBlock;
 
 function test() {
   return _createElement(Component, {
     id: foo,
     bar: bar
-  }, _templateBlock`{"type":"first","key":"","ref":null,"props":{"children":${text}}}`, "second", _templateBlock`{"type":"third","key":"","ref":null,"props":{"third":"third"}}`, fourth, _templateBlock`{"type":"fifth","key":"","ref":null,"props":{"fifth":${fifth}}}`, [...sixth]);
+  }, _taggedTemplateBlock`{"type":"first","key":"","ref":null,"props":{"children":${text}}}`, "second", _taggedTemplateBlock`{"type":"third","key":"","ref":null,"props":{"third":"third"}}`, fourth, _taggedTemplateBlock`{"type":"fifth","key":"","ref":null,"props":{"fifth":${fifth}}}`, [...sixth]);
 }

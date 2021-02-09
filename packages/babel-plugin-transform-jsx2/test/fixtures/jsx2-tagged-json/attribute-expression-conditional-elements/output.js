@@ -1,5 +1,5 @@
-var _templateBlock = require("jsx2").templateBlock;
+var _taggedTemplateBlock = require("jsx2").taggedTemplateBlock;
 
 function test() {
-  return _templateBlock`{"type":"div","key":"","ref":null,"props":{"attr":${cond ? _templateBlock`{"type":"t","key":"","ref":null,"props":null}` : _templateBlock`{"type":"f","key":"","ref":null,"props":null}`}}}`;
+  return _taggedTemplateBlock`{"type":"div","key":"","ref":null,"props":{"attr":${cond ? _taggedTemplateBlock`{"type":"t","key":"","ref":null,"props":null}` : _taggedTemplateBlock`{"type":"f","key":"","ref":null,"props":null}`}}}`;
 }

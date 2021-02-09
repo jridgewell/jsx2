@@ -1,7 +1,7 @@
 var _Fragment = require("jsx2").Fragment;
 
-var _templateBlock = require("jsx2").templateBlock;
+var _taggedTemplateBlock = require("jsx2").taggedTemplateBlock;
 
 function test() {
-  return _templateBlock`{"type":"div","key":"","ref":null,"props":{"attr":${_templateBlock`{"type":${_Fragment},"key":"","ref":null,"props":null}`}}}`;
+  return _taggedTemplateBlock`{"type":"div","key":"","ref":null,"props":{"attr":${_taggedTemplateBlock`{"type":${_Fragment},"key":"","ref":null,"props":null}`}}}`;
 }
