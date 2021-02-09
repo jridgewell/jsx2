@@ -12,7 +12,7 @@ module.exports = function (api) {
           minimalJson: false,
           taggedTemplate: false,
           prettyJson: false,
-          staticBlocks: false,
+          templateBlocks: false,
         },
         /*/
         require('@babel/plugin-transform-react-jsx'),

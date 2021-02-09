@@ -4,7 +4,7 @@ const { addNamed } = require('@babel/helper-module-imports');
 module.exports = function ({ types: t, template }, options) {
   // istanbul ignore next
   const {
-    staticBlocks = true,
+    templateBlocks = true,
     json = true,
     minimalJson = false,
     taggedTemplate = true,
@@ -14,8 +14,8 @@ module.exports = function ({ types: t, template }, options) {
   } = options || {};
   const importMap = new WeakMap();
 
-  if (json && !staticBlocks) {
-    throw new Error('"json" option requires "staticBlocks" to be true');
+  if (json && !templateBlocks) {
+    throw new Error('"json" option requires "templateBlocks" to be true');
   }
   if (minimalJson && !json) {
     throw new Error('"minimalJson" option requires "json" to be true');
@@ -51,7 +51,7 @@ module.exports = function ({ types: t, template }, options) {
   }
 
   function buildTemplate(path) {
-    if (!staticBlocks || isComponent(path)) {
+    if (!templateBlocks || isComponent(path)) {
       return buildElement(path);
     }
 
@@ -417,7 +417,7 @@ module.exports = function ({ types: t, template }, options) {
     }
 
     return t.taggedTemplateExpression(
-      getImport(path, 'templateBlock'),
+      getImport(path, 'taggedTemplateBlock'),
       t.templateLiteral(elements, orderedExpressions),
     );
   }

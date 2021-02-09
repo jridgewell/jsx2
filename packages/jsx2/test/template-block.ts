@@ -1,14 +1,46 @@
 import type { TemplateBlock } from '../src/template-block';
 
-import { templateBlock } from '../src/jsx2';
+import { taggedTemplateBlock, templateBlock } from '../src/jsx2';
 
 describe('templateBlock', () => {
   function div(): TemplateBlock {
-    return templateBlock`{"type": "div"}`;
+    return templateBlock({ type: 'div', props: { id: 0 } }, ['id']);
+  }
+
+  it("sets results's constructor to undefined", () => {
+    const result = div();
+
+    expect(result).toHaveProperty('constructor', undefined);
+    expect(result.constructor).toBe(undefined);
+  });
+
+  it('stores static node as tree', () => {
+    const node = div().tree;
+    const result = templateBlock(node, []);
+
+    expect(result.tree).toBe(node);
+  });
+
+  it('returns new result for every evaluation', () => {
+    const result = div();
+
+    expect(result).not.toBe(div());
+  });
+
+  it('stores expressions in expression array', () => {
+    const result = div();
+
+    expect(result.expressions).toEqual(['id']);
+  });
+});
+
+describe('taggedTemplateBlock', () => {
+  function div(): TemplateBlock {
+    return taggedTemplateBlock`{"type": "div"}`;
   }
 
   function interpolations(): TemplateBlock {
-    return templateBlock`{
+    return taggedTemplateBlock`{
       "type": ${'type'},
       "key": ${'key'},
       "ref": ${'ref'}
@@ -57,7 +89,7 @@ describe('templateBlock', () => {
   });
 
   it('excludes overridden properties', () => {
-    const result = templateBlock`{"type":${'a'},"type":${'b'}}`;
+    const result = taggedTemplateBlock`{"type":${'a'},"type":${'b'}}`;
 
     expect(result.tree).toEqual({ type: 1 });
     expect(result.expressions).toEqual(['a', 'b']);

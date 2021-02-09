@@ -1,10 +1,9 @@
 {
   "plugins": [
-    ["@babel/plugin-syntax-bigint"],
     [
-      "../../../..",
+      "../../..",
       {
-        "staticBlocks": false,
+        "templateBlocks": false,
         "json": false,
         "minimalJson": false,
         "prettyJson": false,

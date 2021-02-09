@@ -18,5 +18,5 @@ export {
 } from './hooks';
 export { memo } from './memo';
 export { hydrate, render } from './render';
-export { templateBlock } from './template-block';
+export { taggedTemplateBlock, templateBlock } from './template-block';
 export { act } from './util/act';

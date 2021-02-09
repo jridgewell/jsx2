@@ -3,7 +3,7 @@
     [
       "../../../..",
       {
-        "staticBlocks": false,
+        "templateBlocks": false,
         "json": true,
         "minimalJson": false,
         "prettyJson": false,
@@ -11,5 +11,5 @@
       }
     ]
   ],
-  "throws": "\"json\" option requires \"staticBlocks\" to be true"
+  "throws": "\"json\" option requires \"templateBlocks\" to be true"
 }

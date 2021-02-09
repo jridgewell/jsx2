@@ -38,13 +38,17 @@ function getTree(strings: TemplateStringsArray): StaticNode {
   return tree;
 }
 
-export function templateBlock(
-  strings: TemplateStringsArray,
-  ...expressions: unknown[]
-): TemplateBlock {
+export function templateBlock(tree: StaticNode, expressions: unknown[]): TemplateBlock {
   return {
-    tree: getTree(strings),
+    tree,
     expressions,
     constructor: void 0,
   };
+}
+
+export function taggedTemplateBlock(
+  strings: TemplateStringsArray,
+  ...expressions: unknown[]
+): TemplateBlock {
+  return templateBlock(getTree(strings), expressions);
 }
