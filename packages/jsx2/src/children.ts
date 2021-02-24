@@ -13,7 +13,7 @@ export function map<T extends Renderable, R>(
 ): T extends null | undefined ? T : Individual<R>[] {
   if (children == null) return children as any;
   const mapped: Individual<R>[] = [];
-  recurse(children, 0, mapped, cb);
+  recurse(children, 0, '', mapped, cb);
   return mapped as any;
 }
 
@@ -23,7 +23,7 @@ export function toArray(children: Renderable): IndividualRenderable[] {
 
 export function count(children: Renderable): number {
   if (children == null) return 0;
-  return recurse(children, 0, [], blank);
+  return recurse(children, 0, '', [], blank);
 }
 
 export function only(child: Renderable): VNode {
@@ -33,7 +33,7 @@ export function only(child: Renderable): VNode {
 
 export function forEach(children: Renderable, cb: Callback<void>): void {
   if (children == null) return;
-  recurse(children, 0, [], (child, index) => {
+  recurse(children, 0, '', [], (child, index) => {
     cb(child, index);
   });
 }
@@ -49,6 +49,7 @@ function blank(): void {
 function recurse<T, R>(
   child: T,
   calls: number,
+  keyPath: string,
   array: Individual<R>[],
   cb: (child: null | IndividualRenderable, index: number) => unknown,
 ): number {
@@ -60,7 +61,8 @@ function recurse<T, R>(
   } else {
     if (Array.isArray(child)) {
       for (let i = 0; i < child.length; i++) {
-        calls = recurse(child[i], calls, array, cb);
+        const key = keyPath + '.' + i;
+        calls = recurse(child[i], calls, key, array, cb);
       }
     }
     return calls;
@@ -70,6 +72,9 @@ function recurse<T, R>(
     return calls;
   }
   if (!Array.isArray(mapped)) {
+    if (isValidElement(mapped)) {
+      mapped = clone(mapped, )
+    }
     array.push(mapped as Individual<R>);
     return calls;
   }
