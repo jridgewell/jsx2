@@ -1,3 +1,4 @@
+export * as Children from './children';
 export { cloneElement } from './clone-element';
 export { Component } from './component';
 export { createContext } from './create-context';
