@@ -37,7 +37,7 @@
     "@rollup/plugin-strip": "2.0.0",
     "@rollup/plugin-typescript": "6.0.0",
     "@types/jest": "26.0.23",
-    "@types/jsdom": "16.2.11",
+    "@types/jsdom": "16.2.12",
     "@typescript-eslint/eslint-plugin": "4.28.0",
     "@typescript-eslint/parser": "4.28.0",
     "eslint": "7.19.0",
