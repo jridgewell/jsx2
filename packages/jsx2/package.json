@@ -43,12 +43,12 @@
     "eslint": "7.19.0",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-rulesdir": "0.1.0",
-    "jest": "26.6.3",
-    "jest-config": "26.6.3",
+    "jest": "27.0.6",
+    "jest-config": "27.0.6",
     "npm-run-all": "4.1.5",
     "prettier": "2.2.1",
     "rollup": "2.38.5",
-    "ts-jest": "26.5.0",
+    "ts-jest": "27.0.3",
     "typescript": "4.1.3"
   }
 }
