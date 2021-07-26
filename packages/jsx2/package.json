@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@jridgewell/path-sorter": "0.0.1",
-    "@rollup/plugin-strip": "2.0.0",
+    "@rollup/plugin-strip": "2.1.0",
     "@rollup/plugin-typescript": "6.0.0",
     "@types/jest": "26.0.24",
     "@types/jsdom": "16.2.13",
