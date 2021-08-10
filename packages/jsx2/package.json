@@ -36,7 +36,7 @@
     "@jridgewell/path-sorter": "0.0.1",
     "@rollup/plugin-strip": "2.0.0",
     "@rollup/plugin-typescript": "6.0.0",
-    "@types/jest": "26.0.24",
+    "@types/jest": "27.0.0",
     "@types/jsdom": "16.2.13",
     "@typescript-eslint/eslint-plugin": "4.29.1",
     "@typescript-eslint/parser": "4.29.1",
