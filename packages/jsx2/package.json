@@ -35,7 +35,7 @@
   "devDependencies": {
     "@jridgewell/path-sorter": "0.0.1",
     "@rollup/plugin-strip": "2.0.0",
-    "@rollup/plugin-typescript": "6.0.0",
+    "@rollup/plugin-typescript": "8.5.0",
     "@types/jest": "27.0.2",
     "@types/jsdom": "16.2.13",
     "@typescript-eslint/eslint-plugin": "4.33.0",
