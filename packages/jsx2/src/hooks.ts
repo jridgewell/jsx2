@@ -134,7 +134,7 @@ export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {
   return init;
 }
 
-export function useRef<T extends unknown>(initial: T): { current: T } {
+export function useRef<T>(initial: T): { current: T } {
   return useMemo(() => ({ current: initial }), []);
 }
 

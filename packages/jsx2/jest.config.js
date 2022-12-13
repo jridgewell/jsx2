@@ -1,7 +1,8 @@
 module.exports = {
   transform: {
-    '.ts': 'ts-jest',
+    '.ts': '@swc/jest',
   },
+  testEnvironment: "jsdom",
   testRegex: 'test/[^\\.]*\\.ts$',
   moduleFileExtensions: ['ts', 'js'],
   coveragePathIgnorePatterns: ['/node_modules/', '/test/'],

@@ -16,6 +16,6 @@ export function getAncestorFiber(fiber: Fiber): Fiber | null {
 
 function getParent(node: Node): null | Node {
   return (
-    ((node as unknown) as Slottable).assignedSlot || (node as ShadowRoot).host || node.parentNode
+    (node as unknown as Slottable).assignedSlot || (node as ShadowRoot).host || node.parentNode
   );
 }

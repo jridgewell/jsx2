@@ -51,7 +51,7 @@ describe('diffTree', () => {
     method: M,
     spy: (...args: jest.ArgsType<Required<T>[M]>) => void,
   ) {
-    const original = (obj[method] as unknown) as (...args: jest.ArgsType<Required<T>[M]>) => any;
+    const original = obj[method] as unknown as (...args: jest.ArgsType<Required<T>[M]>) => any;
     jest.spyOn(obj, method).mockImplementation((...args) => {
       spy(...args);
       return original.apply(obj, args);
