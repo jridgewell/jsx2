@@ -1,4 +1,4 @@
-import { render, createElement, useState, useEffect, useCallback, useMemo } from 'jsx2';
+import { render, useState, useEffect, useCallback, useMemo } from 'jsx2';
 
 const dotStyle = {
   position: 'absolute',

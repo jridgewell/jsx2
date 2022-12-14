@@ -1,5 +1,5 @@
-import { createElement, render, hydrate } from 'jsx2';
-import { App, Raf } from './App.js';
+import { render, hydrate } from 'jsx2';
+import { App } from './App.jsx';
 import './index.css';
 
 const r = document.createElement('root');

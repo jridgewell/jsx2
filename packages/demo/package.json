@@ -1,19 +1,25 @@
 {
+  "name": "demo2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "snowpack dev",
-    "build": "snowpack build",
-    "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "lint": "prettier --check \"src/**/*.{js,jsx}\""
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "jsx2": "0.0.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "jsx2": "*"
   },
   "devDependencies": {
-    "@babel/plugin-transform-react-jsx": "7.12.13",
-    "@babel/preset-typescript": "7.12.13",
-    "@snowpack/plugin-babel": "2.1.6",
-    "babel-plugin-transform-jsx2": "0.0.0",
-    "prettier": "2.2.1",
-    "snowpack": "3.0.11"
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9",
+    "@vitejs/plugin-react": "^3.0.0",
+    "babel-plugin-transform-jsx2": "*",
+    "perf-monitor": "0.4.1",
+    "vite": "^4.0.0"
   }
 }
+

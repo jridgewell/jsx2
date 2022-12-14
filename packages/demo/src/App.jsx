@@ -1,5 +1,5 @@
-import { createElement, useMemo, useState, useEffect, useLayoutEffect, useCallback } from 'jsx2';
-import logo from './logo.png';
+import { useMemo, useState, useEffect, useLayoutEffect, useCallback } from 'jsx2';
+import logo from './assets/react.svg';
 import './App.css';
 
 function Seconds({ init }) {
