@@ -14,6 +14,24 @@
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/jsx2.d.ts",
+      "require": "./dist/jsx2.umd.js",
+      "import": "./dist/jsx2.mjs"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "require": "./dist/jsx-runtime.umd.js",
+      "import": "./dist/jsx-runtime.mjs"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/types/jsx-runtime.d.ts",
+      "require": "./dist/jsx-runtime.umd.js",
+      "import": "./dist/jsx-runtime.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/jsx2",
   "scripts": {
     "build": "run-s -n build:*",

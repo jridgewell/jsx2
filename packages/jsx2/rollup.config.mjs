@@ -1,12 +1,27 @@
 import strip from '@rollup/plugin-strip';
 import typescript from '@rollup/plugin-typescript';
 
-function configure(esm) {
+const entryPoints = {
+  jsx2: 'src/jsx2.ts',
+  jsx2Runtime: 'src/jsx-runtime.ts',
+};
+
+function configure(name, input, esm) {
   return {
-    input: 'src/jsx2.ts',
-    output:  esm
-        ? { format: 'es', dir: 'dist', entryFileNames: '[name].mjs', sourcemap: true }
-        : { format: 'umd', name: 'jsx2', dir: 'dist', entryFileNames: '[name].umd.js', sourcemap: true },
+    input,
+    output: esm
+      ? { format: 'es', dir: 'dist', entryFileNames: '[name].mjs', sourcemap: true }
+      : {
+          format: 'umd',
+          name,
+          dir: 'dist',
+          entryFileNames: '[name].umd.js',
+          sourcemap: true,
+          globals: { jsx2: 'jsx2' },
+        },
+
+    external: ['jsx2'],
+
     plugins: [
       // Compile TypeScript files
       typescript({ tsconfig: './tsconfig.build.json' }),
@@ -20,4 +35,6 @@ function configure(esm) {
   };
 }
 
-export default [configure(false), configure(true)];
+export default Object.entries(entryPoints).flatMap(([name, input]) => {
+  return [configure(name, input, true), configure(name, input, false)];
+});

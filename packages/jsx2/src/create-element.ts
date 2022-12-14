@@ -2,8 +2,10 @@ import type { Component, ComponentChildren, ComponentProps, FunctionComponent } 
 import type { Ref } from './create-ref';
 import type { Renderable } from './render';
 
+export type Key = string | number | null;
+
 export interface SharedVNode {
-  readonly key: string | number | null;
+  readonly key: Key;
   readonly ref: null | Ref;
   readonly props: RegularProps & { readonly children?: Renderable };
   readonly constructor: undefined;

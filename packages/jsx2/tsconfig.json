@@ -12,7 +12,11 @@
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+
+    "paths": {
+      "jsx2": ["./src/jsx2.ts"]
+    }
   },
   "exclude": ["dist"],
   "include": ["src", "test"]
