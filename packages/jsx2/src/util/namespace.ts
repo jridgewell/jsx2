@@ -7,7 +7,10 @@ export const NS_SVG = 1;
 export type NS = typeof NS_HTML | typeof NS_SVG;
 
 export function nsFromNode(node: Node): NS {
-  return childSpace((node as any).namespaceURI === DOM_SVG_NAMESPACE ? NS_SVG : NS_HTML, node.nodeName);
+  return childSpace(
+    (node as any).namespaceURI === DOM_SVG_NAMESPACE ? NS_SVG : NS_HTML,
+    node.nodeName,
+  );
 }
 
 export function childSpace(ns: NS, nodeName: string): NS {
