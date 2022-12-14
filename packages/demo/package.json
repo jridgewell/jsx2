@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "jsx2": "*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "jsx2": "*"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
@@ -19,7 +19,7 @@
     "@vitejs/plugin-react": "^3.0.0",
     "babel-plugin-transform-jsx2": "*",
     "perf-monitor": "0.4.1",
+    "preact": "10.11.3",
     "vite": "^4.0.0"
   }
 }
-
