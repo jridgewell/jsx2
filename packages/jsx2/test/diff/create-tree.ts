@@ -15,7 +15,7 @@ describe('createRoot', () => {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.ELEMENT_NODE);
     expect((node as Element).localName).toBe(tag);
-    expect(node.namespaceURI).toBe(namespace);
+    expect((node as Element).namespaceURI).toBe(namespace);
   }
 
   function create(renderable: Renderable, container: Node) {
@@ -145,7 +145,7 @@ describe('createRoot', () => {
 
       const firstChild = body.firstChild!;
       expectElement(firstChild, 'div');
-      expect(firstChild.namespaceURI).toBe('http://www.w3.org/1999/xhtml');
+      expect((firstChild as Element).namespaceURI).toBe('http://www.w3.org/1999/xhtml');
     });
 
     it('renders props', () => {

@@ -49,7 +49,7 @@ function verifyFiberMountedInContianer(fiber: Fiber, end: Fiber | null, containe
   let current: null | Fiber = fiber;
   do {
     assert(current !== null);
-    const { data, dom, child } = current;
+    const { data, dom, child } = current!;
     if (dom && dom !== data) {
       assert(
         dom.parentNode === container,

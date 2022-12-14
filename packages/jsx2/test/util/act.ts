@@ -268,7 +268,7 @@ describe('act', () => {
           throw new Error('foobar');
         });
       } catch (e) {
-        expect(e.message).toBe('foobar');
+        expect((e as Error).message).toBe('foobar');
       }
       expect(effect).toHaveBeenCalledTimes(1);
     });

@@ -20,7 +20,7 @@ function verifyRange(
     assert(current.index === i, 'unexpected index');
     assert(current.parent === parent, 'unexpected parent');
 
-    const { child, dom, data } = current;
+    const { child, dom, data } = current!;
     if (dom !== null && dom !== data) {
       assert(dom.parentNode !== null, 'found unmounted node');
     }

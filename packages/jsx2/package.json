@@ -17,7 +17,7 @@
   "repository": "https://github.com/jridgewell/jsx2/tree/master/packages/jsx2",
   "scripts": {
     "build": "run-s -n build:*",
-    "build:rollup": "rollup -c rollup.config.js",
+    "build:rollup": "rollup -c rollup.config.mjs",
     "lint": "run-s -n lint:*",
     "lint:prettier": "npm run test:lint:prettier -- --write",
     "lint:ts": "npm run test:lint:ts -- --fix",

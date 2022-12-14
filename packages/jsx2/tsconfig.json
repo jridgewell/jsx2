@@ -8,6 +8,7 @@
     "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "allowUnusedLabels": true,
     "declarationDir": "dist/types",
     "outDir": "dist/lib",
     "noUnusedLocals": true,

@@ -31,7 +31,7 @@ describe('diffTree', () => {
     expect(node).toBeTruthy();
     expect(node.nodeType).toBe(Node.ELEMENT_NODE);
     expect((node as Element).localName).toBe(tag);
-    expect(node.namespaceURI).toBe(namespace);
+    expect((node as Element).namespaceURI).toBe(namespace);
   }
 
   function diff(old: RootFiber, renderable: CoercedRenderable, container: Node) {
