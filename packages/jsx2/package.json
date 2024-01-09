@@ -53,7 +53,7 @@
   "devDependencies": {
     "@jridgewell/path-sorter": "0.0.1",
     "@rollup/plugin-strip": "3.0.1",
-    "@rollup/plugin-typescript": "10.0.1",
+    "@rollup/plugin-typescript": "11.1.6",
     "@swc/jest": "0.2.24",
     "@types/jest": "29.2.4",
     "@types/jsdom": "20.0.1",
