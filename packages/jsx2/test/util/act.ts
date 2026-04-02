@@ -43,22 +43,21 @@ describe('act', () => {
       });
       act(() => {
         makeTree(createElement(C), body);
-        C.mockClear();
         return deferred.promise;
       });
-      expect(C).not.toHaveBeenCalled();
+      expect(C).toHaveBeenCalledTimes(1);
       expect(effect).not.toHaveBeenCalled();
       expect(layoutEffect).toHaveBeenCalledTimes(1);
 
       set!(1);
       await wait(20);
-      expect(C).not.toHaveBeenCalled();
+      expect(C).toHaveBeenCalledTimes(1);
       expect(effect).not.toHaveBeenCalled();
       expect(layoutEffect).toHaveBeenCalledTimes(1);
 
       deferred.resolve();
       await deferred.promise;
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledTimes(1);
       expect(layoutEffect).toHaveBeenCalledTimes(2);
     });
@@ -76,7 +75,6 @@ describe('act', () => {
       });
       const ret = act(() => {
         makeTree(createElement(C), body);
-        C.mockClear();
         return deferred.promise;
       });
 
@@ -84,7 +82,7 @@ describe('act', () => {
       deferred.resolve();
 
       await ret;
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledTimes(1);
       expect(layoutEffect).toHaveBeenCalledTimes(2);
     });
@@ -128,20 +126,19 @@ describe('act', () => {
       });
       const ret = act(() => {
         makeTree(createElement(C), body);
-        C.mockClear();
         return deferred.promise;
       });
-      expect(C).not.toHaveBeenCalled();
+      expect(C).toHaveBeenCalledTimes(1);
       expect(effect).not.toHaveBeenCalled();
 
       set!(1);
       await wait(20);
-      expect(C).not.toHaveBeenCalled();
+      expect(C).toHaveBeenCalledTimes(1);
       expect(effect).not.toHaveBeenCalled();
 
       deferred.reject(new Error(''));
       await ret.catch(() => {});
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledTimes(1);
     });
 
@@ -160,7 +157,6 @@ describe('act', () => {
         act(() => {
           makeTree(createElement(C), body);
           set(1);
-          C.mockClear();
           expect(layoutEffect).toHaveBeenCalledTimes(1);
           act(() => {
             makeTree(
@@ -175,13 +171,13 @@ describe('act', () => {
         });
 
         await wait(20);
-        expect(C).not.toHaveBeenCalled();
+        expect(C).toHaveBeenCalledTimes(1);
         expect(effect).not.toHaveBeenCalled();
 
         deferred.resolve();
         await deferred.promise;
 
-        expect(C).toHaveBeenCalledTimes(1);
+        expect(C).toHaveBeenCalledTimes(2);
         expect(effect).toHaveBeenCalledTimes(1);
       });
 
@@ -199,7 +195,6 @@ describe('act', () => {
         const ret = act(async () => {
           makeTree(createElement(C), body);
           set(1);
-          C.mockClear();
           expect(layoutEffect).toHaveBeenCalledTimes(1);
           const ret = act(() => {
             makeTree(
@@ -216,13 +211,13 @@ describe('act', () => {
         });
 
         await wait(20);
-        expect(C).not.toHaveBeenCalled();
+        expect(C).toHaveBeenCalledTimes(1);
         expect(effect).not.toHaveBeenCalled();
 
         deferred.resolve();
         await ret;
 
-        expect(C).toHaveBeenCalledTimes(1);
+        expect(C).toHaveBeenCalledTimes(2);
         expect(effect).toHaveBeenCalledTimes(1);
       });
     });
@@ -241,15 +236,14 @@ describe('act', () => {
       });
       act(() => {
         makeTree(createElement(C), body);
-        C.mockClear();
         set(1);
 
-        expect(C).not.toHaveBeenCalled();
+        expect(C).toHaveBeenCalledTimes(1);
         expect(effect).not.toHaveBeenCalled();
         expect(layoutEffect).toHaveBeenCalledTimes(1);
       });
 
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledTimes(1);
       expect(layoutEffect).toHaveBeenCalledTimes(2);
     });
@@ -287,7 +281,6 @@ describe('act', () => {
         act(() => {
           makeTree(createElement(C), body);
           set(1);
-          C.mockClear();
           expect(layoutEffect).toHaveBeenCalledTimes(1);
           act(() => {
             makeTree(
@@ -300,7 +293,7 @@ describe('act', () => {
           expect(layoutEffect).toHaveBeenCalledTimes(2);
         });
 
-        expect(C).toHaveBeenCalledTimes(1);
+        expect(C).toHaveBeenCalledTimes(2);
         expect(effect).toHaveBeenCalledTimes(1);
       });
 
@@ -318,7 +311,6 @@ describe('act', () => {
         act(() => {
           makeTree(createElement(C), body);
           set(1);
-          C.mockClear();
           expect(layoutEffect).toHaveBeenCalledTimes(1);
           act(() => {
             makeTree(
@@ -332,13 +324,13 @@ describe('act', () => {
           expect(layoutEffect).toHaveBeenCalledTimes(2);
         });
 
-        expect(C).not.toHaveBeenCalled();
+        expect(C).toHaveBeenCalledTimes(1);
         expect(effect).not.toHaveBeenCalled();
 
         deferred.resolve();
         await deferred.promise;
 
-        expect(C).toHaveBeenCalledTimes(1);
+        expect(C).toHaveBeenCalledTimes(2);
         expect(effect).toHaveBeenCalledTimes(1);
       });
     });
