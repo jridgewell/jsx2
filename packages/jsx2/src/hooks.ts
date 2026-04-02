@@ -1,12 +1,14 @@
 import type { Context, ContextHolder } from './create-context';
 import type { Ref } from './create-ref';
 import type { Fiber } from './fiber';
+import type { SignalContext } from './signals';
 
 import { scheduleEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { setRef } from './diff/ref';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
 import { getAncestorFiber } from './fiber/get-ancestor-fiber';
+import { getCurrentContext, setContext, notifyDependents } from './signals';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 
 export type EffectHookState = {
@@ -27,6 +29,7 @@ type NextState<S> = (prevState: S) => S;
 type StateState<S> = readonly [S, (nextState: S | NextState<S>) => void];
 type Reducer<S, A> = (prevState: S, action: A) => S;
 type ReducerState<S, A> = readonly [S, (action: A) => void];
+type SignalFns<S> = readonly [() => S, (next: S) => void, (cb: (prev: S) => S) => void];
 
 export type EffectState = {
   deps: undefined | unknown[];
@@ -57,6 +60,73 @@ export function useState<S>(initial: S | Lazy<S>): StateState<S> {
     return useReducer(result, initial as Lazy<S>, lazy);
   }
   return useReducer(result, initial as S);
+}
+
+export function useSignal<S>(initial: S): SignalFns<S> {
+  const hookState = getHookState();
+  const data = hookState.data as null | SignalFns<S>;
+  if (data) return data;
+
+  let value = initial;
+  const dependents = new Set<SignalContext>();
+  const fns = [getter, setter, update] as const;
+
+  function getter() {
+    const context = getCurrentContext();
+    if (context) dependents.add(context);
+    return value;
+  };
+
+  function setter(next: S) {
+    if (next === value) return;
+    value = next;
+    notifyDependents(dependents);
+  };
+
+  function update(cb: (prev: S) => S) {
+    setter(cb(value));
+  };
+
+  return (hookState.data = fns);
+}
+
+export function useComputed<T>(cb: () => T): () => T {
+  const hookState = getHookState();
+  const data = hookState.data as null | (() => T);
+  if (data) return data;
+
+  const dependents = new Set<SignalContext>();
+  let value: T;
+  let dirty = true;
+
+  const context: SignalContext = {
+    type: 'computed',
+    markDirty,
+    dependents,
+  };
+
+  function markDirty() {
+    if (dirty) return;
+    dirty = true;
+    notifyDependents(dependents);
+  };
+
+  function getter() {
+    if (dirty) {
+      const oldContext = setContext(context);
+      try {
+        value = cb();
+        dirty = false;
+      } finally {
+        setContext(oldContext);
+      }
+    }
+    const ctx = getCurrentContext();
+    if (ctx) dependents.add(ctx);
+    return value;
+  };
+
+  return (hookState.data = getter);
 }
 
 export function useReducer<S, A>(reducer: Reducer<S, A>, initial: S): ReducerState<S, A>;
@@ -90,7 +160,7 @@ export function useReducer<S, A, I>(
 
 export function useEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
-  const oldData = hookState.data as EffectState;
+  const oldData = hookState.data as null | EffectState;
   if (oldData !== null) {
     if (shallowArrayEquals(oldData.deps, deps)) {
       return;
@@ -98,12 +168,28 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     oldData.active = false;
   }
   hookState.effect = true;
-  const data = (hookState.data = {
+
+  const data = {
     deps,
-    effect,
+    effect: wrappedEffect,
     cleanup: oldData?.cleanup,
     active: true,
-  });
+  };
+  const context: SignalContext = {
+    type: 'effect',
+    state: data
+  };
+
+  function wrappedEffect() {
+    const oldContext = setContext(context);
+    try {
+      return effect();
+    } finally {
+      setContext(oldContext);
+    }
+  };
+
+  hookState.data = data;
   scheduleEffect(data);
 }
 

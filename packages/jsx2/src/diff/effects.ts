@@ -4,6 +4,7 @@ let queuedEffects: EffectState[] = [];
 let scheduling = true;
 
 export function scheduleEffect(effect: EffectState, scheduler = getRaf()): void {
+  if (queuedEffects.includes(effect)) return;
   const length = queuedEffects.push(effect);
   if (length === 1 && scheduling) scheduler(process);
 }

@@ -7,6 +7,7 @@ export { forwardRef } from './forward-ref';
 export { Fragment } from './fragment';
 export {
   useCallback,
+  useComputed,
   useContext,
   useDebugValue,
   useEffect,
@@ -15,6 +16,7 @@ export {
   useMemo,
   useReducer,
   useRef,
+  useSignal,
   useState,
 } from './hooks';
 export { memo } from './memo';
