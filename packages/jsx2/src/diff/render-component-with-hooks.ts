@@ -2,18 +2,18 @@ import type { FunctionComponent } from '../component';
 import type { VNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { FunctionComponentFiber } from '../fiber';
-import type { EffectState } from '../hooks';
-import type { SignalContext } from '../signals';
+import type { LayoutEffectData } from '../hooks';
+import type { ComponentSignalContext } from '../signals';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { setContext } from '../signals';
+import { SignalContextType, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
 export type FiberState = {
   index: number;
   fiber: FunctionComponentFiber;
-  layoutEffects: EffectState[];
+  layoutEffects: LayoutEffectData[];
   ref: null | Ref;
 };
 
@@ -29,7 +29,7 @@ export function renderComponentWithHooks(
   props: VNode['props'],
   ref: VNode['ref'],
   fiber: FunctionComponentFiber,
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): CoercedRenderable {
   const { length } = layoutEffects;
   let rendered;
@@ -43,7 +43,12 @@ export function renderComponentWithHooks(
   };
   fiber.current = true;
 
-  const context: SignalContext = { type: 'component', fiber };
+  const context: ComponentSignalContext = {
+    type: SignalContextType.COMPONENT,
+    fiber,
+    dependents: new Set(),
+    dependencies: new Set(),
+  };
   const oldContext = setContext(context);
   try {
     for (let renderCount = 0; renderCount < 25; renderCount++) {
@@ -61,7 +66,6 @@ export function renderComponentWithHooks(
     fiber.current = false;
     currentFiberState = prevFiberState;
   }
-
 
   return coerceRenderable(rendered);
 }

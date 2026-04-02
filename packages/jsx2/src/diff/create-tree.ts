@@ -1,6 +1,6 @@
 import type { RefWork } from './ref';
 import type { DiffableFiber, Fiber, FunctionComponentFiber, RootFiber } from '../fiber';
-import type { EffectState } from '../hooks';
+import type { LayoutEffectData } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { NS } from '../util/namespace';
 
@@ -44,7 +44,7 @@ export function createRoot(renderable: CoercedRenderable, container: Node): Root
   root.dom = container;
   root.namespace = namespace;
   const refs: RefWork[] = [];
-  const layoutEffects: EffectState[] = [];
+  const layoutEffects: LayoutEffectData[] = [];
   internal(
     renderable,
     root,
@@ -67,7 +67,7 @@ export function createTree(
   previousFiber: null | Fiber,
   namespace: NS,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): DiffableFiber {
   return internal(renderable, parentFiber, previousFiber, namespace, refs, layoutEffects, CREATION);
 }
@@ -78,7 +78,7 @@ function internal(
   previousFiber: null | Fiber,
   namespace: NS,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
   mode: CreateMode,
 ): DiffableFiber {
   const f = fiber(renderable);

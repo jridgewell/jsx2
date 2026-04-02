@@ -2,7 +2,9 @@ import type { ContextHolder } from '../../src/create-context';
 import type { FunctionComponentFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';
+import { HookType } from '../../src/hooks';
 import { Component, createElement } from '../../src/jsx2';
+import { SignalContextType } from '../../src/signals';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 
@@ -232,12 +234,19 @@ describe('unmount', () => {
       const cleanup = jest.fn();
       fiber.stateData = [
         {
-          effect: true,
+          type: HookType.EFFECT,
           data: {
             deps: [],
             active: true,
+            scheduled: false,
             effect: () => {},
             cleanup,
+            context: {
+              type: SignalContextType.EFFECT,
+              state: null as any,
+              dependents: new Set(),
+              dependencies: new Set(),
+            } as any,
           },
         },
       ];

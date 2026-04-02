@@ -1,7 +1,7 @@
 import type { RefWork } from './ref';
 import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '../create-element';
 import type { DiffableFiber, Fiber, FunctionComponentFiber } from '../fiber';
-import type { EffectState } from '../hooks';
+import type { LayoutEffectData } from '../hooks';
 import type { RenderableArray } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
@@ -29,7 +29,7 @@ export function diffTree(
   old: Fiber,
   renderable: CoercedRenderable,
   container: Node,
-  layoutEffects: EffectState[] = [],
+  layoutEffects: LayoutEffectData[] = [],
 ): void {
   const refs: RefWork[] = [];
   diffChild(old.child!, renderable, old, null, container, refs, layoutEffects);
@@ -40,7 +40,7 @@ export function diffTree(
 
 export function rediffComponent(fiber: FunctionComponentFiber): void {
   const { type, props, ref } = fiber.data;
-  const layoutEffects: EffectState[] = [];
+  const layoutEffects: LayoutEffectData[] = [];
   const rendered = coerceRenderable(
     renderComponentWithHooks(type, props, ref, fiber, layoutEffects),
   );
@@ -54,7 +54,7 @@ function diffChild(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
   if (data === renderable) return old;
@@ -102,7 +102,7 @@ function renderNull(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   return replaceFiber(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
 }
@@ -114,7 +114,7 @@ function renderText(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
   if (typeof data !== 'string') {
@@ -141,7 +141,7 @@ function renderArray(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
   if (!isArray(data)) {
@@ -221,7 +221,7 @@ function renderElement(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
@@ -266,7 +266,7 @@ function renderComponent(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
   if (data === null || typeof data === 'string' || isArray(data)) {
@@ -313,7 +313,7 @@ function replaceFiber(
   previousFiber: null | Fiber,
   container: Node,
   refs: RefWork[],
-  layoutEffects: EffectState[],
+  layoutEffects: LayoutEffectData[],
 ): Fiber {
   const f = createTree(renderable, parentFiber, previousFiber, old.namespace, refs, layoutEffects);
   return replace(old, f, parentFiber, container);

@@ -1,16 +1,35 @@
-import type { Effect, EffectCleanup, EffectHookState, HookState } from '../../src/hooks';
+import type {
+  Effect,
+  EffectCleanup,
+  EffectData,
+  EffectHookState,
+  HookState,
+} from '../../src/hooks';
+import type { EffectSignalContext } from '../../src/signals';
 
+import { HookType } from '../../src/hooks';
+import { SignalContextType } from '../../src/signals';
 import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
+  const data: EffectData = {
+    deps: [],
+    active: true,
+    scheduled: false,
+    cleanup,
+    effect,
+    context: null as unknown as EffectSignalContext,
+  };
+  const context: EffectSignalContext = {
+    type: SignalContextType.EFFECT,
+    state: data,
+    dependents: new Set(),
+    dependencies: new Set(),
+  };
+  data.context = context;
   return {
-    effect: true,
-    data: {
-      deps: [],
-      active: true,
-      cleanup,
-      effect,
-    },
+    type: HookType.EFFECT,
+    data,
   };
 }
 
@@ -101,7 +120,7 @@ describe('cleanupEffects', () => {
     const cleanup = jest.fn();
     const hooks: HookState[] = [
       {
-        effect: false,
+        type: HookType.REGULAR,
         data: null,
       },
       makeEffect(() => {}, cleanup),

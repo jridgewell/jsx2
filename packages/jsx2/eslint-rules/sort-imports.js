@@ -1,6 +1,10 @@
 const { default: pathSorter } = require('@jridgewell/path-sorter');
 
 module.exports = {
+  meta: {
+    fixable: 'code',
+  },
+
   create(context) {
     const imports = [];
     const source = context.getSourceCode();

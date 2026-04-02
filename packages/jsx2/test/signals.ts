@@ -1,12 +1,4 @@
-import {
-  act,
-  createElement,
-  render,
-  useCallback,
-  useComputed,
-  useEffect,
-  useSignal,
-} from '../src/jsx2';
+import { act, createElement, render, useComputed, useEffect, useSignal } from '../src/jsx2';
 
 function expectTextNode(node: null | Node, text: string) {
   expect(node).toBeTruthy();
@@ -128,13 +120,11 @@ describe('signals integration tests', () => {
   describe('useComputed', () => {
     it('caches computed value', () => {
       const body = document.createElement('body');
-      let getComputed: () => string;
       const cb = jest.fn(() => 'test');
       act(() => {
         render(
           createElement(() => {
             const get = useComputed(cb);
-            getComputed = get;
             get();
             get();
             return get();
@@ -223,6 +213,5 @@ describe('signals integration tests', () => {
       expect(effect).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledWith('test');
     });
-
   });
 });
