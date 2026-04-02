@@ -1,12 +1,21 @@
 import type { EffectState, HookState } from '../hooks';
 
+import { getCurrentFiberState } from './render-component-with-hooks';
+
 let queuedEffects: EffectState[] = [];
 let scheduling = true;
 
 export function scheduleEffect(effect: EffectState, scheduler = getRaf()): void {
-  if (queuedEffects.includes(effect)) return;
+  if (effect.scheduled) return;
+  effect.scheduled = true;
   const length = queuedEffects.push(effect);
   if (length === 1 && scheduling) scheduler(process);
+}
+
+export function scheduleLayoutEffect(effect: EffectState): void {
+  if (effect.scheduled) return;
+  effect.scheduled = true;
+  getCurrentFiberState().layoutEffects.push(effect);
 }
 
 export function cleanupEffects(stateData: HookState[]): void {
@@ -30,6 +39,7 @@ export function applyEffects(effects: EffectState[]): void {
     const item = effects[i];
     const { active, effect } = item;
     if (active) item.cleanup = effect();
+    item.scheduled = false;
   }
 }
 

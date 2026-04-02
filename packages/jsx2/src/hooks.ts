@@ -3,7 +3,7 @@ import type { Ref } from './create-ref';
 import type { Fiber } from './fiber';
 import type { SignalContext } from './signals';
 
-import { scheduleEffect } from './diff/effects';
+import { scheduleEffect, scheduleLayoutEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { setRef } from './diff/ref';
 import { getCurrentFiberState } from './diff/render-component-with-hooks';
@@ -36,6 +36,7 @@ export type EffectState = {
   cleanup: EffectCleanup;
   effect: Effect;
   active: boolean;
+  scheduled: boolean;
 };
 
 function getHookState(): HookState {
@@ -160,20 +161,22 @@ export function useReducer<S, A, I>(
 
 export function useEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
-  const oldData = hookState.data as null | EffectState;
-  if (oldData !== null) {
-    if (shallowArrayEquals(oldData.deps, deps)) {
-      return;
+  let data = hookState.data as null | EffectState;
+  if (data !== null) {
+    if (!shallowArrayEquals(data.deps, deps)) {
+      data.deps = deps;
+      scheduleEffect(data);
     }
-    oldData.active = false;
+    return;
   }
   hookState.effect = true;
 
-  const data = {
+  data = {
     deps,
     effect: wrappedEffect,
-    cleanup: oldData?.cleanup,
+    cleanup: null,
     active: true,
+    scheduled: false,
   };
   const context: SignalContext = {
     type: 'effect',
@@ -195,18 +198,24 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
 
 export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
-  const oldData = hookState.data as EffectState;
-  if (oldData !== null && shallowArrayEquals(oldData.deps, deps)) {
+  let data = hookState.data as null | EffectState;
+  if (data !== null) {
+    if (!shallowArrayEquals(data.deps, deps)) {
+      data.deps = deps;
+      scheduleLayoutEffect(data);
+    }
     return;
   }
+
   hookState.effect = true;
-  const data = (hookState.data = {
+  data = (hookState.data = {
     deps,
     effect,
-    cleanup: oldData?.cleanup,
+    cleanup: null,
     active: true,
+    scheduled: false,
   });
-  getCurrentFiberState().layoutEffects.push(data);
+  scheduleLayoutEffect(data);
 }
 
 export function useMemo<T>(factory: () => T, deps: undefined | unknown[]): T {
