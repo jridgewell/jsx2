@@ -3,10 +3,9 @@ import type { VNode } from '../create-element';
 import type { Ref } from '../create-ref';
 import type { FunctionComponentFiber } from '../fiber';
 import type { LayoutEffectData } from '../hooks';
-import type { ComponentSignalContext } from '../signals';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { SignalContextType, setContext } from '../signals';
+import { SignalContextType, cleanupContext, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
@@ -43,12 +42,17 @@ export function renderComponentWithHooks(
   };
   fiber.current = true;
 
-  const context: ComponentSignalContext = {
-    type: SignalContextType.COMPONENT,
-    fiber,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
+  let context = fiber.signalContext;
+  if (context === null) {
+    context = fiber.signalContext = {
+      type: SignalContextType.COMPONENT,
+      fiber,
+      dependents: new Set(),
+      dependencies: new Set(),
+    };
+  } else {
+    cleanupContext(context);
+  }
   const oldContext = setContext(context);
   try {
     for (let renderCount = 0; renderCount < 25; renderCount++) {

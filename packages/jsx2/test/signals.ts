@@ -64,13 +64,13 @@ describe('signals integration tests', () => {
       act(() => {
         render(createElement(C), body);
       });
-      C.mockClear();
+      expect(C).toHaveBeenCalledTimes(1);
 
       act(() => {
         set('new');
       });
 
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
       expectTextNode(body.firstChild, 'new');
     });
 
@@ -86,13 +86,13 @@ describe('signals integration tests', () => {
       act(() => {
         render(createElement(C), body);
       });
-      C.mockClear();
+      expect(C).toHaveBeenCalledTimes(1);
 
       act(() => {
         set('init');
       });
 
-      expect(C).not.toHaveBeenCalled();
+      expect(C).toHaveBeenCalledTimes(1);
       expectTextNode(body.firstChild, 'init');
     });
 
@@ -114,6 +114,149 @@ describe('signals integration tests', () => {
       });
 
       expectTextNode(body.firstChild, '5');
+    });
+
+    it('drops dependencies when rerunning due to props change', () => {
+      const body = document.createElement('body');
+      let setB: (val: string) => void;
+
+      const Child = jest.fn(({ useVal }: { useVal: boolean }) => {
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        if (useVal) {
+          return getB();
+        }
+        return 'C';
+      });
+
+      act(() => {
+        render(createElement(Child, { useVal: true }), body);
+      });
+      expectTextNode(body.firstChild, 'B');
+      expect(Child).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        render(createElement(Child, { useVal: false }), body);
+      });
+      expectTextNode(body.firstChild, 'C');
+      expect(Child).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        setB('B2');
+      });
+      expect(Child).toHaveBeenCalledTimes(2);
+    });
+
+    it('drops dependencies when rerunning useEffect due to props change', () => {
+      const body = document.createElement('body');
+      let setB: (val: string) => void;
+      const effectCb = jest.fn();
+
+      const Child = jest.fn(({ useVal }: { useVal: boolean }) => {
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        useEffect(() => {
+          if (useVal) {
+            effectCb(getB());
+          } else {
+            effectCb('C');
+          }
+        }, [useVal]);
+
+        return null;
+      });
+
+      act(() => {
+        render(createElement(Child, { useVal: true }), body);
+      });
+      expect(effectCb).toHaveBeenCalledTimes(1);
+      expect(effectCb).toHaveBeenCalledWith('B');
+
+      act(() => {
+        render(createElement(Child, { useVal: false }), body);
+      });
+      expect(effectCb).toHaveBeenCalledTimes(2);
+      expect(effectCb).toHaveBeenCalledWith('C');
+
+      act(() => {
+        setB('B2');
+      });
+      expect(effectCb).toHaveBeenCalledTimes(2);
+    });
+
+    it('drops dependencies when rerunning due to own signal change', () => {
+      const body = document.createElement('body');
+      let setA: (val: boolean) => void;
+      let setB: (val: string) => void;
+
+      const Comp = jest.fn(() => {
+        const [getA, setterA] = useSignal(true);
+        setA = setterA;
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        if (getA()) {
+          return getB();
+        }
+        return 'C';
+      });
+
+      act(() => {
+        render(createElement(Comp), body);
+      });
+      expectTextNode(body.firstChild, 'B');
+      expect(Comp).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        setA(false);
+      });
+      expectTextNode(body.firstChild, 'C');
+      expect(Comp).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        setB('B2');
+      });
+      expect(Comp).toHaveBeenCalledTimes(2);
+    });
+
+    it('drops dependencies when rerunning due to outside signal change', () => {
+      const body = document.createElement('body');
+      let setA: (val: boolean) => void;
+      let setX: (val: string) => void;
+
+      const Child = jest.fn(({ useVal, getX }: { useVal: boolean; getX: () => string }) => {
+        if (useVal) {
+          return getX();
+        }
+        return 'C';
+      });
+
+      const Parent = jest.fn(() => {
+        const [getA, setterA] = useSignal(true);
+        setA = setterA;
+        const [getX, setterX] = useSignal('X');
+        setX = setterX;
+        return createElement(Child, { useVal: getA(), getX });
+      });
+
+      act(() => {
+        render(createElement(Parent), body);
+      });
+      expectTextNode(body.firstChild, 'X');
+      expect(Child).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        setA(false);
+      });
+      expectTextNode(body.firstChild, 'C');
+      expect(Child).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        setX('X2');
+      });
+      expect(Child).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -139,40 +282,83 @@ describe('signals integration tests', () => {
 
     it('re-evaluates computed when signal inside updates', () => {
       const body = document.createElement('body');
+      let cb: () => string;
       let set: (val: string) => void;
       const C = jest.fn(() => {
         const [get, setter] = useSignal('init');
         set = setter;
-        const getComp = useComputed(() => get() + '2');
+        cb ||= jest.fn(() => get() + '2');
+        const getComp = useComputed(cb);
         return getComp();
       });
 
       act(() => {
         render(createElement(C), body);
       });
-      C.mockClear();
+      expect(C).toHaveBeenCalledTimes(1);
 
       act(() => {
         set('new');
       });
 
-      expect(C).toHaveBeenCalledTimes(1);
+      expect(C).toHaveBeenCalledTimes(2);
+      expect(cb!).toHaveBeenCalledTimes(2);
       expectTextNode(body.firstChild, 'new2');
+    });
+
+    it('drops dependencies that are no longer used', () => {
+      const body = document.createElement('body');
+      let setA: (val: boolean) => void;
+      let setB: (val: string) => void;
+
+      const Comp = jest.fn(() => {
+        const [getA, setterA] = useSignal(true);
+        setA = setterA;
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        const getComp = useComputed(() => {
+          if (getA()) {
+            return getB();
+          }
+          return 'C';
+        });
+
+        return getComp();
+      });
+
+      act(() => {
+        render(createElement(Comp), body);
+      });
+      expectTextNode(body.firstChild, 'B');
+      expect(Comp).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        setA(false);
+      });
+      expectTextNode(body.firstChild, 'C');
+      expect(Comp).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        setB('B2');
+      });
+      expect(Comp).toHaveBeenCalledTimes(2);
+      expectTextNode(body.firstChild, 'C');
     });
 
     it('persists getter among renders', () => {
       const body = document.createElement('body');
-      let get1, get2;
+      const gets: unknown[] = [];
       const C = jest
         .fn()
         .mockImplementationOnce(() => {
           const get = useComputed(() => 'x');
-          get1 = get;
+          gets.push(get);
           return 'rendered';
         })
         .mockImplementationOnce(() => {
           const get = useComputed(() => 'x');
-          get2 = get;
+          gets.push(get);
           return 'rendered';
         });
 
@@ -182,7 +368,7 @@ describe('signals integration tests', () => {
       });
 
       expect(C).toHaveBeenCalledTimes(2);
-      expect(get1).toBe(get2);
+      expect(gets[0]).toBe(gets[1]);
     });
   });
 
@@ -212,6 +398,47 @@ describe('signals integration tests', () => {
 
       expect(effect).toHaveBeenCalledTimes(2);
       expect(effect).toHaveBeenCalledWith('test');
+    });
+
+    it('drops dependencies that are no longer used', () => {
+      const body = document.createElement('body');
+      let setA: (val: boolean) => void;
+      let setB: (val: string) => void;
+      const effectCb = jest.fn();
+
+      const Comp = jest.fn(() => {
+        const [getA, setterA] = useSignal(true);
+        setA = setterA;
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        useEffect(() => {
+          if (getA()) {
+            effectCb(getB());
+          } else {
+            effectCb('C');
+          }
+        });
+
+        return null;
+      });
+
+      act(() => {
+        render(createElement(Comp), body);
+      });
+      expect(effectCb).toHaveBeenCalledTimes(1);
+      expect(effectCb).toHaveBeenCalledWith('B');
+
+      act(() => {
+        setA(false);
+      });
+      expect(effectCb).toHaveBeenCalledTimes(2);
+      expect(effectCb).toHaveBeenCalledWith('C');
+
+      act(() => {
+        setB('B2');
+      });
+      expect(effectCb).toHaveBeenCalledTimes(2);
     });
   });
 });

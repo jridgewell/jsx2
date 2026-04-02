@@ -655,6 +655,27 @@ describe('useEffect', () => {
         expect(effect).toHaveBeenCalledTimes(2);
       });
 
+      it('uses the latest closure', () => {
+        const body = document.createElement('body');
+        const effectCb = jest.fn();
+        const C = jest.fn(({ val }: { val: string }) => {
+          useEffect(() => {
+            effectCb(val);
+          }, [val]);
+          return null;
+        });
+
+        act(() => {
+          render(createElement(C, { val: 'first' }), body);
+        });
+        expect(effectCb).toHaveBeenCalledWith('first');
+
+        act(() => {
+          render(createElement(C, { val: 'second' }), body);
+        });
+        expect(effectCb).toHaveBeenCalledWith('second');
+      });
+
       it('cleans up effect', () => {
         const body = document.createElement('body');
         const cleanup = jest.fn();
@@ -818,7 +839,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -835,7 +856,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -858,7 +879,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -881,7 +902,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect, []);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -898,7 +919,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect, []);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -922,7 +943,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -939,7 +960,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -962,7 +983,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -979,7 +1000,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -1002,7 +1023,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -1055,6 +1076,27 @@ describe('useLayoutEffect', () => {
 
         expect(C).toHaveBeenCalledTimes(2);
         expect(effect).toHaveBeenCalledTimes(2);
+      });
+
+      it('uses the latest closure', () => {
+        const body = document.createElement('body');
+        const effectCb = jest.fn();
+        const C = jest.fn(({ val }: { val: string }) => {
+          useLayoutEffect(() => {
+            effectCb(val);
+          }, [val]);
+          return null;
+        });
+
+        act(() => {
+          render(createElement(C, { val: 'first' }), body);
+        });
+        expect(effectCb).toHaveBeenCalledWith('first');
+
+        act(() => {
+          render(createElement(C, { val: 'second' }), body);
+        });
+        expect(effectCb).toHaveBeenCalledWith('second');
       });
 
       it('cleans up effect', () => {
@@ -1220,7 +1262,7 @@ describe('useLayoutEffect', () => {
         const C = jest.fn(() => {
           useLayoutEffect(effect);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -1244,7 +1286,7 @@ describe('useLayoutEffect', () => {
         const C = jest.fn(() => {
           useLayoutEffect(effect, []);
         });
-        const C2 = jest.fn(() => {});
+        const C2 = jest.fn(() => { });
 
         act(() => {
           render(createElement(C), body);
@@ -1269,7 +1311,7 @@ describe('useLayoutEffect', () => {
           const C = jest.fn(() => {
             useLayoutEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);
@@ -1293,7 +1335,7 @@ describe('useLayoutEffect', () => {
           const C = jest.fn(() => {
             useLayoutEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => {});
+          const C2 = jest.fn(() => { });
 
           act(() => {
             render(createElement(C), body);

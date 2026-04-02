@@ -1,6 +1,7 @@
 import type { Fiber, FunctionComponentFiber } from '.';
 import type { ContextHolder } from '../create-context';
 import type { HookState } from '../hooks';
+import type { ComponentSignalContext } from '../signals';
 
 import { HookType } from '../hooks';
 import { cleanupContext } from '../signals';
@@ -16,11 +17,12 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
     debug: assert(current !== null, 'end is guaranteed to prevent null loop');
-    const { ref, stateData, consumedContexts, child } = current;
+    const { ref, stateData, signalContext, consumedContexts, child } = current;
     if (ref) setRef(null, ref);
     if (stateData) {
       cleanupEffects(stateData);
-      cleanupSignals(stateData);
+      debug: assert(signalContext !== null, 'signalContext is guaranteed by stateData');
+      cleanupSignals(stateData, signalContext);
     }
 
     if (consumedContexts) {
@@ -33,10 +35,11 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
   } while (current !== end);
 }
 
-function cleanupSignals(stateData: HookState[]): void {
+function cleanupSignals(stateData: HookState[], signalContext: ComponentSignalContext): void {
+  cleanupContext(signalContext);
   for (let i = 0; i < stateData.length; i++) {
     const state = stateData[i];
-    if (state.type === HookType.SIGNAL) {
+    if (state.type === HookType.SIGNAL || state.type === HookType.EFFECT) {
       cleanupContext(state.data.context);
     }
   }

@@ -1,5 +1,6 @@
 import type { ContextHolder } from '../../src/create-context';
 import type { FunctionComponentFiber } from '../../src/fiber';
+import type { EffectSignalContext } from '../../src/signals';
 
 import { fiber } from '../../src/fiber';
 import { HookType } from '../../src/hooks';
@@ -232,6 +233,19 @@ describe('unmount', () => {
   describe('pending useEffects', () => {
     function addEffect(fiber: FunctionComponentFiber): jest.Mock {
       const cleanup = jest.fn();
+      fiber.signalContext = {
+        type: SignalContextType.COMPONENT,
+        fiber,
+        dependents: new Set(),
+        dependencies: new Set(),
+      };
+      const effectContext: EffectSignalContext = {
+        type: SignalContextType.EFFECT,
+        state: null as any,
+        dependents: new Set(),
+        dependencies: new Set([fiber.signalContext]),
+      };
+      fiber.signalContext.dependents.add(effectContext);
       fiber.stateData = [
         {
           type: HookType.EFFECT,
@@ -241,12 +255,7 @@ describe('unmount', () => {
             scheduled: false,
             effect: () => {},
             cleanup,
-            context: {
-              type: SignalContextType.EFFECT,
-              state: null as any,
-              dependents: new Set(),
-              dependencies: new Set(),
-            } as any,
+            context: effectContext,
           },
         },
       ];

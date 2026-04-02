@@ -3,7 +3,7 @@ import type { Ref } from './create-ref';
 import type { Fiber } from './fiber';
 import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } from './signals';
 
-import { SignalContextType, getCurrentContext, notifyDependents, setContext } from './signals';
+import { SignalContextType, cleanupContext, getCurrentContext, notifyDependents, setContext } from './signals';
 import { scheduleEffect, scheduleLayoutEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { setRef } from './diff/ref';
@@ -35,7 +35,7 @@ export interface RegularHookState {
 
 export interface EffectHookState {
   type: HookType.EFFECT;
-  data: EffectData;
+  data: EffectEffectData;
 }
 
 export interface SignalHookState<S = unknown> {
@@ -63,7 +63,7 @@ type Reducer<S, A> = (prevState: S, action: A) => S;
 type ReducerState<S, A> = readonly [S, (action: A) => void];
 type SignalFns<S> = readonly [() => S, (next: S) => void, (cb: (prev: S) => S) => void];
 
-export interface LayoutEffectData {
+export interface BaseEffectData {
   deps: undefined | unknown[];
   cleanup: EffectCleanup;
   effect: Effect;
@@ -71,7 +71,13 @@ export interface LayoutEffectData {
   scheduled: boolean;
 }
 
-export interface EffectData extends LayoutEffectData {
+export interface LayoutEffectData extends BaseEffectData {
+  type: HookType.LAYOUT_EFFECT;
+}
+
+export interface EffectEffectData extends BaseEffectData {
+  type: HookType.EFFECT;
+  innerEffect: Effect;
   context: EffectSignalContext;
 }
 
@@ -203,16 +209,19 @@ export function useReducer<S, A, I>(
 
 export function useEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
-  let data = hookState.data as null | EffectData;
-  if (data !== null) {
-    if (!shallowArrayEquals(data.deps, deps)) {
-      data.deps = deps;
-      scheduleEffect(data);
+  let current = hookState.data as null | EffectEffectData;
+  if (current !== null) {
+    if (!shallowArrayEquals(current.deps, deps)) {
+      current.deps = deps;
+      current.innerEffect = effect;
+      scheduleEffect(current);
     }
     return;
   }
-  data = {
+  const data: EffectEffectData = {
+    type: HookType.EFFECT,
     deps,
+    innerEffect: effect,
     effect: wrappedEffect,
     cleanup: null,
     active: true,
@@ -229,8 +238,9 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
 
   function wrappedEffect() {
     const oldContext = setContext(context);
+    cleanupContext(context);
     try {
-      return effect();
+      return data.innerEffect();
     } finally {
       setContext(oldContext);
     }
@@ -247,12 +257,14 @@ export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
   if (data !== null) {
     if (!shallowArrayEquals(data.deps, deps)) {
       data.deps = deps;
+      data.effect = effect;
       scheduleLayoutEffect(data);
     }
     return;
   }
 
   data = {
+    type: HookType.LAYOUT_EFFECT,
     deps,
     effect,
     cleanup: null,

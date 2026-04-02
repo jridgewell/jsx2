@@ -4,6 +4,7 @@ import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '
 import type { Ref } from '../create-ref';
 import type { HookState } from '../hooks';
 import type { RenderableArray } from '../render';
+import type { ComponentSignalContext } from '../signals';
 import type { NS } from '../util/namespace';
 
 import { NS_HTML } from '../util/namespace';
@@ -28,6 +29,7 @@ export interface RootFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null;
 }
 
@@ -39,6 +41,7 @@ export interface NullFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null;
 }
 
@@ -50,6 +53,7 @@ export interface TextFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null;
 }
 
@@ -61,6 +65,7 @@ export interface ElementFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null | Ref;
 }
 
@@ -72,6 +77,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   component: null;
   providedContext: null | ContextHolder<any>;
   consumedContexts: null | ContextHolder<any>[];
+  signalContext: null | ComponentSignalContext;
   ref: null;
 }
 
@@ -83,6 +89,7 @@ export interface ClassComponentFiber extends SharedFiber {
   component: null | Component<any>;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null | Ref;
 }
 
@@ -94,6 +101,7 @@ export interface ArrayFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
+  signalContext: null;
   ref: null;
 }
 
@@ -138,6 +146,7 @@ export function fiber<T extends Fiber['data']>(
     component: null,
     providedContext: null,
     consumedContexts: null,
+    signalContext: null,
     parent: null,
     child: null,
     next: null,

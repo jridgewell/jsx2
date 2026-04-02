@@ -1,7 +1,7 @@
 import type {
   Effect,
   EffectCleanup,
-  EffectData,
+  EffectEffectData,
   EffectHookState,
   HookState,
 } from '../../src/hooks';
@@ -12,11 +12,13 @@ import { SignalContextType } from '../../src/signals';
 import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
-  const data: EffectData = {
+  const data: EffectEffectData = {
+    type: HookType.EFFECT,
     deps: [],
     active: true,
     scheduled: false,
     cleanup,
+    innerEffect: effect,
     effect,
     context: null as unknown as EffectSignalContext,
   };
