@@ -5,7 +5,13 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { LayoutEffectData } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { SignalContextEnum, context, finalizeDependencies, prepareDependencies, setContext } from '../signals';
+import {
+  SignalContextEnum,
+  context,
+  finalizeDependencies,
+  prepareDependencies,
+  setContext,
+} from '../signals';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 

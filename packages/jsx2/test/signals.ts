@@ -1,4 +1,14 @@
-import { act, createElement, render, signal, useComputed, useEffect, useSignal } from '../src/jsx2';
+import {
+  act,
+  createElement,
+  memo,
+  render,
+  signal,
+  useComputed,
+  useEffect,
+  useSignal,
+  useState,
+} from '../src/jsx2';
 import { createSignal } from '../src/signals';
 
 function expectTextNode(node: null | Node, text: string) {
@@ -268,7 +278,7 @@ describe('signals integration tests', () => {
       act(() => {
         render(
           createElement(() => {
-            const get = useComputed(cb);
+            const get = useComputed(cb, []);
             get();
             get();
             return get();
@@ -289,7 +299,7 @@ describe('signals integration tests', () => {
         const [get, setter] = useSignal('init');
         set = setter;
         cb ||= jest.fn(() => get() + '2');
-        const getComp = useComputed(cb);
+        const getComp = useComputed(cb, []);
         return getComp();
       });
 
@@ -305,6 +315,66 @@ describe('signals integration tests', () => {
       expect(C).toHaveBeenCalledTimes(2);
       expect(cb!).toHaveBeenCalledTimes(2);
       expectTextNode(body.firstChild, 'new2');
+    });
+
+    it('updates callback when component rerenders with new useState state', () => {
+      const body = document.createElement('body');
+      let setState: (val: number) => void;
+      let setSignal: (val: string) => void;
+      const C = jest.fn(() => {
+        const [count, setter] = useState(0);
+        setState = setter;
+        const [getSig, setterSig] = useSignal('init');
+        setSignal = setterSig;
+
+        const getComp = useComputed(() => getSig() + count, [count]);
+        return getComp();
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+      expectTextNode(body.firstChild, 'init0');
+
+      act(() => {
+        setState(1);
+      });
+      expectTextNode(body.firstChild, 'init1');
+
+      act(() => {
+        setSignal('new');
+      });
+      expectTextNode(body.firstChild, 'new1');
+    });
+
+    it('notifies dependents when callback changes', () => {
+      const body = document.createElement('body');
+      let setState: (val: number) => void;
+      const childMock = jest.fn(({ getComp }) => {
+        return getComp();
+      });
+      const Child = memo(childMock);
+      const Parent = jest.fn(() => {
+        const [count, setter] = useState(0);
+        setState = setter;
+        const [getSig] = useSignal('init');
+
+        const getComp = useComputed(() => getSig() + count, [count]);
+
+        return createElement(Child, { getComp });
+      });
+
+      act(() => {
+        render(createElement(Parent), body);
+      });
+      expectTextNode(body.firstChild, 'init0');
+      expect(childMock).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        setState(1);
+      });
+      expect(childMock).toHaveBeenCalledTimes(2);
+      expectTextNode(body.firstChild, 'init1');
     });
 
     it('drops dependencies that are no longer used', () => {
@@ -323,7 +393,7 @@ describe('signals integration tests', () => {
             return getB();
           }
           return 'C';
-        });
+        }, []);
 
         return getComp();
       });
@@ -367,7 +437,7 @@ describe('signals integration tests', () => {
             return getA() + getB();
           }
           return getB() + getA();
-        });
+        }, []);
 
         return getComp();
       });
@@ -397,12 +467,12 @@ describe('signals integration tests', () => {
       const C = jest
         .fn()
         .mockImplementationOnce(() => {
-          const get = useComputed(() => 'x');
+          const get = useComputed(() => 'x', []);
           gets.push(get);
           return 'rendered';
         })
         .mockImplementationOnce(() => {
-          const get = useComputed(() => 'x');
+          const get = useComputed(() => 'x', []);
           gets.push(get);
           return 'rendered';
         });

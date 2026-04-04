@@ -106,6 +106,7 @@ describe('unmount', () => {
           type: HookEnum.SIGNAL,
           data: {
             ctx: hookContext,
+            cb: () => 'test',
             getter: () => 'test',
           },
         },

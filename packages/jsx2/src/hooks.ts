@@ -10,6 +10,7 @@ import {
   finalizeDependencies,
   getCurrentContext,
   linkContexts,
+  notifyDependents,
   prepareDependencies,
   setContext,
 } from './signals';
@@ -35,6 +36,8 @@ export interface SignalData<S> {
 export interface ComputedData<S> {
   ctx: ComputedSignalContext;
   getter: () => S;
+  cb: () => S;
+  deps?: unknown[];
 }
 
 export interface RegularHookState {
@@ -127,21 +130,31 @@ export function useSignal<S>(initial: S): SignalFns<S> {
   return fns;
 }
 
-export function useComputed<T>(cb: () => T): () => T {
+export function useComputed<T>(cb: () => T, deps?: unknown[]): () => T {
   const hookState = getHookState();
-  const data = hookState.data as null | ComputedData<T>;
-  if (data) return data.getter;
+  const current = hookState.data as null | ComputedData<T>;
+  if (current) {
+    if (!shallowArrayEquals(current.deps, deps)) {
+      current.cb = cb;
+      current.deps = deps;
+      current.ctx.dirty = true;
+      notifyDependents(current.ctx.nextDependent);
+    }
+    return current.getter;
+  }
 
   let value: T;
 
   const ctx = context(SignalContextEnum.COMPUTED);
   ctx.dirty = true;
 
+  const data = { ctx, cb, getter, deps };
   function getter() {
     if (ctx.dirty) {
       const oldContext = setContext(ctx);
       try {
         prepareDependencies(ctx);
+        const { cb } = data;
         value = cb();
         finalizeDependencies(ctx);
         ctx.dirty = false;
@@ -155,7 +168,7 @@ export function useComputed<T>(cb: () => T): () => T {
   }
 
   hookState.type = HookEnum.SIGNAL;
-  hookState.data = { ctx, getter };
+  hookState.data = data;
   return getter;
 }
 
@@ -215,7 +228,8 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     const oldContext = setContext(ctx);
     try {
       prepareDependencies(ctx);
-      const res = data.innerEffect();
+      const { innerEffect } = data;
+      const res = innerEffect();
       finalizeDependencies(ctx);
       return res;
     } finally {

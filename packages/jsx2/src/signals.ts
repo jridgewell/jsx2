@@ -141,7 +141,6 @@ export function linkContexts(source: SignalContext, sink: SignalContext): void {
   if (altDependency && altDependency.source === source) {
     debug: assert(sink === altDependency.sink);
 
-
     sink.altDependency = altDependency.nextDependency;
     sink.nextDependency = altDependency;
     altDependency.nextDependency = nextDependency;
