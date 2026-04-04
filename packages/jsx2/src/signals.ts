@@ -116,6 +116,8 @@ export function cleanupContext(ctx: SignalContext): void {
 }
 
 export function notifyDependents(dependents: Set<SignalContext>): void {
+  if (dependents.size === 0) return;
+
   const slice = Array.from(dependents);
   dependents.clear();
 
