@@ -19,6 +19,7 @@ interface BaseContext {
   type: SignalContextEnum;
   dependents: Set<SignalContext>;
   dependencies: Set<SignalContext>;
+  alternateDependencies: Set<SignalContext>;
 }
 
 export interface SignalSignalContext extends BaseContext {
@@ -115,15 +116,26 @@ export function cleanupContext(ctx: SignalContext): void {
   dependencies.clear();
 }
 
+export function finalizeDependencies(ctx: SignalContext): void {
+  const { dependencies, alternateDependencies } = ctx;
+  for (const dep of alternateDependencies) {
+    if (!dependencies.has(dep)) {
+      dep.dependents.delete(ctx);
+    }
+  }
+  alternateDependencies.clear();
+}
+
+export function prepareDependencies(ctx: SignalContext): void {
+  const { dependencies, alternateDependencies } = ctx;
+  ctx.alternateDependencies = dependencies;
+  ctx.dependencies = alternateDependencies;
+}
+
 export function notifyDependents(dependents: Set<SignalContext>): void {
   if (dependents.size === 0) return;
 
-  const slice = Array.from(dependents);
-  dependents.clear();
-
-  for (const dep of slice) {
-    cleanupContext(dep);
-
+  for (const dep of dependents) {
     if (dep.type === SignalContextEnum.COMPONENT) {
       enqueueDiff(dep.fiber);
     } else if (dep.type === SignalContextEnum.COMPUTED) {
@@ -159,6 +171,7 @@ export function context<T extends SignalContext['type']>(
     type,
     dependents: new Set(),
     dependencies: new Set(),
+    alternateDependencies: new Set(),
     fiber: null,
     dirty: false,
     state: null,

@@ -73,7 +73,7 @@ export interface ElementFiber extends SharedFiber {
   providedContext: null;
   consumedContexts: null;
   signalContext: null;
-  attributeSignals: null | Record<string, null | AttributeSignalContext>;
+  attributeSignals: Record<string, null | AttributeSignalContext>;
   ref: null | Ref;
 }
 
@@ -85,7 +85,7 @@ export interface FunctionComponentFiber extends SharedFiber {
   component: null;
   providedContext: null | ContextHolder<any>;
   consumedContexts: null | ContextHolder<any>[];
-  signalContext: null | ComponentSignalContext;
+  signalContext: ComponentSignalContext;
   attributeSignals: null;
   ref: null;
 }
@@ -124,7 +124,7 @@ export interface SignalFiber extends SharedFiber {
   component: null;
   providedContext: null;
   consumedContexts: null;
-  signalContext: null | ChildSignalContext;
+  signalContext: ChildSignalContext;
   attributeSignals: null;
   ref: null;
 }

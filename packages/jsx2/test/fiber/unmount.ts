@@ -4,7 +4,7 @@ import type { FunctionComponentFiber } from '../../src/fiber';
 import { fiber } from '../../src/fiber';
 import { HookEnum } from '../../src/hooks';
 import { Component, createElement } from '../../src/jsx2';
-import { context, SignalContextEnum } from '../../src/signals';
+import { SignalContextEnum, context } from '../../src/signals';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 

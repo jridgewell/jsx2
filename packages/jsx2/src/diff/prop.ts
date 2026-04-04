@@ -6,7 +6,14 @@ import type { AttributeSignalContext } from '../signals';
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';
-import { SignalContextEnum, cleanupContext, context, setContext } from '../signals';
+import {
+  SignalContextEnum,
+  cleanupContext,
+  context,
+  finalizeDependencies,
+  prepareDependencies,
+  setContext,
+} from '../signals';
 import { assert } from '../util/assert';
 import { DOM_XLINK_NAMESPACE } from '../util/namespace';
 
@@ -86,7 +93,9 @@ export function rediffProp(context: AttributeSignalContext): void {
   const oldContext = setContext(context);
   let newValue: unknown;
   try {
+    prepareDependencies(context);
     newValue = getter();
+    finalizeDependencies(context);
   } finally {
     setContext(oldContext);
   }

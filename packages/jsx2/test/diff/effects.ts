@@ -8,7 +8,7 @@ import type {
 import type { EffectSignalContext } from '../../src/signals';
 
 import { HookEnum } from '../../src/hooks';
-import { context, SignalContextEnum } from '../../src/signals';
+import { SignalContextEnum, context } from '../../src/signals';
 import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {

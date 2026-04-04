@@ -5,10 +5,11 @@ import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } 
 
 import {
   SignalContextEnum,
-  cleanupContext,
   context,
   createSignal,
+  finalizeDependencies,
   getCurrentContext,
+  prepareDependencies,
   setContext,
 } from './signals';
 import { scheduleEffect, scheduleLayoutEffect } from './diff/effects';
@@ -139,7 +140,9 @@ export function useComputed<T>(cb: () => T): () => T {
     if (ctx.dirty) {
       const oldContext = setContext(ctx);
       try {
+        prepareDependencies(ctx);
         value = cb();
+        finalizeDependencies(ctx);
         ctx.dirty = false;
       } finally {
         setContext(oldContext);
@@ -212,9 +215,11 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
 
   function wrappedEffect() {
     const oldContext = setContext(ctx);
-    cleanupContext(ctx);
     try {
-      return data.innerEffect();
+      prepareDependencies(ctx);
+      const res = data.innerEffect();
+      finalizeDependencies(ctx);
+      return res;
     } finally {
       setContext(oldContext);
     }

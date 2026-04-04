@@ -18,7 +18,7 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
-import { setContext } from '../signals';
+import { finalizeDependencies, prepareDependencies, setContext } from '../signals';
 import { clone } from '../fiber/clone';
 import { getContainer } from '../fiber/get-container';
 import { getNextSibling } from '../fiber/get-next-sibling';
@@ -60,7 +60,9 @@ export function rediffSignalChild(fiber: SignalFiber): void {
   const oldContext = setContext(signalContext);
   let rendered: CoercedRenderable;
   try {
+    prepareDependencies(signalContext);
     rendered = coerceRenderable(data());
+    finalizeDependencies(signalContext);
   } finally {
     setContext(oldContext);
   }
@@ -365,7 +367,9 @@ function renderSignalChild(
   const oldContext = setContext(signalContext);
   let rendered: CoercedRenderable;
   try {
+    prepareDependencies(signalContext);
     rendered = coerceRenderable(renderable());
+    finalizeDependencies(signalContext);
   } finally {
     setContext(oldContext);
   }
