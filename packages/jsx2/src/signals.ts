@@ -5,6 +5,7 @@ import { rediffSignalChild } from './diff/diff-tree';
 import { scheduleEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { rediffProp } from './diff/prop';
+import { assert } from './util/assert';
 
 export enum SignalContextEnum {
   SIGNAL = 0,
@@ -15,11 +16,20 @@ export enum SignalContextEnum {
   ATTRIBUTE = 5,
 }
 
+interface SignalLink {
+  source: SignalContext;
+  sink: SignalContext;
+  prevDependent: SignalLink | null;
+  nextDependent: SignalLink | null;
+  prevDependency: SignalLink | null;
+  nextDependency: SignalLink | null;
+}
+
 interface BaseContext {
   type: SignalContextEnum;
-  dependents: Set<SignalContext>;
-  dependencies: Set<SignalContext>;
-  alternateDependencies: Set<SignalContext>;
+  nextDependent: SignalLink | null;
+  nextDependency: SignalLink | null;
+  altDependency: SignalLink | null;
 }
 
 export interface SignalSignalContext extends BaseContext {
@@ -108,40 +118,78 @@ export function setContext(ctx: SignalContext | null): null | SignalContext {
   return old;
 }
 
-export function cleanupContext(ctx: SignalContext): void {
-  const { dependencies } = ctx;
-  for (const dep of dependencies) {
-    dep.dependents.delete(ctx);
+function cleanupLinks(link: SignalLink | null): void {
+  while (link !== null) {
+    const { source, nextDependency, nextDependent, prevDependent } = link;
+    link = nextDependency;
+
+    if (prevDependent) prevDependent.nextDependent = nextDependent;
+    else source.nextDependent = nextDependent;
+
+    if (nextDependent) nextDependent.prevDependent = prevDependent;
   }
-  dependencies.clear();
 }
 
-export function finalizeDependencies(ctx: SignalContext): void {
-  const { dependencies, alternateDependencies } = ctx;
-  for (const dep of alternateDependencies) {
-    if (!dependencies.has(dep)) {
-      dep.dependents.delete(ctx);
-    }
+export function cleanupContext(ctx: SignalContext): void {
+  cleanupLinks(ctx.nextDependency);
+  ctx.nextDependency = null;
+}
+
+export function linkContexts(source: SignalContext, sink: SignalContext): void {
+  const { nextDependent } = source;
+  const { nextDependency, altDependency } = sink;
+  if (altDependency && altDependency.source === source) {
+    debug: assert(sink === altDependency.sink);
+
+
+    sink.altDependency = altDependency.nextDependency;
+    sink.nextDependency = altDependency;
+    altDependency.nextDependency = nextDependency;
+    altDependency.prevDependency = null;
+    if (nextDependency) nextDependency.prevDependency = altDependency;
+
+    return;
   }
-  alternateDependencies.clear();
+
+  const link: SignalLink = {
+    source,
+    sink,
+    prevDependent: null,
+    nextDependent,
+    prevDependency: null,
+    nextDependency,
+  };
+
+  if (nextDependent) nextDependent.prevDependent = link;
+  source.nextDependent = link;
+
+  if (nextDependency) nextDependency.prevDependency = link;
+  sink.nextDependency = link;
 }
 
 export function prepareDependencies(ctx: SignalContext): void {
-  const { dependencies, alternateDependencies } = ctx;
-  ctx.alternateDependencies = dependencies;
-  ctx.dependencies = alternateDependencies;
+  const { nextDependency, altDependency } = ctx;
+  ctx.nextDependency = altDependency;
+  ctx.altDependency = nextDependency;
 }
 
-export function notifyDependents(dependents: Set<SignalContext>): void {
-  if (dependents.size === 0) return;
+export function finalizeDependencies(ctx: SignalContext): void {
+  cleanupLinks(ctx.altDependency);
+  ctx.altDependency = null;
+}
 
-  for (const dep of dependents) {
+export function notifyDependents(head: SignalLink | null): void {
+  let link = head;
+  while (link !== null) {
+    const dep = link.sink;
+    link = link.nextDependent;
+
     if (dep.type === SignalContextEnum.COMPONENT) {
       enqueueDiff(dep.fiber);
     } else if (dep.type === SignalContextEnum.COMPUTED) {
       if (dep.dirty) continue;
       dep.dirty = true;
-      notifyDependents(dep.dependents);
+      notifyDependents(dep.nextDependent);
     } else if (dep.type === SignalContextEnum.EFFECT) {
       scheduleEffect(dep.state);
     } else if (dep.type === SignalContextEnum.CHILD) {
@@ -169,9 +217,9 @@ export function context<T extends SignalContext['type']>(
   : never {
   return {
     type,
-    dependents: new Set(),
-    dependencies: new Set(),
-    alternateDependencies: new Set(),
+    nextDependent: null,
+    nextDependency: null,
+    altDependency: null,
     fiber: null,
     dirty: false,
     state: null,
@@ -190,17 +238,14 @@ export function createSignal<S>(
 
   function getter() {
     const current = getCurrentContext();
-    if (current) {
-      ctx.dependents.add(current);
-      current.dependencies.add(ctx);
-    }
+    if (current) linkContexts(ctx, current);
     return value;
   }
 
   function setter(next: S) {
     if (next === value) return;
     value = next;
-    notifyDependents(ctx.dependents);
+    notifyDependents(ctx.nextDependent);
   }
 
   function update(cb: (prev: S) => S) {

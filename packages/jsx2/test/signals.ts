@@ -347,6 +347,50 @@ describe('signals integration tests', () => {
       expectTextNode(body.firstChild, 'C');
     });
 
+    it('handles changing order of getter calls', () => {
+      const body = document.createElement('body');
+      let setA: (val: string) => void;
+      let setB: (val: string) => void;
+      const cb = jest.fn();
+      let first = true;
+
+      const Comp = jest.fn(() => {
+        const [getA, setterA] = useSignal('A');
+        setA = setterA;
+        const [getB, setterB] = useSignal('B');
+        setB = setterB;
+
+        const getComp = useComputed(() => {
+          cb();
+          if (first) {
+            first = false;
+            return getA() + getB();
+          }
+          return getB() + getA();
+        });
+
+        return getComp();
+      });
+
+      act(() => {
+        render(createElement(Comp), body);
+      });
+      expectTextNode(body.firstChild, 'AB');
+      expect(cb).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        setA('A2');
+      });
+      expectTextNode(body.firstChild, 'BA2');
+      expect(cb).toHaveBeenCalledTimes(2);
+
+      act(() => {
+        setB('B2');
+      });
+      expectTextNode(body.firstChild, 'B2A2');
+      expect(cb).toHaveBeenCalledTimes(3);
+    });
+
     it('persists getter among renders', () => {
       const body = document.createElement('body');
       const gets: unknown[] = [];
@@ -516,8 +560,8 @@ describe('signals integration tests', () => {
     it('does not register dependency when reading outside component', () => {
       const [get, , , context] = createSignal('init');
       expect(get()).toBe('init');
-      expect(context.dependents.size).toBe(0);
-      expect(context.dependencies.size).toBe(0);
+      expect(context.nextDependent).toBe(null);
+      expect(context.nextDependency).toBe(null);
     });
   });
 });

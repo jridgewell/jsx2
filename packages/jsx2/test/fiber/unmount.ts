@@ -4,7 +4,7 @@ import type { FunctionComponentFiber } from '../../src/fiber';
 import { fiber } from '../../src/fiber';
 import { HookEnum } from '../../src/hooks';
 import { Component, createElement } from '../../src/jsx2';
-import { SignalContextEnum, context } from '../../src/signals';
+import { SignalContextEnum, context, linkContexts } from '../../src/signals';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 
@@ -70,16 +70,13 @@ describe('unmount', () => {
       const parentContext = context(SignalContextEnum.SIGNAL);
       const ctx = (current.signalContext = context(SignalContextEnum.CHILD));
       ctx.fiber = current;
-      ctx.dependencies.add(parentContext);
-      parentContext.dependents.add(ctx);
+      linkContexts(parentContext, ctx);
       mark(current, parent, null);
-      const spy = jest.spyOn(parentContext.dependents, 'delete');
 
       unmount(current);
 
-      expect(ctx.dependencies.size).toBe(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(ctx);
+      expect(ctx.nextDependency).toBe(null);
+      expect(parentContext.nextDependent).toBe(null);
     });
 
     it('cleans up component context when unmounted', () => {
@@ -88,16 +85,13 @@ describe('unmount', () => {
       const parentContext = context(SignalContextEnum.SIGNAL);
       const ctx = (current.signalContext = context(SignalContextEnum.COMPONENT));
       ctx.fiber = current;
-      ctx.dependencies.add(parentContext);
-      parentContext.dependents.add(ctx);
+      linkContexts(parentContext, ctx);
       mark(current, parent, null);
-      const spy = jest.spyOn(parentContext.dependents, 'delete');
 
       unmount(current);
 
-      expect(ctx.dependencies.size).toBe(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(ctx);
+      expect(ctx.nextDependency).toBe(null);
+      expect(parentContext.nextDependent).toBe(null);
     });
 
     it('cleans up hook signals when unmounted', () => {
@@ -105,8 +99,7 @@ describe('unmount', () => {
       const current = makeFunctionComponentFiber();
       const parentContext = context(SignalContextEnum.SIGNAL);
       const hookContext = context(SignalContextEnum.COMPUTED);
-      hookContext.dependencies.add(parentContext);
-      parentContext.dependents.add(hookContext);
+      linkContexts(parentContext, hookContext);
 
       current.stateData = [
         {
@@ -118,12 +111,10 @@ describe('unmount', () => {
         },
       ];
       mark(current, parent, null);
-      const spy = jest.spyOn(parentContext.dependents, 'delete');
 
       unmount(current);
 
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(hookContext);
+      expect(parentContext.nextDependent).toBe(null);
     });
   });
 
@@ -300,8 +291,7 @@ describe('unmount', () => {
       fiber.signalContext.fiber = fiber;
 
       const effectContext = context(SignalContextEnum.EFFECT);
-      effectContext.dependencies.add(fiber.signalContext);
-      fiber.signalContext.dependents.add(effectContext);
+      linkContexts(fiber.signalContext, effectContext);
       fiber.stateData = [
         {
           type: HookEnum.EFFECT,

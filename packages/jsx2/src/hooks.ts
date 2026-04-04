@@ -9,6 +9,7 @@ import {
   createSignal,
   finalizeDependencies,
   getCurrentContext,
+  linkContexts,
   prepareDependencies,
   setContext,
 } from './signals';
@@ -149,10 +150,7 @@ export function useComputed<T>(cb: () => T): () => T {
       }
     }
     const current = getCurrentContext();
-    if (current) {
-      ctx.dependents.add(current);
-      current.dependencies.add(ctx);
-    }
+    if (current) linkContexts(ctx, current);
     return value;
   }
 
