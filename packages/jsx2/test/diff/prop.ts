@@ -2,8 +2,7 @@ import type { ElementFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';
 import { createElement } from '../../src/jsx2';
-import type { SignalContext } from '../../src/signals';
-import { SignalContextEnum, getCurrentContext, notifyDependents } from '../../src/signals';
+import { createSignal } from '../../src/signals';
 import {
   addProps as realAddProps,
   diffProp as realDiffProp,
@@ -16,28 +15,6 @@ function createMockFiber(dom: HTMLElement | SVGElement): ElementFiber {
   f.dom = dom;
   f.attributeSignals = Object.create(null);
   return f;
-}
-
-function createSignalTrack<T>(initialValue: T) {
-  const context: SignalContext = {
-    type: SignalContextEnum.SIGNAL,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
-  let value = initialValue;
-  const signal = jest.fn(() => {
-    const current = getCurrentContext();
-    if (current) {
-      current.dependencies.add(context);
-      context.dependents.add(current);
-    }
-    return value;
-  });
-  const setSignal = (v: T) => {
-    value = v;
-    notifyDependents(context.dependents);
-  };
-  return [signal, setSignal] as const;
 }
 
 function diffProp(
@@ -420,7 +397,7 @@ describe('diffProp', () => {
       const el = document.createElement('div');
       const prop = 'foo';
 
-      const [signal] = createSignalTrack('test');
+      const [signal] = createSignal('test');
 
       diffProp(el, prop, null, signal);
 
@@ -431,7 +408,7 @@ describe('diffProp', () => {
       const el = document.createElement('div');
       const prop = 'foo';
 
-      const [signal, setSignal] = createSignalTrack('test');
+      const [signal, setSignal] = createSignal('test');
 
       diffProp(el, prop, null, 'before');
       diffProp(el, prop, 'before', signal);
@@ -446,7 +423,7 @@ describe('diffProp', () => {
     it('sets the attribute with number from signal', () => {
       const el = document.createElement('div');
       const prop = 'foo';
-      const [signal] = createSignalTrack(123);
+      const [signal] = createSignal(123);
 
       diffProp(el, prop, null, signal);
 
@@ -456,7 +433,7 @@ describe('diffProp', () => {
     it('sets the attribute with boolean from signal', () => {
       const el = document.createElement('div');
       const prop = 'foo';
-      const [signal] = createSignalTrack(true);
+      const [signal] = createSignal(true);
 
       diffProp(el, prop, null, signal);
 
@@ -466,7 +443,7 @@ describe('diffProp', () => {
     it('unsets the attribute with null from signal', () => {
       const el = document.createElement('div');
       const prop = 'foo';
-      const [signal] = createSignalTrack(null);
+      const [signal] = createSignal(null);
 
       diffProp(el, prop, null, 'before');
       diffProp(el, prop, 'before', signal);
@@ -477,7 +454,7 @@ describe('diffProp', () => {
     it('unsets the attribute with undefined from signal', () => {
       const el = document.createElement('div');
       const prop = 'foo';
-      const [signal] = createSignalTrack(undefined);
+      const [signal] = createSignal(undefined);
 
       diffProp(el, prop, null, 'before');
       diffProp(el, prop, 'before', signal);
@@ -489,7 +466,7 @@ describe('diffProp', () => {
       const el = document.createElement('div');
       const prop = 'foo';
 
-      const [signal, setSignal] = createSignalTrack('test');
+      const [signal, setSignal] = createSignal('test');
       const fiber = createMockFiber(el);
 
       realDiffProp(el, prop, null, signal, fiber);
@@ -505,7 +482,7 @@ describe('diffProp', () => {
     it('sets className property if prop is class', () => {
       const el = document.createElement('div');
       const prop = 'class';
-      const [signal] = createSignalTrack('test');
+      const [signal] = createSignal('test');
 
       diffProp(el, prop, null, signal);
 
@@ -515,7 +492,7 @@ describe('diffProp', () => {
     it('sets className property if prop is className', () => {
       const el = document.createElement('div');
       const prop = 'className';
-      const [signal] = createSignalTrack('test');
+      const [signal] = createSignal('test');
 
       diffProp(el, prop, null, signal);
 
@@ -525,7 +502,7 @@ describe('diffProp', () => {
     it('sets style property if prop is style', () => {
       const el = document.createElement('div');
       const prop = 'style';
-      const [signal] = createSignalTrack({ color: 'red' });
+      const [signal] = createSignal({ color: 'red' });
 
       diffProp(el, prop, null, signal);
 
@@ -535,7 +512,7 @@ describe('diffProp', () => {
     it('sets namespaced attribute if prop starts with xlink', () => {
       const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       const prop = 'xlink:href';
-      const [signal] = createSignalTrack('test');
+      const [signal] = createSignal('test');
 
       diffProp(el, prop, null, signal);
 
@@ -545,7 +522,7 @@ describe('diffProp', () => {
     it('throws error for dangerouslySetInnerHTML', () => {
       const el = document.createElement('div');
       const prop = 'dangerouslySetInnerHTML';
-      const [signal] = createSignalTrack({ __html: 'test' });
+      const [signal] = createSignal({ __html: 'test' });
 
       expect(() => {
         diffProp(el, prop, null, signal);
@@ -556,7 +533,7 @@ describe('diffProp', () => {
       const el = document.createElement('div') as any;
       const prop = 'customProp';
       el[prop] = null; // Make it exist in el
-      const [signal, setSignal] = createSignalTrack<Record<string, string>>({ foo: 'bar' });
+      const [signal, setSignal] = createSignal<Record<string, string>>({ foo: 'bar' });
 
       diffProp(el, prop, null, signal);
 

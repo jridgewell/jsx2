@@ -103,3 +103,42 @@ export function notifyDependents(dependents: Set<SignalContext>): void {
     }
   }
 }
+
+export function createSignal<S>(
+  initial: S,
+): readonly [() => S, (next: S) => void, (cb: (prev: S) => S) => void, SignalSignalContext] {
+  let value = initial;
+  const context: SignalSignalContext = {
+    type: SignalContextEnum.SIGNAL,
+    dependents: new Set(),
+    dependencies: new Set(),
+  };
+
+  function getter() {
+    const current = getCurrentContext();
+    if (current) {
+      context.dependents.add(current);
+      current.dependencies.add(context);
+    }
+    return value;
+  }
+
+  function setter(next: S) {
+    if (next === value) return;
+    value = next;
+    notifyDependents(context.dependents);
+  }
+
+  function update(cb: (prev: S) => S) {
+    setter(cb(value));
+  }
+
+  return [getter, setter, update, context] as const;
+}
+
+export function signal<S>(
+  initial: S,
+): readonly [() => S, (next: S) => void, (cb: (prev: S) => S) => void] {
+  const { 0: getter, 1: setter, 2: update } = createSignal(initial);
+  return [getter, setter, update];
+}

@@ -23,3 +23,4 @@ export { memo } from './memo';
 export { hydrate, render } from './render';
 export { taggedTemplateBlock, templateBlock } from './template-block';
 export { act } from './util/act';
+export { signal } from './signals';

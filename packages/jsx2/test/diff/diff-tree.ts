@@ -5,11 +5,10 @@ import type {
 } from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { Renderable, RenderableArray } from '../../src/render';
-import type { SignalContext } from '../../src/signals';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
 import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
-import { SignalContextEnum, getCurrentContext, notifyDependents } from '../../src/signals';
+import { createSignal } from '../../src/signals';
 import { createRoot } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
@@ -22,28 +21,6 @@ function expectTextNode(node: Node, text: string) {
   expect(node).toBeTruthy();
   expect(node.nodeType).toBe(Node.TEXT_NODE);
   expect(node.textContent).toBe(text);
-}
-
-function createChildSignalTrack<T>(initialValue: T) {
-  const context: SignalContext = {
-    type: SignalContextEnum.SIGNAL,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
-  let value = initialValue;
-  const signal = jest.fn(() => {
-    const current = getCurrentContext();
-    if (current) {
-      current.dependencies.add(context);
-      context.dependents.add(current);
-    }
-    return value;
-  });
-  const setSignal = (v: T) => {
-    value = v;
-    notifyDependents(context.dependents);
-  };
-  return [signal, setSignal] as const;
 }
 
 describe('diffTree', () => {
@@ -236,7 +213,7 @@ describe('diffTree', () => {
       it('renders signal text', () => {
         const container = document.createElement('body');
         const tree = makeOldFiberTree(container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 
@@ -412,7 +389,7 @@ describe('diffTree', () => {
       it('renders signal text', () => {
         const container = document.createElement('body');
         const tree = makeOldFiberTree('before', container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 
@@ -440,7 +417,7 @@ describe('diffTree', () => {
 
       it('cleans up context when unmounting', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack('test');
+        const [signal, setSignal] = createSignal('test');
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
@@ -468,7 +445,7 @@ describe('diffTree', () => {
 
       it('cleans up context when replaced by string', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack('test');
+        const [signal, setSignal] = createSignal('test');
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
@@ -496,7 +473,7 @@ describe('diffTree', () => {
 
       it('cleans up context when replaced by element', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack('test');
+        const [signal, setSignal] = createSignal('test');
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
@@ -524,14 +501,14 @@ describe('diffTree', () => {
 
       it('cleans up context when replaced by signal', () => {
         const container = document.createElement('body');
-        const [signal1, setSignal1] = createChildSignalTrack('test1');
+        const [signal1, setSignal1] = createSignal('test1');
         const tree = makeTree(signal1, container);
         const node = container.firstChild!;
 
         setSignal1('after1');
         expectTextNode(node, 'after1');
 
-        const [signal2] = createChildSignalTrack('test2');
+        const [signal2] = createSignal('test2');
         diff(tree, signal2, container);
 
         expectTextNode(container.firstChild!, 'test2');
@@ -607,7 +584,7 @@ describe('diffTree', () => {
     describe('updating signal value', () => {
       it('updates number as string', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string | number>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -619,7 +596,7 @@ describe('diffTree', () => {
 
       it('updates text as text', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -631,7 +608,7 @@ describe('diffTree', () => {
 
       it('updates boolean as nothing', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string | boolean>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -643,7 +620,7 @@ describe('diffTree', () => {
 
       it('updates null as nothing', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string | null>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -655,7 +632,7 @@ describe('diffTree', () => {
 
       it('updates element from signal', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string | ElementVNode>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -667,7 +644,7 @@ describe('diffTree', () => {
 
       it('updates array from signal', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        const [signal, setSignal] = createSignal<string | string[]>('before');
         makeTree(signal, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -680,8 +657,8 @@ describe('diffTree', () => {
 
       it('updates nested signal', () => {
         const container = document.createElement('body');
-        const [signal1, setSignal1] = createChildSignalTrack<any>('before');
-        const [signal2, setSignal2] = createChildSignalTrack<any>('nested');
+        const [signal2, setSignal2] = createSignal<string>('nested');
+        const [signal1, setSignal1] = createSignal<string | typeof signal2>('before');
         makeTree(signal1, container);
 
         expectTextNode(container.firstChild!, 'before');
@@ -695,8 +672,8 @@ describe('diffTree', () => {
 
       it('cleans up nested context when replaced', () => {
         const container = document.createElement('body');
-        const [signal2, setSignal2] = createChildSignalTrack<any>('nested');
-        const [signal1, setSignal1] = createChildSignalTrack<any>(signal2);
+        const [signal2, setSignal2] = createSignal<string>('nested');
+        const [signal1, setSignal1] = createSignal<typeof signal2>(signal2);
         makeTree(signal1, container);
         const node = container.firstChild!;
 
@@ -724,7 +701,7 @@ describe('diffTree', () => {
 
       it('cleans up context when replaced by component', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack('test');
+        const [signal, setSignal] = createSignal('test');
         const tree = makeTree(signal, container);
         const C = () => 'test';
         const renderable = createElement(C);
@@ -756,7 +733,7 @@ describe('diffTree', () => {
 
       it('cleans up context when replaced by array', () => {
         const container = document.createElement('body');
-        const [signal, setSignal] = createChildSignalTrack('test');
+        const [signal, setSignal] = createSignal('test');
         const tree = makeTree(signal, container);
         const renderable = ['after'];
         const node = container.firstChild!;
@@ -1197,7 +1174,7 @@ describe('diffTree', () => {
       it('renders signal text', () => {
         const container = document.createElement('body');
         const tree = makeOldFiberTree(createElement('before'), container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 
@@ -1429,7 +1406,7 @@ describe('diffTree', () => {
         const container = document.createElement('body');
         const C = () => 'before';
         const tree = makeOldFiberTree(createElement(C), container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 
@@ -1733,7 +1710,7 @@ describe('diffTree', () => {
           }
         }
         const tree = makeOldFiberTree(createElement(C), container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 
@@ -2337,7 +2314,7 @@ describe('diffTree', () => {
       it('renders signal text', () => {
         const container = document.createElement('body');
         const tree = makeOldFiberTree([createElement('before')], container);
-        const [signal] = createChildSignalTrack('test');
+        const [signal] = createSignal('test');
 
         diff(tree, signal, container);
 

@@ -6,8 +6,8 @@ import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } 
 import {
   SignalContextEnum,
   cleanupContext,
+  createSignal,
   getCurrentContext,
-  notifyDependents,
   setContext,
 } from './signals';
 import { scheduleEffect, scheduleLayoutEffect } from './diff/effects';
@@ -115,33 +115,8 @@ export function useSignal<S>(initial: S): SignalFns<S> {
   const hookState = getHookState();
   if (hookState.data) return (hookState.data as SignalData<S>).fns;
 
-  let value = initial;
-  const context: SignalSignalContext = {
-    type: SignalContextEnum.SIGNAL,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
+  const { 0: getter, 1: setter, 2: update, 3: context } = createSignal(initial);
   const fns = [getter, setter, update] as const;
-
-  function getter() {
-    const current = getCurrentContext();
-    if (current) {
-      context.dependents.add(current);
-      current.dependencies.add(context);
-    }
-    return value;
-  }
-
-  function setter(next: S) {
-    if (next === value) return;
-    value = next;
-    notifyDependents(context.dependents);
-  }
-
-  function update(cb: (prev: S) => S) {
-    setter(cb(value));
-  }
-
   hookState.type = HookEnum.SIGNAL;
   hookState.data = { context, fns };
   return fns;

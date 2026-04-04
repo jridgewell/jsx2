@@ -1,4 +1,5 @@
-import { act, createElement, render, useComputed, useEffect, useSignal } from '../src/jsx2';
+import { act, createElement, render, signal, useComputed, useEffect, useSignal } from '../src/jsx2';
+import { createSignal } from '../src/signals';
 
 function expectTextNode(node: null | Node, text: string) {
   expect(node).toBeTruthy();
@@ -439,6 +440,84 @@ describe('signals integration tests', () => {
         setB('B2');
       });
       expect(effectCb).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('signal', () => {
+    it('accepts an initial value and getter reads it', () => {
+      const [get] = signal('init');
+      expect(get()).toBe('init');
+    });
+
+    it('updates value and notifies dependents', () => {
+      const [get, set] = signal('init');
+      const body = document.createElement('body');
+      const C = jest.fn(() => {
+        return get();
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+      expect(C).toHaveBeenCalledTimes(1);
+      expectTextNode(body.firstChild, 'init');
+
+      act(() => {
+        set('new');
+      });
+
+      expect(C).toHaveBeenCalledTimes(2);
+      expectTextNode(body.firstChild, 'new');
+    });
+
+    it('update applies callback over previous state', () => {
+      const [get, , update] = signal(1);
+      const body = document.createElement('body');
+      const C = jest.fn(() => {
+        return String(get());
+      });
+
+      act(() => {
+        render(createElement(C), body);
+      });
+
+      act(() => {
+        update((prev) => prev * 5);
+      });
+
+      expectTextNode(body.firstChild, '5');
+    });
+
+    it('notifies multiple dependents', () => {
+      const [get, set] = signal('init');
+      const body1 = document.createElement('body');
+      const body2 = document.createElement('body');
+      const C1 = jest.fn(() => get());
+      const C2 = jest.fn(() => get());
+
+      act(() => {
+        render(createElement(C1), body1);
+        render(createElement(C2), body2);
+      });
+
+      expect(C1).toHaveBeenCalledTimes(1);
+      expect(C2).toHaveBeenCalledTimes(1);
+
+      act(() => {
+        set('new');
+      });
+
+      expect(C1).toHaveBeenCalledTimes(2);
+      expect(C2).toHaveBeenCalledTimes(2);
+      expectTextNode(body1.firstChild, 'new');
+      expectTextNode(body2.firstChild, 'new');
+    });
+
+    it('does not register dependency when reading outside component', () => {
+      const [get, , , context] = createSignal('init');
+      expect(get()).toBe('init');
+      expect(context.dependents.size).toBe(0);
+      expect(context.dependencies.size).toBe(0);
     });
   });
 });
