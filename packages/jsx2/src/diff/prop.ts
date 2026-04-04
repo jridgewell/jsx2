@@ -45,8 +45,9 @@ export function diffProp(
       ctx.name = name;
       ctx.getter = newValue as () => unknown;
       ctx.oldValue = oldValue;
+      ctx.fiber = fiber;
       attributeSignals[name] = ctx;
-    } else {
+    } else if (ctx.getter !== newValue) {
       cleanupContext(ctx);
       ctx.getter = newValue as () => unknown;
     }

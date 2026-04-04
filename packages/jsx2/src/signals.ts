@@ -1,10 +1,8 @@
-import type { FunctionComponentFiber, SignalFiber } from './fiber';
+import type { ElementFiber, FunctionComponentFiber, SignalFiber } from './fiber';
 import type { EffectEffectData } from './hooks';
 
-import { rediffSignalChild } from './diff/diff-tree';
 import { scheduleEffect } from './diff/effects';
-import { enqueueDiff } from './diff/enqueue-diff';
-import { rediffProp } from './diff/prop';
+import { enqueueDiff, enqueueProp, enqueueSignalChild } from './diff/enqueue-diff';
 import { assert } from './util/assert';
 
 export enum SignalContextEnum {
@@ -30,6 +28,7 @@ interface BaseContext {
   nextDependent: SignalLink | null;
   nextDependency: SignalLink | null;
   tailDependency: SignalLink | null;
+  active: boolean;
 }
 
 export interface SignalSignalContext extends BaseContext {
@@ -89,7 +88,7 @@ export interface ChildSignalContext extends BaseContext {
 
 export interface AttributeSignalContext extends BaseContext {
   type: SignalContextEnum.ATTRIBUTE;
-  fiber: null;
+  fiber: ElementFiber;
   dirty: false;
   state: null;
   el: HTMLElement | SVGElement;
@@ -133,6 +132,7 @@ function cleanupLinks(link: SignalLink | null): void {
 export function cleanupContext(ctx: SignalContext): void {
   cleanupLinks(getTail(ctx.nextDependency));
   ctx.nextDependency = null;
+  ctx.active = false;
 }
 
 export function linkContexts(source: SignalContext, sink: SignalContext): void {
@@ -203,9 +203,9 @@ export function notifyDependents(head: SignalLink | null): void {
     } else if (dep.type === SignalContextEnum.EFFECT) {
       scheduleEffect(dep.state);
     } else if (dep.type === SignalContextEnum.CHILD) {
-      rediffSignalChild(dep.fiber);
+      enqueueSignalChild(dep);
     } else if (dep.type === SignalContextEnum.ATTRIBUTE) {
-      rediffProp(dep);
+      enqueueProp(dep);
     }
   }
 }
@@ -230,6 +230,7 @@ export function context<T extends SignalContext['type']>(
     nextDependent: null,
     nextDependency: null,
     tailDependency: null,
+    active: true,
     fiber: null,
     dirty: false,
     state: null,

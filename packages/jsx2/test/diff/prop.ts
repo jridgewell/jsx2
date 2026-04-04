@@ -1,7 +1,7 @@
 import type { ElementFiber } from '../../src/fiber';
 
 import { fiber } from '../../src/fiber';
-import { createElement } from '../../src/jsx2';
+import { act, createElement } from '../../src/jsx2';
 import { createSignal } from '../../src/signals';
 import {
   addProps as realAddProps,
@@ -415,7 +415,9 @@ describe('diffProp', () => {
 
       expect(el.getAttribute(prop)).toBe('test');
 
-      setSignal('after');
+      act(() => {
+        setSignal('after');
+      });
 
       expect(el.getAttribute(prop)).toBe('after');
     });
@@ -539,9 +541,26 @@ describe('diffProp', () => {
 
       expect(el[prop]).toEqual({ foo: 'bar' });
 
-      setSignal({ bar: 'baz' });
+      act(() => {
+        setSignal({ bar: 'baz' });
+      });
 
       expect(el[prop]).toEqual({ bar: 'baz' });
+    });
+
+    it('transitions from signal to signal', () => {
+      const el = document.createElement('div');
+      const prop = 'foo';
+
+      const [signal1] = createSignal('test1');
+      const [signal2] = createSignal('test2');
+      const fiber = createMockFiber(el);
+
+      realDiffProp(el, prop, null, signal1, fiber);
+      expect(el.getAttribute(prop)).toBe('test1');
+
+      realDiffProp(el, prop, signal1, signal2, fiber);
+      expect(el.getAttribute(prop)).toBe('test2');
     });
   });
 

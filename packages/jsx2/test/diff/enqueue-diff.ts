@@ -3,13 +3,21 @@ import type { Renderable } from '../../src/render';
 
 import { createElement } from '../../src/jsx2';
 import { createRoot } from '../../src/diff/create-tree';
-import { enqueueDiff } from '../../src/diff/enqueue-diff';
+import { WorkItemEnum, enqueueWork } from '../../src/diff/enqueue-diff';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
 
 describe('enqueueDiff', () => {
   let process: () => void;
   function defaultScheduler(p: () => void): void {
     process = p;
+  }
+  function enqueueDiff(fiber: FunctionComponentFiber, scheduler = defaultScheduler) {
+    enqueueWork(scheduler, {
+      type: WorkItemEnum.COMPONENT,
+      depth: fiber.depth,
+      fiber,
+      context: null,
+    });
   }
 
   function makeTree(renderable: Renderable, container: Node) {

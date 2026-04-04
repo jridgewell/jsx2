@@ -153,8 +153,8 @@ export function useComputed<T>(cb: () => T, deps?: unknown[]): () => T {
     if (ctx.dirty) {
       const oldContext = setContext(ctx);
       try {
-        prepareDependencies(ctx);
         const { cb } = data;
+        prepareDependencies(ctx);
         value = cb();
         finalizeDependencies(ctx);
         ctx.dirty = false;

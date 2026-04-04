@@ -7,7 +7,7 @@ import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { Renderable, RenderableArray } from '../../src/render';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
-import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
+import { Component, act, createElement, useLayoutEffect } from '../../src/jsx2';
 import { createSignal } from '../../src/signals';
 import { createRoot } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
@@ -421,7 +421,9 @@ describe('diffTree', () => {
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
-        setSignal('after');
+        act(() => {
+          setSignal('after');
+        });
         expectTextNode(node, 'after');
 
         diff(tree, null, container);
@@ -449,7 +451,9 @@ describe('diffTree', () => {
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
-        setSignal('after');
+        act(() => {
+          setSignal('after');
+        });
         expectTextNode(node, 'after');
 
         diff(tree, 'new-string', container);
@@ -477,7 +481,9 @@ describe('diffTree', () => {
         const tree = makeTree(signal, container);
         const node = container.firstChild!;
 
-        setSignal('after');
+        act(() => {
+          setSignal('after');
+        });
         expectTextNode(node, 'after');
 
         diff(tree, createElement('div'), container);
@@ -505,7 +511,9 @@ describe('diffTree', () => {
         const tree = makeTree(signal1, container);
         const node = container.firstChild!;
 
-        setSignal1('after1');
+        act(() => {
+          setSignal1('after1');
+        });
         expectTextNode(node, 'after1');
 
         const [signal2] = createSignal('test2');
@@ -589,7 +597,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal(123);
+        act(() => {
+          setSignal(123);
+        });
 
         expectTextNode(container.firstChild!, '123');
       });
@@ -601,7 +611,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal('after');
+        act(() => {
+          setSignal('after');
+        });
 
         expectTextNode(container.firstChild!, 'after');
       });
@@ -613,7 +625,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal(true);
+        act(() => {
+          setSignal(true);
+        });
 
         expect(container.firstChild).toBe(null);
       });
@@ -625,7 +639,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal(null);
+        act(() => {
+          setSignal(null);
+        });
 
         expect(container.firstChild).toBe(null);
       });
@@ -637,7 +653,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal(createElement('div'));
+        act(() => {
+          setSignal(createElement('div'));
+        });
 
         expectElement(container.firstChild!, 'div');
       });
@@ -649,7 +667,9 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal(['a', 'b']);
+        act(() => {
+          setSignal(['a', 'b']);
+        });
 
         expectTextNode(container.firstChild!, 'a');
         expectTextNode(container.lastChild!, 'b');
@@ -663,10 +683,14 @@ describe('diffTree', () => {
 
         expectTextNode(container.firstChild!, 'before');
 
-        setSignal1(signal2);
+        act(() => {
+          setSignal1(signal2);
+        });
         expectTextNode(container.firstChild!, 'nested');
 
-        setSignal2('after');
+        act(() => {
+          setSignal2('after');
+        });
         expectTextNode(container.firstChild!, 'after');
       });
 
@@ -679,7 +703,9 @@ describe('diffTree', () => {
 
         expectTextNode(node, 'nested');
 
-        setSignal1('after');
+        act(() => {
+          setSignal1('after');
+        });
         setSignal2('ignored');
 
         expectTextNode(container.firstChild!, 'after');
@@ -707,7 +733,9 @@ describe('diffTree', () => {
         const renderable = createElement(C);
         const node = container.firstChild!;
 
-        setSignal('after');
+        act(() => {
+          setSignal('after');
+        });
 
         expectTextNode(node, 'after');
 
@@ -738,7 +766,9 @@ describe('diffTree', () => {
         const renderable = ['after'];
         const node = container.firstChild!;
 
-        setSignal('signal-after');
+        act(() => {
+          setSignal('signal-after');
+        });
 
         expectTextNode(node, 'signal-after');
 
