@@ -29,7 +29,7 @@ interface BaseContext {
   type: SignalContextEnum;
   nextDependent: SignalLink | null;
   nextDependency: SignalLink | null;
-  altDependency: SignalLink | null;
+  tailDependency: SignalLink | null;
 }
 
 export interface SignalSignalContext extends BaseContext {
@@ -120,8 +120,8 @@ export function setContext(ctx: SignalContext | null): null | SignalContext {
 
 function cleanupLinks(link: SignalLink | null): void {
   while (link !== null) {
-    const { source, nextDependency, nextDependent, prevDependent } = link;
-    link = nextDependency;
+    const { source, prevDependency, nextDependent, prevDependent } = link;
+    link = prevDependency;
 
     if (prevDependent) prevDependent.nextDependent = nextDependent;
     else source.nextDependent = nextDependent;
@@ -131,21 +131,21 @@ function cleanupLinks(link: SignalLink | null): void {
 }
 
 export function cleanupContext(ctx: SignalContext): void {
-  cleanupLinks(ctx.nextDependency);
+  cleanupLinks(getTail(ctx.nextDependency));
   ctx.nextDependency = null;
 }
 
 export function linkContexts(source: SignalContext, sink: SignalContext): void {
   const { nextDependent } = source;
-  const { nextDependency, altDependency } = sink;
-  if (altDependency && altDependency.source === source) {
-    debug: assert(sink === altDependency.sink);
+  const { nextDependency, tailDependency } = sink;
 
-    sink.altDependency = altDependency.nextDependency;
-    sink.nextDependency = altDependency;
-    altDependency.nextDependency = nextDependency;
-    altDependency.prevDependency = null;
-    if (nextDependency) nextDependency.prevDependency = altDependency;
+  if (tailDependency !== null && tailDependency.source === source) {
+    debug: assert(sink === tailDependency.sink);
+
+    sink.tailDependency = tailDependency.prevDependency;
+    sink.nextDependency = tailDependency;
+    tailDependency.nextDependency = nextDependency;
+    if (nextDependency) nextDependency.prevDependency = tailDependency;
 
     return;
   }
@@ -166,15 +166,26 @@ export function linkContexts(source: SignalContext, sink: SignalContext): void {
   sink.nextDependency = link;
 }
 
+function getTail(link: SignalLink | null): SignalLink | null {
+  let tail = null;
+  while (link !== null) {
+    tail = link;
+    link = link.nextDependency;
+  }
+  return tail;
+}
+
 export function prepareDependencies(ctx: SignalContext): void {
-  const { nextDependency, altDependency } = ctx;
-  ctx.nextDependency = altDependency;
-  ctx.altDependency = nextDependency;
+  const tail = getTail(ctx.nextDependency);
+  ctx.tailDependency = tail;
+  ctx.nextDependency = null;
 }
 
 export function finalizeDependencies(ctx: SignalContext): void {
-  cleanupLinks(ctx.altDependency);
-  ctx.altDependency = null;
+  const { tailDependency } = ctx;
+  if (tailDependency) tailDependency.prevDependency = null;
+  ctx.tailDependency = null;
+  cleanupLinks(tailDependency);
 }
 
 export function notifyDependents(head: SignalLink | null): void {
@@ -218,7 +229,7 @@ export function context<T extends SignalContext['type']>(
     type,
     nextDependent: null,
     nextDependency: null,
-    altDependency: null,
+    tailDependency: null,
     fiber: null,
     dirty: false,
     state: null,

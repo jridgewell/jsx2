@@ -18,6 +18,38 @@ function expectTextNode(node: null | Node, text: string) {
 }
 
 describe('signals integration tests', () => {
+  it('proves SignalLink instances are not preserved', () => {
+    const [getA, , , ctxA] = createSignal('A');
+    const [getB, , , ctxB] = createSignal('B');
+
+    const Comp = jest.fn(() => {
+      getA();
+      getB();
+    });
+
+    const body = document.createElement('body');
+
+    act(() => {
+      render(createElement(Comp), body);
+    });
+
+    const linkA1 = ctxA.nextDependent;
+    const linkB1 = ctxB.nextDependent;
+
+    expect(linkA1).toBeDefined();
+    expect(linkB1).toBeDefined();
+
+    act(() => {
+      render(createElement(Comp), body);
+    });
+
+    const linkA2 = ctxA.nextDependent;
+    const linkB2 = ctxB.nextDependent;
+
+    expect(linkA2).toBe(linkA1);
+    expect(linkB2).toBe(linkB1);
+  });
+
   describe('useSignal', () => {
     it('accepts an initial value and getter reads it', () => {
       const body = document.createElement('body');
