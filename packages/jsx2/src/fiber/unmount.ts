@@ -47,7 +47,7 @@ function cleanupSignals(stateData: HookState[]): void {
   for (let i = 0; i < stateData.length; i++) {
     const state = stateData[i];
     if (state.type === HookEnum.SIGNAL || state.type === HookEnum.EFFECT) {
-      cleanupContext(state.data.context);
+      cleanupContext(state.data.ctx);
     }
   }
 }

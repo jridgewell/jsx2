@@ -8,7 +8,6 @@ import type {
   SignalFiber,
 } from '../fiber';
 import type { LayoutEffectData } from '../hooks';
-import type { ChildSignalContext } from '../signals';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { NS } from '../util/namespace';
 
@@ -18,7 +17,7 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
-import { SignalContextEnum, setContext } from '../signals';
+import { SignalContextEnum, context, setContext } from '../signals';
 import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { setOnNode } from '../fiber/node';
@@ -114,15 +113,11 @@ function internal(
   }
 
   if (typeof renderable === 'function') {
-    const context: ChildSignalContext = {
-      type: SignalContextEnum.CHILD,
-      dependents: new Set(),
-      dependencies: new Set(),
-      fiber: f as SignalFiber,
-    };
-    f.signalContext = context;
+    const ctx = context(SignalContextEnum.CHILD);
+    ctx.fiber = f as SignalFiber;
+    f.signalContext = ctx;
 
-    const oldContext = setContext(context);
+    const oldContext = setContext(ctx);
     let initial: CoercedRenderable;
     try {
       initial = coerceRenderable(renderable());

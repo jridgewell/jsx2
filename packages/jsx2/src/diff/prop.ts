@@ -6,7 +6,7 @@ import type { AttributeSignalContext } from '../signals';
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';
-import { SignalContextEnum, cleanupContext, setContext } from '../signals';
+import { SignalContextEnum, cleanupContext, context, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { DOM_XLINK_NAMESPACE } from '../util/namespace';
 
@@ -30,25 +30,21 @@ export function diffProp(
   } else if (name.startsWith('on')) {
     diffEvent(el, name, oldValue as ListenerTypes, newValue as ListenerTypes);
   } else if (typeof newValue === 'function') {
-    let context = attributeSignals[name];
+    let ctx = attributeSignals[name];
 
-    if (!context) {
-      context = {
-        type: SignalContextEnum.ATTRIBUTE,
-        dependents: new Set(),
-        dependencies: new Set(),
-        el,
-        name,
-        getter: newValue as () => unknown,
-        oldValue,
-      };
-      attributeSignals[name] = context;
+    if (!ctx) {
+      ctx = context(SignalContextEnum.ATTRIBUTE);
+      ctx.el = el;
+      ctx.name = name;
+      ctx.getter = newValue as () => unknown;
+      ctx.oldValue = oldValue;
+      attributeSignals[name] = ctx;
     } else {
-      cleanupContext(context);
-      context.getter = newValue as () => unknown;
+      cleanupContext(ctx);
+      ctx.getter = newValue as () => unknown;
     }
 
-    rediffProp(context);
+    rediffProp(ctx);
   } else {
     if (typeof oldValue === 'function') {
       const context = attributeSignals[name];

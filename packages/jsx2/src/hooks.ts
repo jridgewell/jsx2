@@ -6,6 +6,7 @@ import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } 
 import {
   SignalContextEnum,
   cleanupContext,
+  context,
   createSignal,
   getCurrentContext,
   setContext,
@@ -25,12 +26,12 @@ export enum HookEnum {
 }
 
 export interface SignalData<S> {
-  context: SignalSignalContext;
+  ctx: SignalSignalContext;
   fns: SignalFns<S>;
 }
 
 export interface ComputedData<S> {
-  context: ComputedSignalContext;
+  ctx: ComputedSignalContext;
   getter: () => S;
 }
 
@@ -84,7 +85,7 @@ export interface LayoutEffectData extends BaseEffectData {
 export interface EffectEffectData extends BaseEffectData {
   type: HookEnum.EFFECT;
   innerEffect: Effect;
-  context: EffectSignalContext;
+  ctx: EffectSignalContext;
 }
 
 function getHookState(): HookState {
@@ -115,10 +116,10 @@ export function useSignal<S>(initial: S): SignalFns<S> {
   const hookState = getHookState();
   if (hookState.data) return (hookState.data as SignalData<S>).fns;
 
-  const { 0: getter, 1: setter, 2: update, 3: context } = createSignal(initial);
+  const { 0: getter, 1: setter, 2: update, 3: ctx } = createSignal(initial);
   const fns = [getter, setter, update] as const;
   hookState.type = HookEnum.SIGNAL;
-  hookState.data = { context, fns };
+  hookState.data = { ctx, fns };
   return fns;
 }
 
@@ -129,33 +130,29 @@ export function useComputed<T>(cb: () => T): () => T {
 
   let value: T;
 
-  const context: ComputedSignalContext = {
-    type: SignalContextEnum.COMPUTED,
-    dirty: true,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
+  const ctx = context(SignalContextEnum.COMPUTED);
+  ctx.dirty = true;
 
   function getter() {
-    if (context.dirty) {
-      const oldContext = setContext(context);
+    if (ctx.dirty) {
+      const oldContext = setContext(ctx);
       try {
         value = cb();
-        context.dirty = false;
+        ctx.dirty = false;
       } finally {
         setContext(oldContext);
       }
     }
-    const ctx = getCurrentContext();
-    if (ctx) {
-      context.dependents.add(ctx);
-      ctx.dependencies.add(context);
+    const current = getCurrentContext();
+    if (current) {
+      ctx.dependents.add(current);
+      current.dependencies.add(ctx);
     }
     return value;
   }
 
   hookState.type = HookEnum.SIGNAL;
-  hookState.data = { context, getter };
+  hookState.data = { ctx, getter };
   return getter;
 }
 
@@ -205,19 +202,15 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     cleanup: null,
     active: true,
     scheduled: false,
-    context: null as unknown as EffectSignalContext,
+    ctx: null as unknown as EffectSignalContext,
   };
-  const context: EffectSignalContext = {
-    type: SignalContextEnum.EFFECT,
-    state: data,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
-  data.context = context;
+  const ctx = context(SignalContextEnum.EFFECT);
+  ctx.state = data;
+  data.ctx = ctx;
 
   function wrappedEffect() {
-    const oldContext = setContext(context);
-    cleanupContext(context);
+    const oldContext = setContext(ctx);
+    cleanupContext(ctx);
     try {
       return data.innerEffect();
     } finally {

@@ -5,7 +5,7 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { LayoutEffectData } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { SignalContextEnum, cleanupContext, setContext } from '../signals';
+import { SignalContextEnum, cleanupContext, context, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
@@ -42,18 +42,14 @@ export function renderComponentWithHooks(
   };
   fiber.current = true;
 
-  let context = fiber.signalContext;
-  if (context === null) {
-    context = fiber.signalContext = {
-      type: SignalContextEnum.COMPONENT,
-      fiber,
-      dependents: new Set(),
-      dependencies: new Set(),
-    };
+  let ctx = fiber.signalContext;
+  if (ctx === null) {
+    ctx = fiber.signalContext = context(SignalContextEnum.COMPONENT);
+    ctx.fiber = fiber;
   } else {
-    cleanupContext(context);
+    cleanupContext(ctx);
   }
-  const oldContext = setContext(context);
+  const oldContext = setContext(ctx);
   try {
     for (let renderCount = 0; renderCount < 25; renderCount++) {
       // The component may have been dirtied by a component change

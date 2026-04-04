@@ -1,11 +1,10 @@
 import type { ContextHolder } from '../../src/create-context';
 import type { FunctionComponentFiber } from '../../src/fiber';
-import type { ComputedSignalContext, EffectSignalContext, SignalContext } from '../../src/signals';
 
 import { fiber } from '../../src/fiber';
 import { HookEnum } from '../../src/hooks';
 import { Component, createElement } from '../../src/jsx2';
-import { SignalContextEnum } from '../../src/signals';
+import { context, SignalContextEnum } from '../../src/signals';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 
@@ -68,78 +67,56 @@ describe('unmount', () => {
     it('cleans up child context when unmounted', () => {
       const parent = fiber('parent');
       const current = fiber(() => 'test');
-      const parentContext: SignalContext = {
-        type: SignalContextEnum.SIGNAL,
-        dependents: new Set(),
-        dependencies: new Set(),
-      };
-      const context = (current.signalContext = {
-        type: SignalContextEnum.CHILD,
-        fiber: current,
-        dependents: new Set(),
-        dependencies: new Set([parentContext]),
-      });
-      parentContext.dependents.add(context);
+      const parentContext = context(SignalContextEnum.SIGNAL);
+      const ctx = (current.signalContext = context(SignalContextEnum.CHILD));
+      ctx.fiber = current;
+      ctx.dependencies.add(parentContext);
+      parentContext.dependents.add(ctx);
       mark(current, parent, null);
       const spy = jest.spyOn(parentContext.dependents, 'delete');
 
       unmount(current);
 
-      expect(context.dependencies.size).toBe(0);
+      expect(ctx.dependencies.size).toBe(0);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(context);
+      expect(spy).toHaveBeenCalledWith(ctx);
     });
 
     it('cleans up component context when unmounted', () => {
       const parent = fiber('parent');
       const current = makeFunctionComponentFiber();
-      const parentContext: SignalContext = {
-        type: SignalContextEnum.SIGNAL,
-        dependents: new Set(),
-        dependencies: new Set(),
-      };
-      const context = (current.signalContext = {
-        type: SignalContextEnum.COMPONENT,
-        fiber: current as any,
-        dependents: new Set(),
-        dependencies: new Set([parentContext]),
-      });
-      parentContext.dependents.add(context);
+      const parentContext = context(SignalContextEnum.SIGNAL);
+      const ctx = (current.signalContext = context(SignalContextEnum.COMPONENT));
+      ctx.fiber = current;
+      ctx.dependencies.add(parentContext);
+      parentContext.dependents.add(ctx);
       mark(current, parent, null);
       const spy = jest.spyOn(parentContext.dependents, 'delete');
 
       unmount(current);
 
-      expect(context.dependencies.size).toBe(0);
+      expect(ctx.dependencies.size).toBe(0);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith(context);
+      expect(spy).toHaveBeenCalledWith(ctx);
     });
 
     it('cleans up hook signals when unmounted', () => {
       const parent = fiber('parent');
       const current = makeFunctionComponentFiber();
-      const parentContext: SignalContext = {
-        type: SignalContextEnum.SIGNAL,
-        dependents: new Set(),
-        dependencies: new Set(),
-      };
-      const hookContext: ComputedSignalContext = {
-        type: SignalContextEnum.COMPUTED,
-        dependents: new Set(),
-        dependencies: new Set([parentContext]),
-        dirty: false,
-      };
+      const parentContext = context(SignalContextEnum.SIGNAL);
+      const hookContext = context(SignalContextEnum.COMPUTED);
+      hookContext.dependencies.add(parentContext);
+      parentContext.dependents.add(hookContext);
 
       current.stateData = [
         {
           type: HookEnum.SIGNAL,
           data: {
-            context: hookContext,
+            ctx: hookContext,
             getter: () => 'test',
           },
         },
       ];
-      parentContext.dependents.add(hookContext);
       mark(current, parent, null);
       const spy = jest.spyOn(parentContext.dependents, 'delete');
 
@@ -319,18 +296,11 @@ describe('unmount', () => {
   describe('pending useEffects', () => {
     function addEffect(fiber: FunctionComponentFiber): jest.Mock {
       const cleanup = jest.fn();
-      fiber.signalContext = {
-        type: SignalContextEnum.COMPONENT,
-        fiber,
-        dependents: new Set(),
-        dependencies: new Set(),
-      };
-      const effectContext: EffectSignalContext = {
-        type: SignalContextEnum.EFFECT,
-        state: null as any,
-        dependents: new Set(),
-        dependencies: new Set([fiber.signalContext]),
-      };
+      fiber.signalContext = context(SignalContextEnum.COMPONENT);
+      fiber.signalContext.fiber = fiber;
+
+      const effectContext = context(SignalContextEnum.EFFECT);
+      effectContext.dependencies.add(fiber.signalContext);
       fiber.signalContext.dependents.add(effectContext);
       fiber.stateData = [
         {
@@ -343,7 +313,7 @@ describe('unmount', () => {
             effect: () => {},
             innerEffect: () => {},
             cleanup,
-            context: effectContext,
+            ctx: effectContext,
           },
         },
       ];

@@ -673,7 +673,7 @@ describe('diffTree', () => {
       it('cleans up nested context when replaced', () => {
         const container = document.createElement('body');
         const [signal2, setSignal2] = createSignal<string>('nested');
-        const [signal1, setSignal1] = createSignal<typeof signal2>(signal2);
+        const [signal1, setSignal1] = createSignal<typeof signal2 | string>(signal2);
         makeTree(signal1, container);
         const node = container.firstChild!;
 

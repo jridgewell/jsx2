@@ -15,7 +15,7 @@ export enum SignalContextEnum {
   ATTRIBUTE = 5,
 }
 
-export interface BaseContext {
+interface BaseContext {
   type: SignalContextEnum;
   dependents: Set<SignalContext>;
   dependencies: Set<SignalContext>;
@@ -23,30 +23,64 @@ export interface BaseContext {
 
 export interface SignalSignalContext extends BaseContext {
   type: SignalContextEnum.SIGNAL;
+  fiber: null;
+  dirty: false;
+  state: null;
+  el: null;
+  name: '';
+  getter: null;
+  oldValue: null;
 }
 
 export interface ComponentSignalContext extends BaseContext {
   type: SignalContextEnum.COMPONENT;
   fiber: FunctionComponentFiber;
+  dirty: false;
+  state: null;
+  el: null;
+  name: '';
+  getter: null;
+  oldValue: null;
 }
 
 export interface ComputedSignalContext extends BaseContext {
   type: SignalContextEnum.COMPUTED;
+  fiber: null;
   dirty: boolean;
+  state: null;
+  el: null;
+  name: '';
+  getter: null;
+  oldValue: null;
 }
 
 export interface EffectSignalContext extends BaseContext {
   type: SignalContextEnum.EFFECT;
+  fiber: null;
+  dirty: false;
   state: EffectEffectData;
+  el: null;
+  name: '';
+  getter: null;
+  oldValue: null;
 }
 
 export interface ChildSignalContext extends BaseContext {
   type: SignalContextEnum.CHILD;
   fiber: SignalFiber;
+  dirty: false;
+  state: null;
+  el: null;
+  name: '';
+  getter: null;
+  oldValue: null;
 }
 
 export interface AttributeSignalContext extends BaseContext {
   type: SignalContextEnum.ATTRIBUTE;
+  fiber: null;
+  dirty: false;
+  state: null;
   el: HTMLElement | SVGElement;
   name: string;
   getter: () => unknown;
@@ -104,21 +138,46 @@ export function notifyDependents(dependents: Set<SignalContext>): void {
   }
 }
 
+export function context<T extends SignalContext['type']>(
+  type: T,
+): T extends SignalContextEnum.SIGNAL
+  ? SignalSignalContext
+  : T extends SignalContextEnum.COMPONENT
+  ? ComponentSignalContext
+  : T extends SignalContextEnum.COMPUTED
+  ? ComputedSignalContext
+  : T extends SignalContextEnum.EFFECT
+  ? EffectSignalContext
+  : T extends SignalContextEnum.CHILD
+  ? ChildSignalContext
+  : T extends SignalContextEnum.ATTRIBUTE
+  ? AttributeSignalContext
+  : never {
+  return {
+    type,
+    dependents: new Set(),
+    dependencies: new Set(),
+    fiber: null,
+    dirty: false,
+    state: null,
+    el: null,
+    name: '',
+    getter: null,
+    oldValue: null,
+  } as any;
+}
+
 export function createSignal<S>(
   initial: S,
 ): readonly [() => S, (next: S) => void, (cb: (prev: S) => S) => void, SignalSignalContext] {
   let value = initial;
-  const context: SignalSignalContext = {
-    type: SignalContextEnum.SIGNAL,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
+  const ctx = context(SignalContextEnum.SIGNAL);
 
   function getter() {
     const current = getCurrentContext();
     if (current) {
-      context.dependents.add(current);
-      current.dependencies.add(context);
+      ctx.dependents.add(current);
+      current.dependencies.add(ctx);
     }
     return value;
   }
@@ -126,14 +185,14 @@ export function createSignal<S>(
   function setter(next: S) {
     if (next === value) return;
     value = next;
-    notifyDependents(context.dependents);
+    notifyDependents(ctx.dependents);
   }
 
   function update(cb: (prev: S) => S) {
     setter(cb(value));
   }
 
-  return [getter, setter, update, context] as const;
+  return [getter, setter, update, ctx] as const;
 }
 
 export function signal<S>(

@@ -29,7 +29,7 @@ export function cleanupEffects(stateData: HookState[]): void {
       data.active = false;
       if (cleanup != null) cleanup();
       if (state.type === HookEnum.EFFECT) {
-        cleanupContext((data as EffectEffectData).context);
+        cleanupContext((data as EffectEffectData).ctx);
       }
     }
   }

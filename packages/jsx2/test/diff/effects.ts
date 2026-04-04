@@ -8,7 +8,7 @@ import type {
 import type { EffectSignalContext } from '../../src/signals';
 
 import { HookEnum } from '../../src/hooks';
-import { SignalContextEnum } from '../../src/signals';
+import { context, SignalContextEnum } from '../../src/signals';
 import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
@@ -20,15 +20,11 @@ function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
     cleanup,
     innerEffect: effect,
     effect,
-    context: null as unknown as EffectSignalContext,
+    ctx: null as unknown as EffectSignalContext,
   };
-  const context: EffectSignalContext = {
-    type: SignalContextEnum.EFFECT,
-    state: data,
-    dependents: new Set(),
-    dependencies: new Set(),
-  };
-  data.context = context;
+  const ctx: EffectSignalContext = context(SignalContextEnum.EFFECT);
+  ctx.state = data;
+  data.ctx = ctx;
   return {
     type: HookEnum.EFFECT,
     data,
