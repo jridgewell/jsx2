@@ -1,4 +1,4 @@
-import { HookType, type LayoutEffectData } from '../../src/hooks';
+import { HookEnum, type LayoutEffectData } from '../../src/hooks';
 import type { FiberState } from '../../src/diff/render-component-with-hooks';
 
 import { fiber } from '../../src/fiber';
@@ -54,7 +54,7 @@ describe('getCurrentFiberState', () => {
 describe('renderComponentWithHooks', () => {
   function makeEffect(): LayoutEffectData {
     return {
-      type: HookType.LAYOUT_EFFECT,
+      type: HookEnum.LAYOUT_EFFECT,
       deps: [],
       cleanup: null,
       effect() {},

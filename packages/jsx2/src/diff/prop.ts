@@ -6,7 +6,7 @@ import type { AttributeSignalContext } from '../signals';
 
 import { diffEvent } from './event';
 import { diffStyle } from './style';
-import { SignalContextType, cleanupContext, setContext } from '../signals';
+import { SignalContextEnum, cleanupContext, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { DOM_XLINK_NAMESPACE } from '../util/namespace';
 
@@ -34,7 +34,7 @@ export function diffProp(
 
     if (!context) {
       context = {
-        type: SignalContextType.ATTRIBUTE,
+        type: SignalContextEnum.ATTRIBUTE,
         dependents: new Set(),
         dependencies: new Set(),
         el,

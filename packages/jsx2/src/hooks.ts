@@ -4,7 +4,7 @@ import type { Fiber } from './fiber';
 import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } from './signals';
 
 import {
-  SignalContextType,
+  SignalContextEnum,
   cleanupContext,
   getCurrentContext,
   notifyDependents,
@@ -17,7 +17,7 @@ import { getCurrentFiberState } from './diff/render-component-with-hooks';
 import { getAncestorFiber } from './fiber/get-ancestor-fiber';
 import { shallowArrayEquals } from './util/shallow-array-equals';
 
-export enum HookType {
+export enum HookEnum {
   REGULAR,
   EFFECT,
   LAYOUT_EFFECT,
@@ -35,22 +35,22 @@ export interface ComputedData<S> {
 }
 
 export interface RegularHookState {
-  type: HookType.REGULAR;
+  type: HookEnum.REGULAR;
   data: unknown;
 }
 
 export interface EffectHookState {
-  type: HookType.EFFECT;
+  type: HookEnum.EFFECT;
   data: EffectEffectData;
 }
 
 export interface SignalHookState<S = unknown> {
-  type: HookType.SIGNAL;
+  type: HookEnum.SIGNAL;
   data: SignalData<S> | ComputedData<S>;
 }
 
 export interface LayoutEffectHookState {
-  type: HookType.LAYOUT_EFFECT;
+  type: HookEnum.LAYOUT_EFFECT;
   data: LayoutEffectData;
 }
 
@@ -78,11 +78,11 @@ export interface BaseEffectData {
 }
 
 export interface LayoutEffectData extends BaseEffectData {
-  type: HookType.LAYOUT_EFFECT;
+  type: HookEnum.LAYOUT_EFFECT;
 }
 
 export interface EffectEffectData extends BaseEffectData {
-  type: HookType.EFFECT;
+  type: HookEnum.EFFECT;
   innerEffect: Effect;
   context: EffectSignalContext;
 }
@@ -94,7 +94,7 @@ function getHookState(): HookState {
   if (stateData.length > index) {
     return stateData[index];
   }
-  return (stateData[index] = { type: HookType.REGULAR, data: null });
+  return (stateData[index] = { type: HookEnum.REGULAR, data: null });
 }
 
 function lazy<S>(f: Lazy<S>): S {
@@ -117,7 +117,7 @@ export function useSignal<S>(initial: S): SignalFns<S> {
 
   let value = initial;
   const context: SignalSignalContext = {
-    type: SignalContextType.SIGNAL,
+    type: SignalContextEnum.SIGNAL,
     dependents: new Set(),
     dependencies: new Set(),
   };
@@ -142,7 +142,7 @@ export function useSignal<S>(initial: S): SignalFns<S> {
     setter(cb(value));
   }
 
-  hookState.type = HookType.SIGNAL;
+  hookState.type = HookEnum.SIGNAL;
   hookState.data = { context, fns };
   return fns;
 }
@@ -155,7 +155,7 @@ export function useComputed<T>(cb: () => T): () => T {
   let value: T;
 
   const context: ComputedSignalContext = {
-    type: SignalContextType.COMPUTED,
+    type: SignalContextEnum.COMPUTED,
     dirty: true,
     dependents: new Set(),
     dependencies: new Set(),
@@ -179,7 +179,7 @@ export function useComputed<T>(cb: () => T): () => T {
     return value;
   }
 
-  hookState.type = HookType.SIGNAL;
+  hookState.type = HookEnum.SIGNAL;
   hookState.data = { context, getter };
   return getter;
 }
@@ -223,7 +223,7 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     return;
   }
   const data: EffectEffectData = {
-    type: HookType.EFFECT,
+    type: HookEnum.EFFECT,
     deps,
     innerEffect: effect,
     effect: wrappedEffect,
@@ -233,7 +233,7 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     context: null as unknown as EffectSignalContext,
   };
   const context: EffectSignalContext = {
-    type: SignalContextType.EFFECT,
+    type: SignalContextEnum.EFFECT,
     state: data,
     dependents: new Set(),
     dependencies: new Set(),
@@ -250,7 +250,7 @@ export function useEffect(effect: Effect, deps?: unknown[]): void {
     }
   }
 
-  hookState.type = HookType.EFFECT;
+  hookState.type = HookEnum.EFFECT;
   hookState.data = data;
   scheduleEffect(data);
 }
@@ -268,14 +268,14 @@ export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
   }
 
   data = {
-    type: HookType.LAYOUT_EFFECT,
+    type: HookEnum.LAYOUT_EFFECT,
     deps,
     effect,
     cleanup: null,
     active: true,
     scheduled: false,
   };
-  hookState.type = HookType.LAYOUT_EFFECT;
+  hookState.type = HookEnum.LAYOUT_EFFECT;
   hookState.data = data;
   scheduleLayoutEffect(data);
 }

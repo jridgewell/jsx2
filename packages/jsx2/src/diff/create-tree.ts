@@ -18,7 +18,7 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
-import { SignalContextType, setContext } from '../signals';
+import { SignalContextEnum, setContext } from '../signals';
 import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { setOnNode } from '../fiber/node';
@@ -115,7 +115,7 @@ function internal(
 
   if (typeof renderable === 'function') {
     const context: ChildSignalContext = {
-      type: SignalContextType.CHILD,
+      type: SignalContextEnum.CHILD,
       dependents: new Set(),
       dependencies: new Set(),
       fiber: f as SignalFiber,

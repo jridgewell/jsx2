@@ -3,7 +3,7 @@ import type { ElementFiber } from '../../src/fiber';
 import { fiber } from '../../src/fiber';
 import { createElement } from '../../src/jsx2';
 import type { SignalContext } from '../../src/signals';
-import { SignalContextType, getCurrentContext, notifyDependents } from '../../src/signals';
+import { SignalContextEnum, getCurrentContext, notifyDependents } from '../../src/signals';
 import {
   addProps as realAddProps,
   diffProp as realDiffProp,
@@ -20,7 +20,7 @@ function createMockFiber(dom: HTMLElement | SVGElement): ElementFiber {
 
 function createSignalTrack<T>(initialValue: T) {
   const context: SignalContext = {
-    type: SignalContextType.SIGNAL,
+    type: SignalContextEnum.SIGNAL,
     dependents: new Set(),
     dependencies: new Set(),
   };

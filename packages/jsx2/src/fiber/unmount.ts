@@ -3,7 +3,7 @@ import type { ContextHolder } from '../create-context';
 import type { HookState } from '../hooks';
 import type { AttributeSignalContext } from '../signals';
 
-import { HookType } from '../hooks';
+import { HookEnum } from '../hooks';
 import { cleanupContext } from '../signals';
 import { cleanupEffects } from '../diff/effects';
 import { setRef } from '../diff/ref';
@@ -46,7 +46,7 @@ function cleanupAttributes(attributeSignals: Record<string, null | AttributeSign
 function cleanupSignals(stateData: HookState[]): void {
   for (let i = 0; i < stateData.length; i++) {
     const state = stateData[i];
-    if (state.type === HookType.SIGNAL || state.type === HookType.EFFECT) {
+    if (state.type === HookEnum.SIGNAL || state.type === HookEnum.EFFECT) {
       cleanupContext(state.data.context);
     }
   }

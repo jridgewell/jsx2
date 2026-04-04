@@ -7,13 +7,13 @@ import type {
 } from '../../src/hooks';
 import type { EffectSignalContext } from '../../src/signals';
 
-import { HookType } from '../../src/hooks';
-import { SignalContextType } from '../../src/signals';
+import { HookEnum } from '../../src/hooks';
+import { SignalContextEnum } from '../../src/signals';
 import { applyEffects, cleanupEffects, scheduleEffect } from '../../src/diff/effects';
 
 function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
   const data: EffectEffectData = {
-    type: HookType.EFFECT,
+    type: HookEnum.EFFECT,
     deps: [],
     active: true,
     scheduled: false,
@@ -23,14 +23,14 @@ function makeEffect(effect: Effect, cleanup?: EffectCleanup): EffectHookState {
     context: null as unknown as EffectSignalContext,
   };
   const context: EffectSignalContext = {
-    type: SignalContextType.EFFECT,
+    type: SignalContextEnum.EFFECT,
     state: data,
     dependents: new Set(),
     dependencies: new Set(),
   };
   data.context = context;
   return {
-    type: HookType.EFFECT,
+    type: HookEnum.EFFECT,
     data,
   };
 }
@@ -122,7 +122,7 @@ describe('cleanupEffects', () => {
     const cleanup = jest.fn();
     const hooks: HookState[] = [
       {
-        type: HookType.REGULAR,
+        type: HookEnum.REGULAR,
         data: null,
       },
       makeEffect(() => {}, cleanup),

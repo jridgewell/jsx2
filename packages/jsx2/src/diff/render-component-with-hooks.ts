@@ -5,7 +5,7 @@ import type { FunctionComponentFiber } from '../fiber';
 import type { LayoutEffectData } from '../hooks';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
-import { SignalContextType, cleanupContext, setContext } from '../signals';
+import { SignalContextEnum, cleanupContext, setContext } from '../signals';
 import { assert } from '../util/assert';
 import { coerceRenderable } from '../util/coerce-renderable';
 
@@ -45,7 +45,7 @@ export function renderComponentWithHooks(
   let context = fiber.signalContext;
   if (context === null) {
     context = fiber.signalContext = {
-      type: SignalContextType.COMPONENT,
+      type: SignalContextEnum.COMPONENT,
       fiber,
       dependents: new Set(),
       dependencies: new Set(),

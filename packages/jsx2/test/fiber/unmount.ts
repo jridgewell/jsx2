@@ -3,9 +3,9 @@ import type { FunctionComponentFiber } from '../../src/fiber';
 import type { ComputedSignalContext, EffectSignalContext, SignalContext } from '../../src/signals';
 
 import { fiber } from '../../src/fiber';
-import { HookType } from '../../src/hooks';
+import { HookEnum } from '../../src/hooks';
 import { Component, createElement } from '../../src/jsx2';
-import { SignalContextType } from '../../src/signals';
+import { SignalContextEnum } from '../../src/signals';
 import { mark } from '../../src/fiber/mark';
 import { unmount } from '../../src/fiber/unmount';
 
@@ -69,12 +69,12 @@ describe('unmount', () => {
       const parent = fiber('parent');
       const current = fiber(() => 'test');
       const parentContext: SignalContext = {
-        type: SignalContextType.SIGNAL,
+        type: SignalContextEnum.SIGNAL,
         dependents: new Set(),
         dependencies: new Set(),
       };
       const context = (current.signalContext = {
-        type: SignalContextType.CHILD,
+        type: SignalContextEnum.CHILD,
         fiber: current,
         dependents: new Set(),
         dependencies: new Set([parentContext]),
@@ -94,12 +94,12 @@ describe('unmount', () => {
       const parent = fiber('parent');
       const current = makeFunctionComponentFiber();
       const parentContext: SignalContext = {
-        type: SignalContextType.SIGNAL,
+        type: SignalContextEnum.SIGNAL,
         dependents: new Set(),
         dependencies: new Set(),
       };
       const context = (current.signalContext = {
-        type: SignalContextType.COMPONENT,
+        type: SignalContextEnum.COMPONENT,
         fiber: current as any,
         dependents: new Set(),
         dependencies: new Set([parentContext]),
@@ -119,12 +119,12 @@ describe('unmount', () => {
       const parent = fiber('parent');
       const current = makeFunctionComponentFiber();
       const parentContext: SignalContext = {
-        type: SignalContextType.SIGNAL,
+        type: SignalContextEnum.SIGNAL,
         dependents: new Set(),
         dependencies: new Set(),
       };
       const hookContext: ComputedSignalContext = {
-        type: SignalContextType.COMPUTED,
+        type: SignalContextEnum.COMPUTED,
         dependents: new Set(),
         dependencies: new Set([parentContext]),
         dirty: false,
@@ -132,7 +132,7 @@ describe('unmount', () => {
 
       current.stateData = [
         {
-          type: HookType.SIGNAL,
+          type: HookEnum.SIGNAL,
           data: {
             context: hookContext,
             getter: () => 'test',
@@ -320,13 +320,13 @@ describe('unmount', () => {
     function addEffect(fiber: FunctionComponentFiber): jest.Mock {
       const cleanup = jest.fn();
       fiber.signalContext = {
-        type: SignalContextType.COMPONENT,
+        type: SignalContextEnum.COMPONENT,
         fiber,
         dependents: new Set(),
         dependencies: new Set(),
       };
       const effectContext: EffectSignalContext = {
-        type: SignalContextType.EFFECT,
+        type: SignalContextEnum.EFFECT,
         state: null as any,
         dependents: new Set(),
         dependencies: new Set([fiber.signalContext]),
@@ -334,9 +334,9 @@ describe('unmount', () => {
       fiber.signalContext.dependents.add(effectContext);
       fiber.stateData = [
         {
-          type: HookType.EFFECT,
+          type: HookEnum.EFFECT,
           data: {
-            type: HookType.EFFECT,
+            type: HookEnum.EFFECT,
             deps: [],
             active: true,
             scheduled: false,

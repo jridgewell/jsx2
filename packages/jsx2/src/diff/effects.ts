@@ -1,7 +1,7 @@
 import type { BaseEffectData, EffectEffectData, HookState, LayoutEffectData } from '../hooks';
 
 import { getCurrentFiberState } from './render-component-with-hooks';
-import { HookType } from '../hooks';
+import { HookEnum } from '../hooks';
 import { cleanupContext } from '../signals';
 
 let queuedEffects: BaseEffectData[] = [];
@@ -23,12 +23,12 @@ export function scheduleLayoutEffect(effect: LayoutEffectData): void {
 export function cleanupEffects(stateData: HookState[]): void {
   for (let i = 0; i < stateData.length; i++) {
     const state = stateData[i];
-    if (state.type === HookType.EFFECT || state.type === HookType.LAYOUT_EFFECT) {
+    if (state.type === HookEnum.EFFECT || state.type === HookEnum.LAYOUT_EFFECT) {
       const { data } = state;
       const { cleanup } = data;
       data.active = false;
       if (cleanup != null) cleanup();
-      if (state.type === HookType.EFFECT) {
+      if (state.type === HookEnum.EFFECT) {
         cleanupContext((data as EffectEffectData).context);
       }
     }

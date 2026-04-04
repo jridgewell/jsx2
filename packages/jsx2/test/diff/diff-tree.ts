@@ -9,7 +9,7 @@ import type { SignalContext } from '../../src/signals';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
 import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
-import { SignalContextType, getCurrentContext, notifyDependents } from '../../src/signals';
+import { SignalContextEnum, getCurrentContext, notifyDependents } from '../../src/signals';
 import { createRoot } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
@@ -26,7 +26,7 @@ function expectTextNode(node: Node, text: string) {
 
 function createChildSignalTrack<T>(initialValue: T) {
   const context: SignalContext = {
-    type: SignalContextType.SIGNAL,
+    type: SignalContextEnum.SIGNAL,
     dependents: new Set(),
     dependencies: new Set(),
   };
