@@ -22,6 +22,21 @@ var SIGNALS = false;
 var N = 50;
 
 document.addEventListener('DOMContentLoaded', function () {
+  function readHash() {
+    if (!location.hash) return;
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    SIGNALS = params.get('signals') === 'true';
+    MUTATIONS = parseFloat(params.get('mutations'));
+  }
+  readHash();
+
+  function updateHash() {
+    const params = new URLSearchParams();
+    params.set('signals', SIGNALS);
+    params.set('mutations', MUTATIONS);
+    window.location.hash = params.toString();
+  }
+
   startFPSMonitor();
   startMemMonitor();
   initProfiler('data update');
@@ -36,8 +51,10 @@ document.addEventListener('DOMContentLoaded', function () {
   signalsText.textContent = 'signals?: ';
   var signalsCheckbox = document.createElement('input');
   signalsCheckbox.type = 'checkbox';
+  signalsCheckbox.checked = SIGNALS;
   signalsCheckbox.addEventListener('change', function (e) {
     SIGNALS = e.target.checked;
+    updateHash();
     render(<AppSignals dbsSignal={getDbs} />, container);
   });
   controls.appendChild(signalsText);
@@ -47,11 +64,13 @@ document.addEventListener('DOMContentLoaded', function () {
   slider.type = 'range';
   slider.style.marginBottom = '10px';
   slider.style.marginTop = '5px';
+  slider.value = MUTATIONS * 100;
   var sliderText = document.createElement('label');
   sliderText.textContent = 'mutations : ' + (MUTATIONS * 100).toFixed(0) + '%';
 
   slider.addEventListener('change', function (e) {
     MUTATIONS = e.target.value / 100;
+    updateHash();
     sliderText.textContent = 'mutations : ' + (MUTATIONS * 100).toFixed(0) + '%';
   });
   controls.appendChild(sliderText);

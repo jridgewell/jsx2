@@ -17,11 +17,12 @@ const Popover = jsx2.memo(({ query }) => {
 });
 
 export const Query = jsx2.memo(({ query }) => {
-  var elapsed = query.elapsed;
+  var elapsed = query.isEmpty ? 0.0 : query.elapsed;
+  var queryText = query.isEmpty ? '' : query.query;
   return (
     <td className={queryClasses(elapsed)}>
       {formatElapsed(elapsed)}
-      <Popover query={query.query} />
+      <Popover query={queryText} />
     </td>
   );
 });

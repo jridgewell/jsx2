@@ -1,3 +1,5 @@
+/** @jsxImportSource jsx2 */
+
 import { useMemo, useState, useEffect, useLayoutEffect, useCallback } from 'jsx2';
 import logo from './assets/react.svg';
 import './App.css';

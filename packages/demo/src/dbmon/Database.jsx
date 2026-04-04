@@ -20,7 +20,7 @@ export const Database = jsx2.memo(({ db }) => {
 
   for (var i = 0; i < 5; i++) {
     var query = topFiveQueries[i];
-    children[i + 2] = query.isEmpty ? _emptyQuery : <Query query={query} id={query.id} />;
+    children[i + 2] = <Query query={query} id={query.id} />;
   }
 
   return <tr>{children}</tr>;
