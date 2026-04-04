@@ -1,3 +1,5 @@
+/** @jsxImportSource jsx2 */
+
 import { render, hydrate } from 'jsx2';
 import { App } from './App.jsx';
 import './index.css';
