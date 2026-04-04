@@ -5,9 +5,11 @@ import type {
 } from '../../src/create-element';
 import type { Fiber, FunctionComponentFiber, RootFiber } from '../../src/fiber';
 import type { Renderable, RenderableArray } from '../../src/render';
+import type { SignalContext } from '../../src/signals';
 import type { CoercedRenderable } from '../../src/util/coerce-renderable';
 
 import { Component, createElement, useLayoutEffect } from '../../src/jsx2';
+import { SignalContextType, getCurrentContext, notifyDependents } from '../../src/signals';
 import { createRoot } from '../../src/diff/create-tree';
 import { diffTree, rediffComponent } from '../../src/diff/diff-tree';
 import { coerceRenderable } from '../../src/util/coerce-renderable';
@@ -20,6 +22,28 @@ function expectTextNode(node: Node, text: string) {
   expect(node).toBeTruthy();
   expect(node.nodeType).toBe(Node.TEXT_NODE);
   expect(node.textContent).toBe(text);
+}
+
+function createChildSignalTrack<T>(initialValue: T) {
+  const context: SignalContext = {
+    type: SignalContextType.SIGNAL,
+    dependents: new Set(),
+    dependencies: new Set(),
+  };
+  let value = initialValue;
+  const signal = jest.fn(() => {
+    const current = getCurrentContext();
+    if (current) {
+      current.dependencies.add(context);
+      context.dependents.add(current);
+    }
+    return value;
+  });
+  const setSignal = (v: T) => {
+    value = v;
+    notifyDependents(context.dependents);
+  };
+  return [signal, setSignal] as const;
 }
 
 describe('diffTree', () => {
@@ -207,6 +231,18 @@ describe('diffTree', () => {
         expect(container.firstChild!.nextSibling).toBe(container.lastChild);
       });
     });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
+      });
+    });
   });
 
   describe('rendered string', () => {
@@ -369,6 +405,371 @@ describe('diffTree', () => {
         diff(tree, renderable, container);
 
         expect(container.firstChild).not.toBe(old);
+      });
+    });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree('before', container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
+      });
+    });
+  });
+
+  describe('rendered signal', () => {
+    function makeOldFiberTree(container: Node) {
+      const signal = () => 'before';
+      return makeTree(signal, container);
+    }
+
+    describe('rendering null', () => {
+      it('removes tree', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = null;
+
+        diff(tree, renderable, container);
+
+        expect(container.firstChild).toBe(null);
+      });
+
+      it('cleans up context when unmounting', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack('test');
+        const tree = makeTree(signal, container);
+        const node = container.firstChild!;
+
+        setSignal('after');
+        expectTextNode(node, 'after');
+
+        diff(tree, null, container);
+        setSignal('ignored');
+
+        expect(container.firstChild).toBe(null);
+        expect(node.textContent).toBe('after');
+      });
+    });
+
+    describe('rendering string', () => {
+      it('replaces signal with text', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = 'after';
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'after');
+      });
+
+      it('cleans up context when replaced by string', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack('test');
+        const tree = makeTree(signal, container);
+        const node = container.firstChild!;
+
+        setSignal('after');
+        expectTextNode(node, 'after');
+
+        diff(tree, 'new-string', container);
+        setSignal('ignored');
+
+        expectTextNode(container.firstChild!, 'new-string');
+        expect(node.textContent).toBe('after');
+      });
+    });
+
+    describe('rendering element', () => {
+      it('replaces signal with element', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = createElement('div');
+
+        diff(tree, renderable, container);
+
+        expectElement(container.firstChild!, 'div');
+      });
+
+      it('cleans up context when replaced by element', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack('test');
+        const tree = makeTree(signal, container);
+        const node = container.firstChild!;
+
+        setSignal('after');
+        expectTextNode(node, 'after');
+
+        diff(tree, createElement('div'), container);
+        setSignal('ignored');
+
+        expectElement(container.firstChild!, 'div');
+        expect(node.textContent).toBe('after');
+      });
+    });
+
+    describe('rendering signal', () => {
+      it('updates signal getter', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => 'after';
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'after');
+      });
+
+      it('cleans up context when replaced by signal', () => {
+        const container = document.createElement('body');
+        const [signal1, setSignal1] = createChildSignalTrack('test1');
+        const tree = makeTree(signal1, container);
+        const node = container.firstChild!;
+
+        setSignal1('after1');
+        expectTextNode(node, 'after1');
+
+        const [signal2] = createChildSignalTrack('test2');
+        diff(tree, signal2, container);
+
+        expectTextNode(container.firstChild!, 'test2');
+        expect(node).toBe(container.firstChild!); // Verify it was reused!
+
+        setSignal1('ignored');
+
+        expect(node.textContent).toBe('test2');
+      });
+
+      it('renders number as string', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => 123;
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, '123');
+      });
+
+      it('renders boolean as nothing', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => true;
+
+        diff(tree, renderable, container);
+
+        expect(container.firstChild).toBe(null);
+      });
+
+      it('renders null as nothing', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => null;
+
+        diff(tree, renderable, container);
+
+        expect(container.firstChild).toBe(null);
+      });
+
+      it('renders element from signal', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => createElement('div');
+
+        diff(tree, renderable, container);
+
+        expectElement(container.firstChild!, 'div');
+      });
+
+      it('renders array from signal', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => ['a', 'b'];
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'a');
+        expectTextNode(container.lastChild!, 'b');
+      });
+
+      it('renders nested signal', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = () => () => 'nested';
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'nested');
+      });
+    });
+
+    describe('updating signal value', () => {
+      it('updates number as string', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal(123);
+
+        expectTextNode(container.firstChild!, '123');
+      });
+
+      it('updates text as text', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal('after');
+
+        expectTextNode(container.firstChild!, 'after');
+      });
+
+      it('updates boolean as nothing', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal(true);
+
+        expect(container.firstChild).toBe(null);
+      });
+
+      it('updates null as nothing', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal(null);
+
+        expect(container.firstChild).toBe(null);
+      });
+
+      it('updates element from signal', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal(createElement('div'));
+
+        expectElement(container.firstChild!, 'div');
+      });
+
+      it('updates array from signal', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack<any>('before');
+        makeTree(signal, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal(['a', 'b']);
+
+        expectTextNode(container.firstChild!, 'a');
+        expectTextNode(container.lastChild!, 'b');
+      });
+
+      it('updates nested signal', () => {
+        const container = document.createElement('body');
+        const [signal1, setSignal1] = createChildSignalTrack<any>('before');
+        const [signal2, setSignal2] = createChildSignalTrack<any>('nested');
+        makeTree(signal1, container);
+
+        expectTextNode(container.firstChild!, 'before');
+
+        setSignal1(signal2);
+        expectTextNode(container.firstChild!, 'nested');
+
+        setSignal2('after');
+        expectTextNode(container.firstChild!, 'after');
+      });
+
+      it('cleans up nested context when replaced', () => {
+        const container = document.createElement('body');
+        const [signal2, setSignal2] = createChildSignalTrack<any>('nested');
+        const [signal1, setSignal1] = createChildSignalTrack<any>(signal2);
+        makeTree(signal1, container);
+        const node = container.firstChild!;
+
+        expectTextNode(node, 'nested');
+
+        setSignal1('after');
+        setSignal2('ignored');
+
+        expectTextNode(container.firstChild!, 'after');
+        expect(node.textContent).toBe('nested');
+      });
+    });
+
+    describe('rendering component', () => {
+      it('replaces signal with component', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const C = () => 'test';
+        const renderable = createElement(C);
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'test');
+      });
+
+      it('cleans up context when replaced by component', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack('test');
+        const tree = makeTree(signal, container);
+        const C = () => 'test';
+        const renderable = createElement(C);
+        const node = container.firstChild!;
+
+        setSignal('after');
+
+        expectTextNode(node, 'after');
+
+        diff(tree, renderable, container);
+        setSignal('ignored');
+
+        expectTextNode(container.firstChild!, 'test');
+        expect(node.textContent).toBe('after');
+      });
+    });
+
+    describe('rendering array', () => {
+      it('replaces signal with array', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(container);
+        const renderable = ['test', createElement('div')];
+
+        diff(tree, renderable, container);
+
+        expectTextNode(container.firstChild!, 'test');
+        expectElement(container.lastChild!, 'div');
+      });
+
+      it('cleans up context when replaced by array', () => {
+        const container = document.createElement('body');
+        const [signal, setSignal] = createChildSignalTrack('test');
+        const tree = makeTree(signal, container);
+        const renderable = ['after'];
+        const node = container.firstChild!;
+
+        setSignal('signal-after');
+
+        expectTextNode(node, 'signal-after');
+
+        diff(tree, renderable, container);
+        setSignal('ignored');
+
+        expectTextNode(container.firstChild!, 'after');
+        expect(node.textContent).toBe('signal-after');
       });
     });
   });
@@ -791,6 +1192,18 @@ describe('diffTree', () => {
         expect(container.firstChild).not.toBe(old);
       });
     });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree(createElement('before'), container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
+      });
+    });
   });
 
   describe('rendered function component', () => {
@@ -1008,6 +1421,19 @@ describe('diffTree', () => {
         diff(tree, renderable, container);
 
         expect(container.firstChild).not.toBe(old);
+      });
+    });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        const C = () => 'before';
+        const tree = makeOldFiberTree(createElement(C), container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
       });
     });
   });
@@ -1295,6 +1721,23 @@ describe('diffTree', () => {
         diff(tree, renderable, container);
 
         expect(container.firstChild).not.toBe(old);
+      });
+    });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        class C extends Component {
+          render() {
+            return 'before';
+          }
+        }
+        const tree = makeOldFiberTree(createElement(C), container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
       });
     });
   });
@@ -1887,6 +2330,18 @@ describe('diffTree', () => {
           expectShallowEqual(added, []);
           expectShallowEqual(removed, []);
         });
+      });
+    });
+
+    describe('rendering signal', () => {
+      it('renders signal text', () => {
+        const container = document.createElement('body');
+        const tree = makeOldFiberTree([createElement('before')], container);
+        const [signal] = createChildSignalTrack('test');
+
+        diff(tree, signal, container);
+
+        expectTextNode(container.firstChild!, 'test');
       });
     });
   });

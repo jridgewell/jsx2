@@ -1,4 +1,4 @@
-import type { EffectState } from '../../src/hooks';
+import { HookType, type LayoutEffectData } from '../../src/hooks';
 import type { FiberState } from '../../src/diff/render-component-with-hooks';
 
 import { fiber } from '../../src/fiber';
@@ -17,7 +17,7 @@ describe('getCurrentFiberState', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
 
     renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
@@ -39,7 +39,7 @@ describe('getCurrentFiberState', () => {
       const nested = fiber(createElement(C2));
       const props = {};
       const ref = null;
-      const layoutEffects: EffectState[] = [];
+      const layoutEffects: LayoutEffectData[] = [];
 
       renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
@@ -52,12 +52,14 @@ describe('getCurrentFiberState', () => {
 });
 
 describe('renderComponentWithHooks', () => {
-  function makeEffect(): EffectState {
+  function makeEffect(): LayoutEffectData {
     return {
+      type: HookType.LAYOUT_EFFECT,
       deps: [],
       cleanup: null,
       effect() {},
       active: true,
+      scheduled: false,
     };
   }
 
@@ -66,7 +68,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
 
     renderComponentWithHooks(component.data.type, props, ref, component, layoutEffects);
 
@@ -79,7 +81,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     C.mockImplementationOnce(() => {
       component.dirty = true;
     });
@@ -96,7 +98,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     C.mockImplementation(() => {
       component.dirty = true;
     });
@@ -111,7 +113,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     const currents: boolean[] = [];
     C.mockImplementationOnce(() => {
       currents.push(component.current);
@@ -132,7 +134,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     const dirties: boolean[] = [];
     C.mockImplementationOnce(() => {
       dirties.push(component.dirty);
@@ -153,7 +155,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     const indices: number[] = [];
     C.mockImplementationOnce(() => {
       const s = getCurrentFiberState();
@@ -178,7 +180,7 @@ describe('renderComponentWithHooks', () => {
     const firstEffect = makeEffect();
     const secondEffect = makeEffect();
     const thirdEffect = makeEffect();
-    const layoutEffects: EffectState[] = [firstEffect];
+    const layoutEffects: LayoutEffectData[] = [firstEffect];
     C.mockImplementationOnce(() => {
       layoutEffects.push(secondEffect);
       component.dirty = true;
@@ -198,7 +200,7 @@ describe('renderComponentWithHooks', () => {
     const component = fiber(createElement(C));
     const props = {};
     const ref = null;
-    const layoutEffects: EffectState[] = [];
+    const layoutEffects: LayoutEffectData[] = [];
     C.mockImplementationOnce(() => {
       component.dirty = true;
       return 0;

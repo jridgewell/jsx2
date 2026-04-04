@@ -10,6 +10,7 @@ export function coerceRenderable(renderable: Renderable | void): CoercedRenderab
   if (typeof renderable === 'boolean') return null;
   if (typeof renderable === 'number') return String(renderable);
   if (typeof renderable === 'string') return renderable;
+  if (typeof renderable === 'function') return renderable;
 
   if (isArray(renderable)) return renderable;
 

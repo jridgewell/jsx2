@@ -3,7 +3,13 @@ import type { Ref } from './create-ref';
 import type { Fiber } from './fiber';
 import type { ComputedSignalContext, EffectSignalContext, SignalSignalContext } from './signals';
 
-import { SignalContextType, cleanupContext, getCurrentContext, notifyDependents, setContext } from './signals';
+import {
+  SignalContextType,
+  cleanupContext,
+  getCurrentContext,
+  notifyDependents,
+  setContext,
+} from './signals';
 import { scheduleEffect, scheduleLayoutEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
 import { setRef } from './diff/ref';
@@ -191,9 +197,7 @@ export function useReducer<S, A, I>(
 ): ReducerState<S, A> {
   const hookState = getHookState();
   const data = hookState.data as null | ReducerState<S, A>;
-  if (data) {
-    return data;
-  }
+  if (data) return data;
 
   const { fiber } = getCurrentFiberState();
   const initialState = init ? init(initial as I) : (initial as S);
@@ -209,7 +213,7 @@ export function useReducer<S, A, I>(
 
 export function useEffect(effect: Effect, deps?: unknown[]): void {
   const hookState = getHookState();
-  let current = hookState.data as null | EffectEffectData;
+  const current = hookState.data as null | EffectEffectData;
   if (current !== null) {
     if (!shallowArrayEquals(current.deps, deps)) {
       current.deps = deps;

@@ -23,7 +23,7 @@ export function diffEvent(
 
   if (newValue) {
     if (!oldValue) {
-      if (!el._listeners) el._listeners = {};
+      if (!el._listeners) el._listeners = Object.create(null);
       el.addEventListener(name, listener, useCapture);
     }
     el._listeners[name] = newValue;

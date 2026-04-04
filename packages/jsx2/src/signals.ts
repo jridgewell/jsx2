@@ -1,14 +1,18 @@
-import type { FunctionComponentFiber } from './fiber';
-import type { EffectState } from './hooks';
+import type { FunctionComponentFiber, SignalFiber } from './fiber';
+import type { EffectEffectData } from './hooks';
 
+import { rediffSignalChild } from './diff/diff-tree';
 import { scheduleEffect } from './diff/effects';
 import { enqueueDiff } from './diff/enqueue-diff';
+import { rediffProp } from './diff/prop';
 
 export enum SignalContextType {
   SIGNAL = 0,
   COMPONENT = 1,
   COMPUTED = 2,
   EFFECT = 3,
+  CHILD = 4,
+  ATTRIBUTE = 5,
 }
 
 export interface BaseContext {
@@ -33,14 +37,29 @@ export interface ComputedSignalContext extends BaseContext {
 
 export interface EffectSignalContext extends BaseContext {
   type: SignalContextType.EFFECT;
-  state: EffectState;
+  state: EffectEffectData;
+}
+
+export interface ChildSignalContext extends BaseContext {
+  type: SignalContextType.CHILD;
+  fiber: SignalFiber;
+}
+
+export interface AttributeSignalContext extends BaseContext {
+  type: SignalContextType.ATTRIBUTE;
+  el: HTMLElement | SVGElement;
+  name: string;
+  getter: () => unknown;
+  oldValue: unknown;
 }
 
 export type SignalContext =
   | SignalSignalContext
   | ComponentSignalContext
   | ComputedSignalContext
-  | EffectSignalContext;
+  | EffectSignalContext
+  | ChildSignalContext
+  | AttributeSignalContext;
 
 let currentContext: null | SignalContext = null;
 
@@ -67,6 +86,8 @@ export function notifyDependents(dependents: Set<SignalContext>): void {
   dependents.clear();
 
   for (const dep of slice) {
+    cleanupContext(dep);
+
     if (dep.type === SignalContextType.COMPONENT) {
       enqueueDiff(dep.fiber);
     } else if (dep.type === SignalContextType.COMPUTED) {
@@ -75,7 +96,10 @@ export function notifyDependents(dependents: Set<SignalContext>): void {
       notifyDependents(dep.dependents);
     } else if (dep.type === SignalContextType.EFFECT) {
       scheduleEffect(dep.state);
+    } else if (dep.type === SignalContextType.CHILD) {
+      rediffSignalChild(dep.fiber);
+    } else if (dep.type === SignalContextType.ATTRIBUTE) {
+      rediffProp(dep);
     }
-    cleanupContext(dep);
   }
 }

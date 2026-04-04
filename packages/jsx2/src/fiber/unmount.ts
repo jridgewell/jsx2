@@ -1,7 +1,7 @@
 import type { Fiber, FunctionComponentFiber } from '.';
 import type { ContextHolder } from '../create-context';
 import type { HookState } from '../hooks';
-import type { ComponentSignalContext } from '../signals';
+import type { AttributeSignalContext } from '../signals';
 
 import { HookType } from '../hooks';
 import { cleanupContext } from '../signals';
@@ -17,12 +17,13 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
   let current: null | Fiber = fiber;
   do {
     debug: assert(current !== null, 'end is guaranteed to prevent null loop');
-    const { ref, stateData, signalContext, consumedContexts, child } = current;
+    const { ref, stateData, signalContext, consumedContexts, child, attributeSignals } = current;
     if (ref) setRef(null, ref);
+    if (signalContext) cleanupContext(signalContext);
+    if (attributeSignals) cleanupAttributes(attributeSignals);
     if (stateData) {
       cleanupEffects(stateData);
-      debug: assert(signalContext !== null, 'signalContext is guaranteed by stateData');
-      cleanupSignals(stateData, signalContext);
+      cleanupSignals(stateData);
     }
 
     if (consumedContexts) {
@@ -35,8 +36,14 @@ function unmountRange(fiber: Fiber, end: null | Fiber): void {
   } while (current !== end);
 }
 
-function cleanupSignals(stateData: HookState[], signalContext: ComponentSignalContext): void {
-  cleanupContext(signalContext);
+function cleanupAttributes(attributeSignals: Record<string, null | AttributeSignalContext>): void {
+  for (const name in attributeSignals) {
+    const context = attributeSignals[name];
+    if (context !== null) cleanupContext(context);
+  }
+}
+
+function cleanupSignals(stateData: HookState[]): void {
   for (let i = 0; i < stateData.length; i++) {
     const state = stateData[i];
     if (state.type === HookType.SIGNAL || state.type === HookType.EFFECT) {

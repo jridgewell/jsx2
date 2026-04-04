@@ -839,7 +839,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -856,7 +856,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -879,7 +879,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -902,7 +902,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect, []);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -919,7 +919,7 @@ describe('useEffect', () => {
         const C = jest.fn(() => {
           useEffect(effect, []);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -943,7 +943,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -960,7 +960,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -983,7 +983,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -1000,7 +1000,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -1023,7 +1023,7 @@ describe('useEffect', () => {
           const C = jest.fn(() => {
             useEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -1262,7 +1262,7 @@ describe('useLayoutEffect', () => {
         const C = jest.fn(() => {
           useLayoutEffect(effect);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -1286,7 +1286,7 @@ describe('useLayoutEffect', () => {
         const C = jest.fn(() => {
           useLayoutEffect(effect, []);
         });
-        const C2 = jest.fn(() => { });
+        const C2 = jest.fn(() => {});
 
         act(() => {
           render(createElement(C), body);
@@ -1311,7 +1311,7 @@ describe('useLayoutEffect', () => {
           const C = jest.fn(() => {
             useLayoutEffect(effect, ['deps']);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);
@@ -1335,7 +1335,7 @@ describe('useLayoutEffect', () => {
           const C = jest.fn(() => {
             useLayoutEffect(effect, [{}]);
           });
-          const C2 = jest.fn(() => { });
+          const C2 = jest.fn(() => {});
 
           act(() => {
             render(createElement(C), body);

@@ -15,7 +15,9 @@ export type Renderable =
   | undefined
   | VNode
   // | TemplateBlock
+  | RenderableSignal
   | RenderableArray;
+export type RenderableSignal = () => Renderable;
 export type RenderableArray = ReadonlyArray<Renderable>;
 
 export function render(_renderable: Renderable, container: Container): void {

@@ -1,8 +1,14 @@
 import type { RefWork } from './ref';
 import type { ClassComponentVNode, ElementVNode, FunctionComponentVNode } from '../create-element';
-import type { DiffableFiber, Fiber, FunctionComponentFiber } from '../fiber';
+import type {
+  DiffableFiber,
+  ElementFiber,
+  Fiber,
+  FunctionComponentFiber,
+  SignalFiber,
+} from '../fiber';
 import type { LayoutEffectData } from '../hooks';
-import type { RenderableArray } from '../render';
+import type { Renderable, RenderableArray } from '../render';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 
 import { createTree } from './create-tree';
@@ -12,6 +18,7 @@ import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { isValidElement } from '../create-element';
+import { setContext } from '../signals';
 import { clone } from '../fiber/clone';
 import { getContainer } from '../fiber/get-container';
 import { getNextSibling } from '../fiber/get-next-sibling';
@@ -44,7 +51,21 @@ export function rediffComponent(fiber: FunctionComponentFiber): void {
   const rendered = coerceRenderable(
     renderComponentWithHooks(type, props, ref, fiber, layoutEffects),
   );
-  diffTree(fiber, rendered, getContainer(fiber.parent!)!, layoutEffects);
+  const container = getContainer(fiber.parent!)!;
+  diffTree(fiber, rendered, container, layoutEffects);
+}
+
+export function rediffSignalChild(fiber: SignalFiber): void {
+  const { data, signalContext } = fiber;
+  const oldContext = setContext(signalContext);
+  let rendered: CoercedRenderable;
+  try {
+    rendered = coerceRenderable(data());
+  } finally {
+    setContext(oldContext);
+  }
+  const container = getContainer(fiber.parent!)!;
+  diffTree(fiber, rendered, container, []);
 }
 
 function diffChild(
@@ -65,6 +86,18 @@ function diffChild(
 
   if (typeof renderable === 'string') {
     return renderText(old, renderable, parentFiber, previousFiber, container, refs, layoutEffects);
+  }
+
+  if (typeof renderable === 'function') {
+    return renderSignalChild(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
   }
 
   if (isArray(renderable)) {
@@ -224,7 +257,7 @@ function renderElement(
   layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
-  if (data === null || typeof data === 'string' || isArray(data)) {
+  if (data === null || typeof data === 'string' || typeof data === 'function' || isArray(data)) {
     return replaceFiber(
       old,
       renderable,
@@ -253,7 +286,7 @@ function renderElement(
   const oldProps = data.props;
   const { props } = renderable;
   const dom = old.dom!;
-  diffProps(dom as HTMLElement, oldProps, props);
+  diffProps(dom as HTMLElement, oldProps, props, old as ElementFiber);
   diffChild(old.child!, coerceRenderable(props.children), old, null, dom, refs, layoutEffects);
   deferRef(refs, dom, data.ref, renderable.ref);
   return old;
@@ -269,7 +302,7 @@ function renderComponent(
   layoutEffects: LayoutEffectData[],
 ): Fiber {
   const { data } = old;
-  if (data === null || typeof data === 'string' || isArray(data)) {
+  if (data === null || typeof data === 'string' || typeof data === 'function' || isArray(data)) {
     return replaceFiber(
       old,
       renderable,
@@ -301,6 +334,41 @@ function renderComponent(
       ? renderComponentWithHooks(type, props, ref, old as FunctionComponentFiber, layoutEffects)
       : old.component!.render(props),
   );
+
+  diffChild(old.child!, rendered, old, null, container, refs, layoutEffects);
+  return old;
+}
+
+function renderSignalChild(
+  old: DiffableFiber,
+  renderable: () => Renderable,
+  parentFiber: Fiber,
+  previousFiber: null | Fiber,
+  container: Node,
+  refs: RefWork[],
+  layoutEffects: LayoutEffectData[],
+): Fiber {
+  const { data, signalContext } = old;
+  if (typeof data !== 'function') {
+    return replaceFiber(
+      old,
+      renderable,
+      parentFiber,
+      previousFiber,
+      container,
+      refs,
+      layoutEffects,
+    );
+  }
+  old.data = renderable;
+
+  const oldContext = setContext(signalContext);
+  let rendered: CoercedRenderable;
+  try {
+    rendered = coerceRenderable(renderable());
+  } finally {
+    setContext(oldContext);
+  }
 
   diffChild(old.child!, rendered, old, null, container, refs, layoutEffects);
   return old;

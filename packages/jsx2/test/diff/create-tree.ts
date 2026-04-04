@@ -137,6 +137,28 @@ describe('createRoot', () => {
     });
   });
 
+  describe('rendering signals', () => {
+    it('renders value', () => {
+      const body = document.createElement('body');
+      const signal = () => 'test';
+
+      create(signal, body);
+
+      expectTextNode(body.firstChild!, 'test');
+      expect(body.firstChild).toBe(body.lastChild);
+    });
+
+    it('renders elements', () => {
+      const body = document.createElement('body');
+      const signal = () => createElement('div');
+
+      create(signal, body);
+
+      expectElement(body.firstChild!, 'div');
+      expect(body.firstChild).toBe(body.lastChild);
+    });
+  });
+
   describe('rendering element', () => {
     it('renders element', () => {
       const body = document.createElement('body');

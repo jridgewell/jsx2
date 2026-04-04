@@ -1,4 +1,4 @@
-import { createElement, hydrate, render } from '../src/jsx2';
+import { act, createElement, hydrate, render, useSignal } from '../src/jsx2';
 
 describe('render', () => {
   function expectTextNode(node: Node, text: string) {
@@ -253,5 +253,54 @@ describe('hydrate', () => {
     hydrate(createElement('div', { id: 'foo' }, createElement('inner', { ref })), container);
 
     expect(ref).toHaveBeenCalled();
+  });
+
+  it('hydrates useSignal child signals and updates', () => {
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+    const text = child.appendChild(document.createTextNode('test'));
+
+    let set!: (v: string) => void;
+    const App = () => {
+      const [get, setter] = useSignal('test');
+      set = setter;
+      return createElement('div', null, get);
+    };
+
+    hydrate(createElement(App), container);
+
+    expect(container.firstChild).toBe(child);
+    expect(child.firstChild).toBe(text);
+    expectTextNode(text, 'test');
+
+    act(() => {
+      set('updated');
+    });
+
+    expectTextNode(text, 'updated');
+  });
+
+  it('hydrates attribute signals and updates', () => {
+    const container = document.createElement('body');
+    const child = container.appendChild(document.createElement('div'));
+    child.id = 'foo';
+
+    let set!: (v: string) => void;
+    const App = () => {
+      const [get, setter] = useSignal('foo');
+      set = setter;
+      return createElement('div', { id: get });
+    };
+
+    hydrate(createElement(App), container);
+
+    expect(container.firstChild).toBe(child);
+    expect(child.id).toBe('foo');
+
+    act(() => {
+      set('bar');
+    });
+
+    expect(child.id).toBe('bar');
   });
 });

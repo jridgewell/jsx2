@@ -1,15 +1,24 @@
 import type { RefWork } from './ref';
-import type { DiffableFiber, Fiber, FunctionComponentFiber, RootFiber } from '../fiber';
+import type {
+  DiffableFiber,
+  ElementFiber,
+  Fiber,
+  FunctionComponentFiber,
+  RootFiber,
+  SignalFiber,
+} from '../fiber';
 import type { LayoutEffectData } from '../hooks';
+import type { ChildSignalContext } from '../signals';
 import type { CoercedRenderable } from '../util/coerce-renderable';
 import type { NS } from '../util/namespace';
 
 import { applyEffects } from './effects';
-import { addListeners, addProps } from './prop';
+import { addProps, hydrateProps } from './prop';
 import { applyRefs, deferRef } from './ref';
 import { renderComponentWithHooks } from './render-component-with-hooks';
 import { isFunctionComponent } from '../component';
 import { fiber } from '../fiber';
+import { SignalContextType, setContext } from '../signals';
 import { insert } from '../fiber/insert';
 import { mark } from '../fiber/mark';
 import { setOnNode } from '../fiber/node';
@@ -104,6 +113,28 @@ function internal(
     return f;
   }
 
+  if (typeof renderable === 'function') {
+    const context: ChildSignalContext = {
+      type: SignalContextType.CHILD,
+      dependents: new Set(),
+      dependencies: new Set(),
+      fiber: f as SignalFiber,
+    };
+    f.signalContext = context;
+
+    const oldContext = setContext(context);
+    let initial: CoercedRenderable;
+    try {
+      initial = coerceRenderable(renderable());
+    } finally {
+      setContext(oldContext);
+    }
+
+    internal(initial, f, null, namespace, refs, layoutEffects, mode);
+
+    return f;
+  }
+
   if (isArray(renderable)) {
     let last: null | Fiber = null;
     for (let i = 0; i < renderable.length; i++) {
@@ -125,6 +156,7 @@ function internal(
   f.key = renderable.key;
   const { type, props, ref } = renderable;
   if (typeof type === 'string') {
+    assertType<ElementFiber>(f);
     if (type === 'svg') namespace = NS_SVG;
     const childNs = childSpace(namespace, type);
 
@@ -137,15 +169,17 @@ function internal(
         assertType<HTMLElement | SVGElement>(c);
         if (c.localName === type) {
           dom = c;
-          addListeners(dom, props);
           hydrateWalker.firstChild();
           hydrated = true;
         }
       }
     }
+    f.attributeSignals = Object.create(null);
     if (dom === null) {
       dom = document.createElementNS(nsToNode(namespace), type) as HTMLElement | SVGElement;
-      addProps(dom, props);
+      addProps(dom, props, f);
+    } else {
+      hydrateProps(dom, props, f);
     }
 
     setOnNode(dom, f);

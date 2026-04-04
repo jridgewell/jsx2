@@ -1,10 +1,10 @@
-import type { EffectEffectData, HookState, LayoutEffectData } from '../hooks';
+import type { BaseEffectData, EffectEffectData, HookState, LayoutEffectData } from '../hooks';
 
 import { getCurrentFiberState } from './render-component-with-hooks';
 import { HookType } from '../hooks';
 import { cleanupContext } from '../signals';
 
-let queuedEffects: EffectEffectData[] = [];
+let queuedEffects: BaseEffectData[] = [];
 let scheduling = true;
 
 export function scheduleEffect(effect: EffectEffectData, scheduler = getRaf()): void {
@@ -35,7 +35,7 @@ export function cleanupEffects(stateData: HookState[]): void {
   }
 }
 
-export function applyEffects(effects: EffectEffectData[]): void {
+export function applyEffects(effects: BaseEffectData[]): void {
   for (let i = 0; i < effects.length; i++) {
     const { active, cleanup } = effects[i];
     if (active && cleanup != null) cleanup();
