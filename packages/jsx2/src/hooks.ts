@@ -80,6 +80,8 @@ export interface BaseEffectData {
 
 export interface LayoutEffectData extends BaseEffectData {
   type: HookEnum.LAYOUT_EFFECT;
+  innerEffect: null;
+  ctx: null;
 }
 
 export interface EffectEffectData extends BaseEffectData {
@@ -238,10 +240,12 @@ export function useLayoutEffect(effect: Effect, deps?: unknown[]): void {
   data = {
     type: HookEnum.LAYOUT_EFFECT,
     deps,
+    innerEffect: null,
     effect,
     cleanup: null,
     active: true,
     scheduled: false,
+    ctx: null,
   };
   hookState.type = HookEnum.LAYOUT_EFFECT;
   hookState.data = data;

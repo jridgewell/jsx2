@@ -60,6 +60,8 @@ describe('renderComponentWithHooks', () => {
       effect() {},
       active: true,
       scheduled: false,
+      innerEffect: null,
+      ctx: null,
     };
   }
 
